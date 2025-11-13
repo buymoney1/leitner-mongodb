@@ -1,8 +1,45 @@
 // app/api/cards/route.ts
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
+export async function POST(request: NextRequest) {
+  try {
+    const session = await auth();
+
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { front, back } = await request.json();
+
+    if (!front || !back) {
+      return NextResponse.json({ error: "Front and back are required" }, { status: 400 });
+    }
+
+    // ایجاد یک کارت جدید با منطق لایتنر
+    const newCard = await prisma.card.create({
+      data: {
+        front,
+        back,
+        userId: session.user.id,
+        boxNumber: 1, // کارت جدید همیشه به جعبه ۱ می‌رود
+        nextReviewAt: new Date(), // برای مرور فردا
+      },
+    });
+
+    return NextResponse.json(newCard, { status: 201 });
+
+  } catch (error) {
+    console.error("Error adding new card:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
+}
+
+// GET را برای گرفتن کارت‌ها حفظ می‌کنیم (همان کد قبلی)
 export async function GET() {
   try {
     const session = await auth();
@@ -26,9 +63,10 @@ export async function GET() {
           },
         },
       },
-      orderBy: {
-        updatedAt: 'desc',
-      },
+      orderBy: [
+        { nextReviewAt: 'asc' }, // کارت‌های زودتر اول
+        { updatedAt: 'desc' }, // سپس کارت‌های جدیدتر
+      ],
     });
 
     return NextResponse.json(cards);

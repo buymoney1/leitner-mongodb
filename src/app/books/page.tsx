@@ -20,12 +20,6 @@ export default async function BooksPage() {
 
   return (
     <main className="container mx-auto p-6 md:p-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight">کتاب‌های من</h1>
-        <p className="text-muted-foreground">
-          در اینجا می‌توانید لیست کتاب‌های فلش‌کارت خود را مشاهده و مدیریت کنید.
-        </p>
-      </div>
 
       {/* --- فقط initialTemplateBooks پاس داده می‌شود --- */}
       <BooksClient initialTemplateBooks={templateBooks} />

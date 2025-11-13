@@ -195,9 +195,6 @@ export function DashboardClient() {
               <thead>
                 <tr className="border-b">
                   <th className="text-right p-4 font-medium">کلمه (روی کارت)</th>
-                  <th className="text-right p-4 font-medium">معنی (پشت کارت)</th>
-                  <th className="text-right p-4 font-medium">کتاب</th>
-                  <th className="text-right p-4 font-medium">جعبه فعلی</th>
                   <th className="text-right p-4 font-medium">تغییر جعبه</th>
                 </tr>
               </thead>
@@ -205,11 +202,6 @@ export function DashboardClient() {
                 {allCards.map((card) => (
                   <tr key={card.id} className="border-b">
                     <td className="p-4">{card.front}</td>
-                    <td className="p-4">{card.back}</td>
-                    <td className="p-4 text-sm text-muted-foreground">{card.book.title}</td>
-                    <td className="p-4">
-                      <span className="px-2 py-1 bg-secondary rounded text-sm">جعبه {card.boxNumber}</span>
-                    </td>
                     <td className="p-4">
                       <select
                         value={card.boxNumber}

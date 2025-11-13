@@ -5,6 +5,8 @@ import { SessionProvider } from "next-auth/react"; // ۱. SessionProvider را �
 import { auth } from "@/lib/auth"; // ۲. auth را برای گرفتن session وارد کنید
 import "./globals.css";
 import Navbar from "@/components/Navbar";
+import AddCardFab from "@/components/AddCardFab"; // <-- وارد کردن کامپوننت
+
 
 const vazir = Vazirmatn({
   subsets: ["arabic"],
@@ -33,6 +35,7 @@ export default async function RootLayout({
         <SessionProvider session={session}>
           <Navbar />
           {children}
+          {session?.user && <AddCardFab />}
         </SessionProvider>
       </body>
     </html>
