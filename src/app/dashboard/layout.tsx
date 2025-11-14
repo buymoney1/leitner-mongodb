@@ -26,6 +26,8 @@ export default async function DashboardLayout({
     redirect('/onboarding');
   }
 
+//test
+
   // 4. در غیر این صورت، صفحه داشبورد را نمایش بده
   return <>{children}</>;
 }
