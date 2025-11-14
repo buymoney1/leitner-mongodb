@@ -58,7 +58,7 @@ model User {
   learningGoal           String?
   targetScore            Float?
   suggestedReviewTime    ReviewTimePreference? 
-  isOnboardingComplete   Boolean   @default(false)
+  isOnboardingComplete   Boolean   @default(false) //test
   lastReviewNotificationAt DateTime? 
   books         Book[]
   cards         Card[]
