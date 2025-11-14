@@ -298,7 +298,7 @@ export default function ReviewPage() {
                 <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full blur-3xl"></div>
                 <div className="absolute bottom-0 left-0 w-40 h-40 bg-black/10 rounded-full blur-3xl"></div>
                 
-                <div className="relative z-10 flex flex-col items-center justify-center min-h-[360px] gap-6">
+                <div className="relative z-10 flex flex-col items-center justify-center min-h-[300px] gap-6">
                   <div className="flex items-center gap-3">
                     <p className="text-3xl font-bold text-center text-white leading-relaxed">
                       {currentCard.back}
