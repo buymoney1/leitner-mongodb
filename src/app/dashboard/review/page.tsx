@@ -216,7 +216,7 @@ export default function ReviewPage() {
         {/* Card Container */}
         <div className="relative mb-8" style={{ perspective: '1500px' }}>
           <div
-            className="relative w-full min-h-[420px] cursor-pointer group"
+            className="relative w-full min-h-[350px] cursor-pointer group"
             onClick={handleFlip}
           >
             {/* Front Side */}
@@ -228,13 +228,13 @@ export default function ReviewPage() {
               }`}
               style={{ transformStyle: 'preserve-3d', backfaceVisibility: 'hidden' }}
             >
-              <div className="w-full h-full bg-gradient-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-slate-700/50 p-8 relative overflow-hidden group-hover:border-violet-500/50 transition-all duration-300">
+              <div className="w-full bg-gradient-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-slate-700/50 p-8 relative overflow-hidden group-hover:border-violet-500/50 transition-all duration-300">
                 <div className="absolute inset-0 bg-gradient-to-br from-violet-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <div className="absolute top-4 right-4 flex items-center gap-2 text-xs text-slate-500 bg-slate-900/50 px-3 py-1.5 rounded-full border border-slate-700/50">
                   <RotateCcw className="h-3 w-3" />
                   <span>برای دیدن پاسخ کلیک کن</span>
                 </div>
-                <div className="relative z-10 flex flex-col items-center justify-center min-h-[360px] gap-6">
+                <div className="relative z-10 flex flex-col items-center justify-center min-h-[300px] gap-6">
                   <div className="flex items-center gap-3">
                     <p className="text-3xl font-bold text-center text-white leading-relaxed">
                       {currentCard.front}
@@ -293,7 +293,7 @@ export default function ReviewPage() {
               }`}
               style={{ transformStyle: 'preserve-3d', backfaceVisibility: 'hidden' }}
             >
-              <div className="w-full h-full bg-gradient-to-br from-violet-600 to-violet-800 rounded-3xl shadow-2xl p-8 relative overflow-hidden">
+              <div className="w-full bg-gradient-to-br from-violet-600 to-violet-800 rounded-3xl shadow-2xl p-8 relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent"></div>
                 <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full blur-3xl"></div>
                 <div className="absolute bottom-0 left-0 w-40 h-40 bg-black/10 rounded-full blur-3xl"></div>
