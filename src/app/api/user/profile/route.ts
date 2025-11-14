@@ -31,7 +31,7 @@ export async function GET() {
     }
   }
 
-export async function PATCH(request: Request) {
+  export async function PATCH(request: Request) {
     try {
       const session = await auth();
   
@@ -41,6 +41,7 @@ export async function PATCH(request: Request) {
   
       const { name, learningGoal, targetScore, suggestedReviewTime } = await request.json();
   
+      // Prisma برای MongoDB بعضی مواقع TypeScript را با فیلدهای Optional نمی‌شناسد
       const updatedUser = await prisma.user.update({
         where: { id: session.user.id },
         data: {
@@ -49,7 +50,7 @@ export async function PATCH(request: Request) {
           targetScore,
           suggestedReviewTime,
           isOnboardingComplete: true,
-        } as unknown as any,
+        } as unknown as any, // 👈 فریب TypeScript
       });
   
       return NextResponse.json(updatedUser);
@@ -59,3 +60,4 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
   }
+  
