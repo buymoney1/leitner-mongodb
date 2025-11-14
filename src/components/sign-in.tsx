@@ -3,53 +3,25 @@ import { signIn } from "@/lib/auth";
 
 export default function SignIn() {
   return (
-    // Main container: تمام صفحه را می‌پوشاند و محتوا را عمودی و افقی وسط‌چین می‌کند
-    <main className="relative flex flex-col items-center justify-center bg-background p-6">
-      {/* پس‌زمینه متحرک و زیبا */}
-      {/* کارت اصلی ورود: با افکت شیشه‌مورفیسم */}
-      <div className="relative z-10 w-full max-w-md overflow-hidden rounded-2xl border border-border/20 bg-background/80 shadow-2xl backdrop-blur-xl">
-        {/* یک نوار رنگی در بالای کارت برای جذابیت بصری */}
-        <div className="h-2 bg-gradient-to-r from-primary via-purple-500 to-pink-500"></div>
+    <main className="relative flex flex-col items-center justify-center">
+      <div className="relative z-10 w-full max-w-md overflow-hidden rounded-2xl border border-gray-700 bg-gray-800/90 shadow-2xl backdrop-blur-xl">
+        {/* نوار رنگی بالای کارت */}
+        <div className="h-2 bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500"></div>
 
         <div className="flex flex-col space-y-1.5 p-8 pt-12">
-          {/* بخش هدر: شامل لوگو، عنوان و توضیحات */}
-          <div className="text-center">
-            {/* می‌توانید یک لوگو یا آیکون زیبا اینجا قرار دهید */}
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 p-3">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth="1.5"
-                stroke="currentColor"
-                className="h-8 w-8 text-primary"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M15 6v12a3 3 0 1 0 3-3h6a3 3 0 0 1 3 3v6M10 6v6a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3h6a3 3 0 0 1 3 3z"
-                />
-              </svg>
-            </div>
-            <p className="mt-3 text-sm text-muted-foreground">
-              برای ادامه، با حساب گوگل خود وارد شوید.
-            </p>
-          </div>
-
-          {/* فرم ورود با گوگل */}
+  
           <form
             action={async () => {
               "use server";
               await signIn("google");
             }}
-            className="mt-8"
+          
           >
             <button
               type="submit"
-              className="group cursor-pointer relative inline-flex w-full items-center justify-center gap-3 overflow-hidden rounded-lg border border-border bg-background px-6 py-3 text-sm font-medium text-foreground shadow-sm transition-all duration-300 hover:bg-accent hover:text-accent-foreground hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className="group cursor-pointer relative inline-flex w-full items-center justify-center gap-3 overflow-hidden rounded-lg border border-gray-700 bg-gray-900 px-6 py-3 text-sm font-medium text-white shadow-sm transition-all duration-300 hover:bg-gray-800 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2"
             >
-              {/* افکت موجی روی دکمه در حالت hover */}
-              <span className="absolute inset-0 -z-10 bg-gradient-to-r from-primary/20 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"></span>
+              <span className="absolute inset-0 -z-10 bg-gradient-to-r from-cyan-500/20 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"></span>
               
               {/* آیکون گوگل */}
               <svg
@@ -78,7 +50,6 @@ export default function SignIn() {
               <span className="relative z-10">ورود با گوگل</span>
             </button>
           </form>
-
         </div>
       </div>
     </main>

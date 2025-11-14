@@ -39,6 +39,14 @@ model Session {
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+enum ReviewTimePreference {
+  MORNING
+  AFTERNOON
+  EVENING
+  NIGHT
+}
+
+
 model User {
   id            String          @id @default(auto()) @map("_id") @db.ObjectId
   name          String?
@@ -47,12 +55,15 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
-  
-  // --- روابط جدید با مدل‌های فلش‌کارت ---
+  learningGoal           String?
+  targetScore            Float?
+  suggestedReviewTime    ReviewTimePreference? 
+  isOnboardingComplete   Boolean   @default(false)
+  lastReviewNotificationAt DateTime? 
   books         Book[]
   cards         Card[]
   reviews       Review[]
-
+  role String @default("user") // user | admin
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

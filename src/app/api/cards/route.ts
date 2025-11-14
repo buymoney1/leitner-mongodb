@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
         back,
         userId: session.user.id,
         boxNumber: 1, // کارت جدید همیشه به جعبه ۱ می‌رود
-        nextReviewAt: new Date(), // برای مرور فردا
+        nextReviewAt: new Date(), // برای مرور در لحظه حال
       },
     });
 
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET را برای گرفتن کارت‌ها حفظ می‌کنیم (همان کد قبلی)
+// GET را برای گرفتن کارت‌ها اصلاح می‌کنیم
 export async function GET() {
   try {
     const session = await auth();
@@ -57,6 +57,7 @@ export async function GET() {
         front: true,
         back: true,
         boxNumber: true,
+        nextReviewAt: true, // <-- **این خط کلیدی را اضافه کردم**
         book: {
           select: {
             title: true,

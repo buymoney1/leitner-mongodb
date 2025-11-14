@@ -1,9 +1,7 @@
-// components/TemplateBookCard.tsx
 "use client";
 import { useState } from "react";
 import { Plus } from "lucide-react";
 
-// یک اینترفیس برای تایپ داده‌های کتاب الگو از فایل JSON
 interface TemplateBook {
   id: string;
   title: string;
@@ -12,7 +10,7 @@ interface TemplateBook {
 }
 
 interface TemplateBookCardProps {
-  book: TemplateBook; // از تایپ TemplateBook استفاده می‌کنیم
+  book: TemplateBook;
 }
 
 export function TemplateBookCard({ book }: TemplateBookCardProps) {
@@ -31,7 +29,7 @@ export function TemplateBookCard({ book }: TemplateBookCardProps) {
 
       if (response.ok) {
         alert("کتاب با موفقیت به مجموعه شما اضافه شد!");
-        window.location.reload(); // ساده‌ترین راه برای به‌روزرسانی لیست
+        window.location.reload();
       } else {
         alert(data.error || "خطا در افزودن کتاب");
       }
@@ -44,34 +42,33 @@ export function TemplateBookCard({ book }: TemplateBookCardProps) {
   };
 
   return (
-    <div className="flex flex-col rounded-lg border bg-card text-card-foreground shadow-sm">
-      <div className="flex flex-col space-y-1.5 p-6">
-        <h3 className="text-2xl font-semibold leading-none tracking-tight line-clamp-1">
+    <div className="group flex flex-col rounded-xl border border-gray-700 bg-gray-800 shadow-lg hover:shadow-cyan-500/50 transition-transform hover:-translate-y-1 duration-300">
+      <div className="p-6 flex-1 flex flex-col">
+        {/* Placeholder تصویر کتاب */}
+        <div className="flex items-center justify-center h-32 w-full mb-4 rounded-lg bg-gray-700 text-gray-500 text-4xl">
+          📚
+        </div>
+
+        <h3 className="text-xl font-semibold text-white mb-2 line-clamp-1 group-hover:text-cyan-400">
           {book.title}
         </h3>
-        <p className="text-sm text-muted-foreground line-clamp-2">
-          {book.description}
-        </p>
-      </div>
-      <div className="flex-1 p-6 pt-0">
-        <p className="text-sm text-muted-foreground">
+        <p className="text-gray-300 text-sm mb-4 line-clamp-3">{book.description}</p>
+
+        <span className="inline-block text-sm font-medium bg-cyan-900/30 text-cyan-400 px-3 py-1 rounded-full w-max">
           شامل {book.cards.length} کارت فلش
-        </p>
+        </span>
       </div>
+
       <div className="p-6 pt-0">
         <button
           onClick={handleAdd}
           disabled={isLoading}
-          className="inline-flex w-full cursor-pointer items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+          className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-cyan-500 py-2 text-sm font-medium text-white shadow hover:bg-cyan-600 transition-colors disabled:pointer-events-none disabled:opacity-50"
         >
-          {isLoading ? (
-            "در حال افزودن..."
-          ) : (
-            <>
-              <Plus className="ml-2 h-4 w-4" />
-              افزودن به مجموعه من
-            </>
-          )}
+          {isLoading ? "در حال افزودن..." : <>
+            <Plus className="h-4 w-4" />
+            افزودن به مجموعه من
+          </>}
         </button>
       </div>
     </div>
