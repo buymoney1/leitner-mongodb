@@ -1,0 +1,130 @@
+// components/video/AdminVideoUploadForm.tsx
+'use client';
+
+import { useState } from 'react';
+import { useSession } from 'next-auth/react';
+
+// لیست سطوح را از enum می‌گیریم تا در منو نمایش دهیم
+const videoLevels = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+
+export default function AdminVideoUploadForm() {
+  const { data: session } = useSession();
+  const [title, setTitle] = useState('');
+  const [videoUrl, setVideoUrl] = useState('');
+  const [level, setLevel] = useState('A1'); // مقدار پیش‌فرض را تنظیم کنید
+  const [subtitlesText, setSubtitlesText] = useState('');
+  const [message, setMessage] = useState('');
+  const [vocabularyText, setVocabularyText] = useState(''); 
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setMessage('');
+
+    const subtitles = subtitlesText.split('\n').map(line => {
+      const parts = line.split('|');
+      if (parts.length < 4) return null;
+      const [startTime, endTime, englishText, persianText] = parts;
+      return {
+        startTime: parseFloat(startTime),
+        endTime: parseFloat(endTime),
+        englishText: englishText.trim(),
+        persianText: persianText.trim(),
+      };
+    }).filter(sub => sub !== null);
+    
+
+    const vocabularies = vocabularyText.split('\n').map(line => {
+      const parts = line.split('|');
+      if (parts.length < 2) return null;
+      const [word, meaning] = parts;
+      return {
+        word: word.trim(),
+        meaning: meaning.trim(),
+      };
+    }).filter(vocab => vocab !== null);
+
+
+    const response = await fetch('/api/admin/upload-video', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title, videoUrl, level, subtitles, vocabularies }), // ارسال لغت‌ها
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      setMessage('Video uploaded successfully!');
+      setTitle('');
+      setVideoUrl('');
+      setLevel('A1'); 
+      setSubtitlesText('');
+      setVocabularyText('');
+    } else {
+      setMessage(`Error: ${data.error}`);
+    }
+  };
+
+  if (session?.user?.role !== 'admin') {
+    return <p>Access Denied. Admins only.
+        
+    </p>;
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="max-w-2xl mx-auto p-4 border rounded-lg shadow-md">
+      <h2 className="text-2xl font-bold mb-4">Upload New Video</h2>
+      <div className="mb-4">
+        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="title">Title</label>
+        <input id="title" type="text" value={title} onChange={(e) => setTitle(e.target.value)} className="w-full p-2 border rounded" required />
+      </div>
+      <div className="mb-4">
+        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="videoUrl">Video URL</label>
+        <input id="videoUrl" type="text" value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} className="w-full p-2 border rounded" required />
+      </div>
+      
+      {/* --- این بخش تغییر کرده است --- */}
+      <div className="mb-4">
+        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="level">
+          Level
+        </label>
+        <select
+          id="level"
+          value={level}
+          onChange={(e) => setLevel(e.target.value)}
+          className="w-full p-2 border rounded"
+          required
+        >
+          {videoLevels.map((lvl) => (
+            <option key={lvl} value={lvl}>
+              {lvl}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="mb-4">
+        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="vocabulary">
+          لغت‌ها و عبارت‌های مهم (هر خط یک مورد: لغت|معنی)
+        </label>
+        <textarea
+          id="vocabulary"
+          value={vocabularyText}
+          onChange={(e) => setVocabularyText(e.target.value)}
+          className="w-full p-2 border rounded h-32 font-mono text-sm"
+          placeholder="Hello|سلام&#10;World|جهان&#10;How are you?|حالت چطوره؟"
+        />
+      </div>
+
+      {/* --- پایان بخش تغییر کرده --- */}
+
+      <div className="mb-4">
+        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="subtitles">Subtitles (one per line: start|end|english|persian)</label>
+        <textarea id="subtitles" value={subtitlesText} onChange={(e) => setSubtitlesText(e.target.value)} className="w-full p-2 border rounded h-48 font-mono text-sm" required placeholder="0.0|3.5|Hello, how are you?|سلام، حال شما چطور است؟&#10;3.5|6.0|I am fine, thank you.|من خوبم، ممنون." />
+      </div>
+      <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+        Upload Video
+      </button>
+      {message && <p className={`mt-4 ${message.includes('Error') ? 'text-red-600' : 'text-green-600'}`}>{message}</p>}
+    </form>
+  );
+}

@@ -125,3 +125,45 @@ model Review {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+
+enum VideoLevel {
+  A1
+  A2
+  B1
+  B2
+  C1
+  C2
+}
+
+// 2. مدل Video را برای استفاده از enum تغییر دهید
+model Video {
+  id          String         @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  videoUrl    String
+  thumbnailUrl String?
+  level       VideoLevel     // <-- از enum استفاده می‌کنیم
+  subtitles   VideoSubtitle[]
+  vocabularies VideoVocabulary[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+
+model VideoSubtitle {
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  videoId     String @db.ObjectId
+  video       Video  @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  startTime   Float
+  endTime     Float
+  englishText String
+  persianText String
+}
+
+model VideoVocabulary {
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  videoId     String @db.ObjectId
+  video       Video  @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  word        String // لغت یا عبارت
+  meaning     String // معنی آن
+}

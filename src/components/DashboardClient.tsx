@@ -3,47 +3,53 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { BookOpen, Brain, Plus } from "lucide-react";
+import { BookOpen, Brain, Plus, Play } from "lucide-react"; // آیکون Play را اضافه کنید
 import { ManageCardsClient } from "./ManageCardsClient";
 import FlashcardProgressChartDark from "./FlashcardProgressChart";
 import { ReviewNotificationBanner } from "./ReviewNotificationBanner";
+import { Stats } from "fs";
+import { AdminPanel } from "./video/AdminPanel";
+import { VideoList } from "./video/VideoList";
 
-interface Stats {
-  totalCards: number;
-  dueCards: number;
-  boxCounts: Record<number, number>;
-  books: { id: string; title: string }[];
-}
+// ... (اینترفیس Stats بدون تغییر)
 
 interface DashboardClientProps {
   userName: string;
+  userRole: string; // نقش کاربر را به عنوان پراپس دریافت می‌کنیم
 }
 
-export function DashboardClient({ userName }: DashboardClientProps) {
+export function DashboardClient({ userName, userRole }: DashboardClientProps) {
   const [stats, setStats] = useState<Stats | null>(null);
+  const [videos, setVideos] = useState<{ recentVideos: any[], a1Videos: any[] } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'overview' | 'manage'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'manage' | 'videos'>('overview'); // تب ویدیوها را اضافه کنید
 
-
-  
   useEffect(() => {
-    fetchStats();
-  }, []);
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const [statsResponse, videosResponse] = await Promise.all([
+          fetch("/api/user/stats"),
+          fetch("/api/user/videos")
+        ]);
 
-  const fetchStats = async () => {
-    setIsLoading(true);
-    try {
-      const response = await fetch("/api/user/stats");
-      if (response.ok) {
-        const data = await response.json();
-        setStats(data);
+        if (statsResponse.ok) {
+          const data = await statsResponse.json();
+          setStats(data);
+        }
+        if (videosResponse.ok) {
+          const data = await videosResponse.json();
+          setVideos(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      console.error("Failed to fetch stats:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    };
+
+    fetchData();
+  }, []);
 
   if (isLoading) {
     return (
@@ -63,7 +69,7 @@ export function DashboardClient({ userName }: DashboardClientProps) {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-6">
-       <ReviewNotificationBanner />
+      <ReviewNotificationBanner />
       {/* تب‌ها */}
       <div className="flex space-x-1 border-b border-gray-700 mb-6">
         <button
@@ -75,6 +81,16 @@ export function DashboardClient({ userName }: DashboardClientProps) {
           }`}
         >
           نمای کلی
+        </button>
+        <button
+          onClick={() => setActiveTab('videos')}
+          className={`pb-4 px-3 text-sm font-medium transition-colors ${
+            activeTab === 'videos'
+              ? 'text-cyan-400 border-b-2 border-cyan-400'
+              : 'text-gray-400 hover:text-white'
+          }`}
+        >
+          ویدیوها
         </button>
         <button
           onClick={() => setActiveTab('manage')}
@@ -92,12 +108,9 @@ export function DashboardClient({ userName }: DashboardClientProps) {
       <div>
         {activeTab === 'overview' && (
           <>
-            {/* نمودار پیشرفت */}
-          
-
-            {/* دسترسی سریع */}
             <section className="mb-5">
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                {/* ... دکمه‌های دسترسی سریع ... */}
                 <Link href="/dashboard/review" aria-label="شروع مرور">
                   <div className="flex items-center justify-center gap-3 rounded-xl border border-gray-700 bg-gray-800 p-6 shadow-lg hover:shadow-cyan-500/50 transition-transform hover:scale-105">
                     <Brain className="h-6 w-6 text-gray-300" />
@@ -116,18 +129,45 @@ export function DashboardClient({ userName }: DashboardClientProps) {
                     افزودن کارت جدید
                   </div>
                 </Link>
+                <Link href="/video-levels" aria-label="سطوح ویدیو">
+                  <div className="flex items-center justify-center gap-3 rounded-xl border border-gray-700 bg-gray-800 p-6 shadow-lg hover:shadow-orange-500/50 transition-transform hover:scale-105">
+                    <Play className="h-6 w-6 text-orange-400" />
+                    ویدیوهای آموزشی
+                  </div>
+                </Link>
               </div>
             </section>
 
             <section className="mb-12">
               <FlashcardProgressChartDark />
             </section>
-            
+          </>
+        )}
+
+        {activeTab === 'videos' && (
+          <>
+            {videos && (
+              <>
+                <VideoList
+                  title="ویدیوهای اخیر"
+                  videos={videos.recentVideos}
+                  seeAllHref="/videos/recent"
+                />
+                <VideoList
+                  title="ویدیوهای سطح A1"
+                  videos={videos.a1Videos}
+                  seeAllHref="/videos-by-level/A1"
+                />
+              </>
+            )}
           </>
         )}
 
         {activeTab === 'manage' && <ManageCardsClient />}
       </div>
+
+      {/* نمایش پنل ادمین فقط در صورت نقش ادمین */}
+      {userRole === 'admin' && <AdminPanel />}
     </div>
   );
 }
