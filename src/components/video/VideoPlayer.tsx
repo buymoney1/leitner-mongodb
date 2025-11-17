@@ -4,7 +4,15 @@
 import { useEffect, useRef, useState } from "react";
 import VocabularyList from "./VocabularyList";
 
-export type Subtitle = {
+// نوع Vocabulary بدون تغییر باقی می‌ماند
+export type Vocabulary = {
+  id: string;
+  word: string;
+  meaning: string;
+};
+
+// نوع Subtitle برای لیست پردازش‌شده زیر ویدیو
+type ProcessedSubtitle = {
   id: string;
   startTime: number;
   endTime: number;
@@ -12,25 +20,104 @@ export type Subtitle = {
   persianText: string;
 };
 
-export type Vocabulary = {
-  id: string;
-  word: string;
-  meaning: string;
-};
-
+// نوع props کامپوننت تغییر می‌کند
 type VideoPlayerProps = {
   videoUrl: string;
-  subtitles: Subtitle[];
+  subtitlesVtt: string | null; // به جای آرایه، رشته VTT را دریافت می‌کند
   vocabularies: Vocabulary[];
 };
 
-export default function VideoPlayer({ videoUrl, subtitles, vocabularies }: VideoPlayerProps) {
+// تابع کمکی برای تبدیل زمان VTT به ثانیه
+const vttTimeToSeconds = (timeStr: string): number => {
+  const parts = timeStr.split(':');
+  const hours = parseInt(parts[0], 10);
+  const minutes = parseInt(parts[1], 10);
+  const seconds = parseFloat(parts[2]);
+  return hours * 3600 + minutes * 60 + seconds;
+};
+
+export default function VideoPlayer({ videoUrl, subtitlesVtt, vocabularies }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [currentTime, setCurrentTime] = useState(0);
   const [activeSubtitleIndex, setActiveSubtitleIndex] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState<"subtitles" | "vocabulary">("subtitles");
+  
+  // State برای نگهداری زیرنویس‌های پردازش‌شده برای لیست زیر ویدیو
+  const [processedSubtitles, setProcessedSubtitles] = useState<ProcessedSubtitle[]>([]);
+  
+  // State برای نگهداری URL موقت فایل VTT که به تگ <track> داده می‌شود
+  const [vttTrackUrl, setVttTrackUrl] = useState<string | null>(null);
 
-  // ویدیو: گرفتن زمان فعلی
+  // Effect 1: ساخت URL موقت برای تگ <track> هر زمان که متن VTT تغییر کرد
+  useEffect(() => {
+    if (subtitlesVtt) {
+      // یک Blob از محتوای VTT می‌سازیم
+      const blob = new Blob([subtitlesVtt], { type: 'text/vtt' });
+      // یک URL موقت برای این Blob می‌سازیم
+      const url = URL.createObjectURL(blob);
+      setVttTrackUrl(url);
+
+      // تابع Cleanup برای آزادسازی حافظه وقتی کامپوننت از بین می‌رود یا زیرنویس‌ها عوض می‌شوند
+      return () => {
+        URL.revokeObjectURL(url);
+      };
+    } else {
+      setVttTrackUrl(null);
+    }
+  }, [subtitlesVtt]);
+
+  // Effect 2: پردازش متن VTT برای نمایش در لیست سفارشی
+  useEffect(() => {
+    if (!subtitlesVtt) {
+      setProcessedSubtitles([]);
+      return;
+    }
+
+    const lines = subtitlesVtt.split('\n');
+    const parsedSubtitles: ProcessedSubtitle[] = [];
+    
+    // پیدا کردن شروع محتوای VTT (بعد از WEBVTT)
+    let startIndex = 0;
+    for (let i = 0; i < lines.length; i++) {
+      if (lines[i].trim() === 'WEBVTT') {
+        startIndex = i + 1;
+        break;
+      }
+    }
+    
+    // پردازش خطوط VTT
+    for (let i = startIndex; i < lines.length; i++) {
+      const line = lines[i].trim();
+      
+      if (!line) continue;
+      
+      if (line.includes('-->')) {
+        const timeParts = line.split('-->');
+        const startTime = vttTimeToSeconds(timeParts[0].trim());
+        const endTime = vttTimeToSeconds(timeParts[1].trim());
+        
+        i++;
+        const englishText = lines[i] ? lines[i].trim() : '';
+        
+        i++;
+        const persianText = lines[i] ? lines[i].trim() : '';
+        
+        if (englishText) {
+          parsedSubtitles.push({
+            id: `subtitle-${parsedSubtitles.length}`,
+            startTime,
+            endTime,
+            englishText,
+            persianText
+          });
+        }
+      }
+    }
+    
+    setProcessedSubtitles(parsedSubtitles);
+  }, [subtitlesVtt]); // این افکت فقط وقتی subtitlesVtt تغییر کند دوباره اجرا می‌شود
+
+  // Effect 3: همگام‌سازی زمان ویدیو با زیرنویس فعال
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -41,15 +128,15 @@ export default function VideoPlayer({ videoUrl, subtitles, vocabularies }: Video
     return () => video.removeEventListener("timeupdate", handleTimeUpdate);
   }, []);
 
-  // تشخیص زیرنویس فعال
+  // Effect 4: تشخیص زیرنویس فعال برای هایلایت در لیست
   useEffect(() => {
-    const index = subtitles.findIndex(
+    const index = processedSubtitles.findIndex(
       (s) => currentTime >= s.startTime && currentTime < s.endTime
     );
     setActiveSubtitleIndex(index);
-  }, [currentTime, subtitles]);
+  }, [currentTime, processedSubtitles]);
 
-  // اسکرول فقط لیست زیرنویس‌ها
+  // Effect 5: اسکرول خودکار به زیرنویس فعال
   useEffect(() => {
     if (activeSubtitleIndex !== null && activeSubtitleIndex >= 0) {
       const element = document.getElementById(`subtitle-${activeSubtitleIndex}`);
@@ -72,15 +159,25 @@ export default function VideoPlayer({ videoUrl, subtitles, vocabularies }: Video
         </button>
       </div>
 
-      {/* Video (همیشه ثابت در بالا) */}
+      {/* Video Container */}
       <div className="w-full flex items-center justify-center p-4 bg-black shadow-lg">
         <div className="relative rounded-xl overflow-hidden shadow-2xl bg-black aspect-video w-full max-w-4xl">
           <video
             ref={videoRef}
             controls
-            src="\test-video.mp4"
+            src="/test-video.mp4"
             className="w-full h-full"
           >
+            {/* استفاده از URL موقتی که ساختیم */}
+            {vttTrackUrl && (
+              <track
+                kind="subtitles"
+                src={vttTrackUrl}
+                srcLang="en" // زبان متن اصلی
+                label="English & Persian"
+                default
+              />
+            )}
             Your browser does not support HTML5 video.
           </video>
         </div>
@@ -117,8 +214,8 @@ export default function VideoPlayer({ videoUrl, subtitles, vocabularies }: Video
       <div className="flex-1 bg-gray-800 rounded-b-lg p-4 overflow-y-auto custom-scrollbar">
         {activeTab === "subtitles" && (
           <div className="space-y-3">
-            {subtitles.length ? (
-              subtitles.map((subtitle, index) => (
+            {processedSubtitles.length ? (
+              processedSubtitles.map((subtitle, index) => (
                 <div
                   key={subtitle.id}
                   id={`subtitle-${index}`}

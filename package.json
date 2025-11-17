@@ -21,6 +21,7 @@
     "mongodb": "^6.21.0",
     "next": "^15.3.5",
     "next-auth": "^5.0.0-beta.29",
+    "next-video": "^2.5.1",
     "pnpm": "^10.22.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
