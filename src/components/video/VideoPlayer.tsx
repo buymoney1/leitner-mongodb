@@ -147,26 +147,17 @@ export default function VideoPlayer({ videoUrl, subtitlesVtt, vocabularies }: Vi
   }, [activeSubtitleIndex]);
 
   return (
-    <div className="fixed inset-0 bg-gray-900 z-50 flex flex-col overflow-hidden">
-      {/* Header */}
-      <div className="flex justify-between items-center p-4 bg-gray-800 shadow-lg">
-        <h1 className="text-xl font-bold text-white">Video Player</h1>
-        <button
-          onClick={() => window.history.back()}
-          className="text-gray-300 hover:text-white text-2xl font-bold"
-        >
-          &times;
-        </button>
-      </div>
+    <div className="fixed inset-0 bg-black z-50 flex flex-col overflow-hidden">
 
-      {/* Video Container */}
-      <div className="w-full flex items-center justify-center p-4 bg-black shadow-lg">
-        <div className="relative rounded-xl overflow-hidden shadow-2xl bg-black aspect-video w-full max-w-4xl">
+      {/* Video Container با طراحی سینمایی */}
+      <div className="w-full flex items-center justify-center p-4 bg-black">
+        <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-gradient-to-br from-gray-900 to-black border border-gray-800 aspect-video w-full max-w-4xl">
+          <div className="absolute inset-0 bg-gradient-to-tr from-cyan-500/10 to-purple-500/10 z-10 pointer-events-none"></div>
           <video
             ref={videoRef}
             controls
             src="/test-video.mp4"
-            className="w-full h-full"
+            className="w-full h-full relative z-0"
           >
             {/* استفاده از URL موقتی که ساختیم */}
             {vttTrackUrl && (
@@ -183,35 +174,41 @@ export default function VideoPlayer({ videoUrl, subtitlesVtt, vocabularies }: Vi
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="px-4">
-        <div className="flex bg-gray-800 rounded-t-lg p-1">
+      {/* Tabs با طراحی مدرن */}
+      <div className="px-4 pt-2">
+        <div className="flex bg-gray-900 rounded-xl p-1 border border-gray-800 shadow-lg">
           <button
             onClick={() => setActiveTab("subtitles")}
-            className={`flex-1 py-2 px-4 rounded-md font-medium transition-colors ${
+            className={`flex-1 py-3 px-4 rounded-xl font-medium transition-all duration-300 relative overflow-hidden ${
               activeTab === "subtitles"
-                ? "bg-cyan-600 text-white"
-                : "text-gray-400 hover:text-white"
+                ? "bg-gradient-to-r from-cyan-600 to-purple-600 text-white shadow-lg"
+                : "text-gray-400 hover:text-white bg-transparent"
             }`}
           >
-            زیرنویس‌ها
+            {activeTab === "subtitles" && (
+              <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-purple-500/20"></div>
+            )}
+            <span className="relative z-10">زیرنویس‌ها</span>
           </button>
 
           <button
             onClick={() => setActiveTab("vocabulary")}
-            className={`flex-1 py-2 px-4 rounded-md font-medium transition-colors ${
+            className={`flex-1 py-3 px-4 rounded-xl font-medium transition-all duration-300 relative overflow-hidden ${
               activeTab === "vocabulary"
-                ? "bg-cyan-600 text-white"
-                : "text-gray-400 hover:text-white"
+                ? "bg-gradient-to-r from-cyan-600 to-purple-600 text-white shadow-lg"
+                : "text-gray-400 hover:text-white bg-transparent"
             }`}
           >
-            لغت‌ها
+            {activeTab === "vocabulary" && (
+              <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-purple-500/20"></div>
+            )}
+            <span className="relative z-10">لغت‌ها</span>
           </button>
         </div>
       </div>
 
-      {/* Scrollable Content */}
-      <div className="flex-1 bg-gray-800 rounded-b-lg p-4 overflow-y-auto custom-scrollbar">
+      {/* Scrollable Content با طراحی لوکس */}
+      <div className="flex-1 bg-gradient-to-b from-gray-900 to-black p-4 overflow-y-auto custom-scrollbar">
         {activeTab === "subtitles" && (
           <div className="space-y-3">
             {processedSubtitles.length ? (
@@ -219,10 +216,10 @@ export default function VideoPlayer({ videoUrl, subtitlesVtt, vocabularies }: Vi
                 <div
                   key={subtitle.id}
                   id={`subtitle-${index}`}
-                  className={`p-4 rounded-lg border transition-all duration-300 cursor-pointer ${
+                  className={`p-4 rounded-xl border transition-all duration-300 cursor-pointer relative overflow-hidden group ${
                     index === activeSubtitleIndex
-                      ? "bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border-cyan-400 shadow-lg scale-105"
-                      : "bg-gray-700/50 border-gray-600 hover:bg-gray-700 hover:border-gray-500"
+                      ? "bg-gradient-to-r from-cyan-600/30 to-purple-600/30 border-cyan-400/50 shadow-xl scale-[1.02]"
+                      : "bg-gray-800/30 border-gray-700 hover:bg-gray-800/50 hover:border-gray-600"
                   }`}
                   onClick={() => {
                     if (videoRef.current) {
@@ -230,24 +227,41 @@ export default function VideoPlayer({ videoUrl, subtitlesVtt, vocabularies }: Vi
                     }
                   }}
                 >
-                  <p
-                    className={`font-semibold mb-1 ${
-                      index === activeSubtitleIndex ? "text-cyan-300" : "text-gray-200"
-                    }`}
-                  >
-                    {subtitle.englishText}
-                  </p>
-                  <p
-                    className={`text-sm ${
-                      index === activeSubtitleIndex ? "text-gray-100" : "text-gray-400"
-                    }`}
-                  >
-                    {subtitle.persianText}
-                  </p>
+                  {/* افکت نور پس‌زمینه برای آیتم فعال */}
+                  {index === activeSubtitleIndex && (
+                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 z-0"></div>
+                  )}
+                  
+                  <div className="relative z-10">
+                    <p
+                      className={`font-medium mb-2 leading-relaxed ${
+                        index === activeSubtitleIndex 
+                          ? "text-cyan-200" 
+                          : "text-gray-200 group-hover:text-white"
+                      }`}
+                    >
+                      {subtitle.englishText}
+                    </p>
+                    <p
+                      className={`text-sm leading-relaxed ${
+                        index === activeSubtitleIndex 
+                          ? "text-gray-100" 
+                          : "text-gray-400 group-hover:text-gray-300"
+                      }`}
+                    >
+                      {subtitle.persianText}
+                    </p>
+                  </div>
+                  
+                  {/* افکت درخشان در هاور */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 to-purple-500/0 group-hover:from-cyan-500/5 group-hover:to-purple-500/5 transition-all duration-500 z-0"></div>
                 </div>
               ))
             ) : (
-              <p className="text-gray-400 text-center">زیرنویسی موجود نیست.</p>
+              <div className="text-center py-10">
+                <div className="text-gray-500 text-lg mb-2">زیرنویسی موجود نیست</div>
+                <div className="text-gray-600 text-sm">ویدیو فاقد زیرنویس است</div>
+              </div>
             )}
           </div>
         )}
@@ -255,21 +269,21 @@ export default function VideoPlayer({ videoUrl, subtitlesVtt, vocabularies }: Vi
         {activeTab === "vocabulary" && <VocabularyList vocabularies={vocabularies} />}
       </div>
 
-      {/* Scrollbar Style */}
+      {/* Custom Scrollbar Styles */}
       <style jsx>{`
         .custom-scrollbar::-webkit-scrollbar {
-          width: 8px;
+          width: 6px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
-          background: #374151;
-          border-radius: 4px;
+          background: rgba(15, 23, 42, 0.5);
+          border-radius: 10px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #06b6d4;
-          border-radius: 4px;
+          background: linear-gradient(to bottom, #06b6d4, #8b5cf6);
+          border-radius: 10px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #0891b2;
+          background: linear-gradient(to bottom, #0891b2, #7c3aed);
         }
       `}</style>
     </div>

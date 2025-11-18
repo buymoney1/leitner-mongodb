@@ -3,16 +3,21 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { UserCheck, Clock, Target, BookOpen } from 'lucide-react';
+import { UserCheck, Clock, Target, BookOpen, Sparkles } from 'lucide-react';
 
 const REVIEW_TIME_OPTIONS = [
-  { value: 'MORNING', label: 'صبح‌ها' },
-  { value: 'AFTERNOON', label: 'بعد از ظهرها' },
-  { value: 'EVENING', label: 'عصرها' },
-  { value: 'NIGHT', label: 'شب‌ها' },
+  { value: 'MORNING', label: 'صبح‌ها ☀️', time: '۸-۱۲' },
+  { value: 'AFTERNOON', label: 'بعد از ظهرها 🌤️', time: '۱۲-۱۶' },
+  { value: 'EVENING', label: 'عصرها 🌙', time: '۱۶-۲۰' },
+  { value: 'NIGHT', label: 'شب‌ها 🌙', time: '۲۰-۲۴' },
 ];
 
-const LEARNING_GOALS = ['IELTS', 'TOEFL', 'GENERAL_ENGLISH', 'BUSINESS_ENGLISH'];
+const LEARNING_GOALS = [
+  { value: 'IELTS', label: 'آیلتس 🎯', description: 'آمادگی برای آزمون آیلتس' },
+  { value: 'TOEFL', label: 'تافل 📝', description: 'آمادگی برای آزمون تافل' },
+  { value: 'GENERAL_ENGLISH', label: 'انگلیسی عمومی 💬', description: 'مکالمه روزمره' },
+  { value: 'BUSINESS_ENGLISH', label: 'انگلیسی تجاری 💼', description: 'زبان کسب و کار' },
+];
 
 export default function OnboardingPage() {
   const { data: session, status } = useSession();
@@ -40,69 +45,118 @@ export default function OnboardingPage() {
 
   const steps = [
     {
-      title: 'نام خود را وارد کنید',
-      icon: <UserCheck className="h-6 w-6 text-indigo-400" />,
+      title: 'خوش آمدید! نامتان چیست؟',
+      icon: <UserCheck className="h-6 w-6" />,
       content: (
-        <input
-          name="name"
-          type="text"
-          value={formData.name}
-          onChange={handleChange}
-          placeholder="نام کامل شما"
-          className="mt-4 w-full px-4 py-2 rounded-xl bg-gray-800 border border-gray-700 text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-        />
+        <div className="space-y-4">
+          <p className="text-gray-400 text-sm text-center">
+            نام شما در پروفایل و گزارش‌ها نمایش داده می‌شود
+          </p>
+          <input
+            name="name"
+            type="text"
+            value={formData.name}
+            onChange={handleChange}
+            placeholder="مثلاً: علی محمدی"
+            className="w-full px-4 py-3 rounded-xl bg-gray-800/50 border border-gray-700 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all duration-300 backdrop-blur-sm"
+            autoFocus
+          />
+        </div>
       ),
-      isValid: formData.name.trim() !== '',
+      isValid: formData.name.trim().length >= 2,
     },
     {
-      title: 'هدف یادگیری',
-      icon: <BookOpen className="h-6 w-6 text-indigo-400" />,
+      title: 'هدف یادگیری شما چیست؟',
+      icon: <BookOpen className="h-6 w-6" />,
       content: (
-        <select
-          name="learningGoal"
-          value={formData.learningGoal}
-          onChange={handleChange}
-          className="mt-4 w-full px-4 py-2 rounded-xl bg-gray-800 border border-gray-700 text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-        >
-          <option value="">انتخاب کنید</option>
-          {LEARNING_GOALS.map(goal => (
-            <option key={goal} value={goal}>{goal}</option>
-          ))}
-        </select>
+        <div className="space-y-3">
+          <p className="text-gray-400 text-sm text-center">
+            هدف خود را برای شخصی‌سازی تجربه یادگیری انتخاب کنید
+          </p>
+          <div className="grid gap-3">
+            {LEARNING_GOALS.map(goal => (
+              <button
+                key={goal.value}
+                onClick={() => setFormData(prev => ({ ...prev, learningGoal: goal.value }))}
+                className={`p-4 rounded-xl border-2 text-right transition-all duration-300 ${
+                  formData.learningGoal === goal.value
+                    ? 'border-blue-500 bg-blue-500/10 shadow-lg shadow-blue-500/20'
+                    : 'border-gray-700 bg-gray-800/30 hover:border-gray-600 hover:bg-gray-700/30'
+                }`}
+              >
+                <div className="font-semibold text-white">{goal.label}</div>
+                <div className="text-xs text-gray-400 mt-1">{goal.description}</div>
+              </button>
+            ))}
+          </div>
+        </div>
       ),
       isValid: formData.learningGoal !== '',
     },
     {
-      title: 'نمره هدف',
-      icon: <Target className="h-6 w-6 text-indigo-400" />,
+      title: 'نمره هدف شما چقدر است؟',
+      icon: <Target className="h-6 w-6" />,
       content: isIELTSOrTOEFL ? (
-        <input
-          name="targetScore"
-          type="number"
-          step="0.5"
-          value={formData.targetScore}
-          onChange={handleChange}
-          placeholder={formData.learningGoal === 'IELTS' ? 'مثلا: 7.0' : 'مثلا: 95'}
-          className="mt-4 w-full px-4 py-2 rounded-xl bg-gray-800 border border-gray-700 text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-        />
-      ) : <p className="mt-4 text-gray-400">نیازی به نمره هدف نیست</p>,
+        <div className="space-y-4">
+          <p className="text-gray-400 text-sm text-center">
+            {formData.learningGoal === 'IELTS' 
+              ? 'نمره هدف خود در آیلتس را وارد کنید (۰-۹)' 
+              : 'نمره هدف خود در تافل را وارد کنید (۰-۱۲۰)'}
+          </p>
+          <input
+            name="targetScore"
+            type="number"
+            step="0.5"
+            min="0"
+            max={formData.learningGoal === 'IELTS' ? "9" : "120"}
+            value={formData.targetScore}
+            onChange={handleChange}
+            placeholder={formData.learningGoal === 'IELTS' ? 'مثلاً: ۷.۵' : 'مثلاً: ۱۰۰'}
+            className="w-full px-4 py-3 rounded-xl bg-gray-800/50 border border-gray-700 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all duration-300 backdrop-blur-sm text-center text-lg"
+            autoFocus
+          />
+          <div className="flex justify-between text-xs text-gray-500">
+            <span>۰</span>
+            <span>{formData.learningGoal === 'IELTS' ? '۹' : '۱۲۰'}</span>
+          </div>
+        </div>
+      ) : (
+        <div className="text-center py-4">
+          <div className="text-green-400 text-4xl mb-2">🎯</div>
+          <p className="text-gray-400">برنامه یادگیری شما بر اساس هدف انتخاب شده تنظیم خواهد شد</p>
+        </div>
+      ),
       isValid: isIELTSOrTOEFL ? formData.targetScore.trim() !== '' : true,
     },
     {
-      title: 'زمان مرور',
-      icon: <Clock className="h-6 w-6 text-indigo-400" />,
+      title: 'ترجیح می‌دهید چه زمانی مرور کنید؟',
+      icon: <Clock className="h-6 w-6" />,
       content: (
-        <select
-          name="reviewTimePreference"
-          value={formData.reviewTimePreference}
-          onChange={handleChange}
-          className="mt-4 w-full px-4 py-2 rounded-xl bg-gray-800 border border-gray-700 text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-        >
-          <option value="">انتخاب کنید</option>
-          {REVIEW_TIME_OPTIONS.map(option => (
-            <option key={option.value} value={option.value}>{option.label}</option>
-          ))}
-        </select>
+        <div className="space-y-3">
+          <p className="text-gray-400 text-sm text-center">
+            زمان مناسب برای مرور و یادگیری را انتخاب کنید
+          </p>
+          <div className="grid gap-3">
+            {REVIEW_TIME_OPTIONS.map(option => (
+              <button
+                key={option.value}
+                onClick={() => setFormData(prev => ({ ...prev, reviewTimePreference: option.value }))}
+                className={`p-4 rounded-xl border-2 text-right transition-all duration-300 ${
+                  formData.reviewTimePreference === option.value
+                    ? 'border-purple-500 bg-purple-500/10 shadow-lg shadow-purple-500/20'
+                    : 'border-gray-700 bg-gray-800/30 hover:border-gray-600 hover:bg-gray-700/30'
+                }`}
+              >
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-gray-500 bg-gray-700/50 px-2 py-1 rounded-lg">
+                    {option.time}
+                  </span>
+                  <span className="font-semibold text-white">{option.label}</span>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
       ),
       isValid: formData.reviewTimePreference !== '',
     },
@@ -141,51 +195,106 @@ export default function OnboardingPage() {
   const progress = ((currentStep + 1) / steps.length) * 100;
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900 px-4 py-12">
-      <div className="max-w-md w-full bg-gray-800 rounded-3xl p-8 shadow-2xl border border-gray-700">
-        {/* Step Header */}
-        <div className="flex items-center gap-2 mb-6">
-          {steps[currentStep].icon}
-          <h2 className="text-lg font-semibold text-white">{steps[currentStep].title}</h2>
+    // تغییرات اصلی اینجا اعمال شده
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-black to-gray-900 px-4 py-8 overflow-hidden">
+      {/* Background Effects */}
+      <div className="fixed inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,black,transparent)]"></div>
+      <div className="fixed top-1/4 -left-10 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl"></div>
+      <div className="fixed bottom-1/4 -right-10 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl"></div>
+
+      <div className="relative w-full max-w-md max-h-[95vh] overflow-y-auto scrollbar-hide">
+        {/* Header */}
+        {/* <div className="text-center mb-6">
+          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white px-4 py-2 rounded-full text-sm font-semibold mb-3">
+            <Sparkles className="h-4 w-4" />
+            راهنمای شخصی‌سازی
+          </div>
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+            تنظیم پروفایل یادگیری
+          </h1>
+          <p className="text-gray-400 text-sm mt-2">
+            {currentStep + 1} از {steps.length} مرحله
+          </p>
+        </div> */}
+
+        {/* Main Card */}
+        <div className="bg-gradient-to-b from-gray-800/50 to-gray-900/30 rounded-3xl p-6 shadow-2xl border border-gray-700/50 backdrop-blur-xl">
+          {/* Step Header */}
+          <div className="flex items-center gap-3 mb-6 p-4 bg-gray-800/30 rounded-2xl border border-gray-700/50">
+            <div className="p-2 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-xl border border-blue-500/30">
+              {steps[currentStep].icon}
+            </div>
+            <h2 className="text-lg font-semibold text-white flex-1 text-right">
+              {steps[currentStep].title}
+            </h2>
+          </div>
+
+          {/* Step Content */}
+          <div className="mb-6">
+            {steps[currentStep].content}
+          </div>
+
+          {/* Progress Bar */}
+          <div className="mb-6">
+            <div className="w-full h-2 bg-gray-700/50 rounded-full overflow-hidden backdrop-blur-sm">
+              <div
+                className="h-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all duration-500 shadow-lg shadow-blue-500/25"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          </div>
+
+          {/* Navigation Buttons */}
+          <div className="flex justify-between gap-3">
+            <button
+              onClick={handlePrev}
+              disabled={currentStep === 0}
+              className="flex-1 px-4 py-3 rounded-xl bg-gray-700/50 text-gray-300 disabled:opacity-30 hover:bg-gray-600/50 transition-all duration-300 border border-gray-600 disabled:border-gray-700 backdrop-blur-sm font-medium"
+            >
+              قبلی
+            </button>
+            
+            {currentStep < steps.length - 1 ? (
+              <button
+                onClick={handleNext}
+                disabled={!steps[currentStep].isValid}
+                className="flex-1 px-4 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-lg shadow-blue-500/25 disabled:opacity-50 disabled:shadow-none font-medium backdrop-blur-sm"
+              >
+                بعدی
+              </button>
+            ) : (
+              <button
+                onClick={handleSubmit}
+                disabled={isLoading || !steps[currentStep].isValid}
+                className="flex-1 px-4 py-3 rounded-xl bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700 transition-all duration-300 shadow-lg shadow-green-500/25 disabled:opacity-50 disabled:shadow-none font-medium backdrop-blur-sm"
+              >
+                {isLoading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    در حال ذخیره...
+                  </span>
+                ) : (
+                  'شروع سفر یادگیری 🚀'
+                )}
+              </button>
+            )}
+          </div>
         </div>
 
-        {/* Step Content */}
-        {steps[currentStep].content}
-
-        {/* Progress Bar */}
-        <div className="mt-6 w-full h-2 bg-gray-700 rounded-full overflow-hidden">
-          <div
-            className="h-2 bg-indigo-500 rounded-full transition-all duration-500"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-
-        {/* Navigation Buttons */}
-        <div className="mt-6 flex justify-between">
-          <button
-            onClick={handlePrev}
-            disabled={currentStep === 0}
-            className="px-4 py-2 rounded-xl bg-gray-700 text-gray-300 disabled:opacity-50 hover:bg-gray-600 transition"
-          >
-            قبلی
-          </button>
-          {currentStep < steps.length - 1 ? (
-            <button
-              onClick={handleNext}
-              disabled={!steps[currentStep].isValid}
-              className="px-4 py-2 rounded-xl bg-indigo-500 text-white hover:bg-indigo-600 transition disabled:opacity-50"
-            >
-              بعدی
-            </button>
-          ) : (
-            <button
-              onClick={handleSubmit}
-              disabled={isLoading || !steps[currentStep].isValid}
-              className="px-4 py-2 rounded-xl bg-green-500 text-white hover:bg-green-600 transition disabled:opacity-50"
-            >
-              {isLoading ? 'در حال ذخیره...' : 'شروع یادگیری'}
-            </button>
-          )}
+        {/* Step Indicators */}
+        <div className="flex justify-center gap-2 mt-6 pb-4">
+          {steps.map((_, index) => (
+            <div
+              key={index}
+              className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                index === currentStep
+                  ? 'bg-blue-500 w-6'
+                  : index < currentStep
+                  ? 'bg-green-500'
+                  : 'bg-gray-600'
+              }`}
+            />
+          ))}
         </div>
       </div>
     </div>

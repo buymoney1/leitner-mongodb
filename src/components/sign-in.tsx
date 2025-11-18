@@ -3,29 +3,34 @@ import { signIn } from "@/lib/auth";
 
 export default function SignIn() {
   return (
-    <main className="relative flex flex-col items-center justify-center">
-      <div className="relative z-10 w-full max-w-md overflow-hidden rounded-2xl border border-gray-700 bg-gray-800/90 shadow-2xl backdrop-blur-xl">
-        {/* نوار رنگی بالای کارت */}
-        <div className="h-2 bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500"></div>
-
-        <div className="flex flex-col space-y-1.5 p-8 pt-12">
-  
-          <form
-            action={async () => {
-              "use server";
-              await signIn("google");
-            }}
+    <div className="relative w-full">
+      <form
+        action={async () => {
+          "use server";
+          await signIn("google");
+        }}
+      >
+        <button
+          type="submit"
+          className="group relative mb-5 w-full cursor-pointer overflow-hidden rounded-xl bg-gradient-to-br from-gray-900 to-black p-px transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/20"
+        >
+          {/* گرادیانت border */}
+          <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
           
-          >
-            <button
-              type="submit"
-              className="group cursor-pointer relative inline-flex w-full items-center justify-center gap-3 overflow-hidden rounded-lg border border-gray-700 bg-gray-900 px-6 py-3 text-sm font-medium text-white shadow-sm transition-all duration-300 hover:bg-gray-800 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2"
-            >
-              <span className="absolute inset-0 -z-10 bg-gradient-to-r from-cyan-500/20 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"></span>
-              
-              {/* آیکون گوگل */}
+          {/* Background glow effect */}
+          <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/20 via-purple-500/20 to-pink-500/20 blur-lg opacity-0 transition-opacity duration-500 group-hover:opacity-100 "></div>
+          
+          {/* Main button content */}
+          <div className="relative  flex w-full items-center justify-center gap-3 rounded-[11px] bg-gradient-to-br from-gray-900 to-gray-800 px-6 py-4 transition-all duration-300 group-hover:bg-gray-800/90 group-hover:from-gray-800 group-hover:to-gray-700">
+            
+            {/* Animated gradient overlay */}
+            <div className="absolute inset-0 -z-10 bg-gradient-to-r from-cyan-500/0 via-purple-500/5 to-pink-500/0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"></div>
+            
+            {/* Google icon with glow */}
+            <div className="relative">
+              <div className="absolute inset-0 rounded-full bg-cyan-500/20 blur-md group-hover:bg-cyan-500/30 transition-all duration-300"></div>
               <svg
-                className="relative z-10 h-5 w-5"
+                className="relative z-10 h-6 w-6 drop-shadow-lg"
                 viewBox="0 0 24 24"
                 xmlns="http://www.w3.org/2000/svg"
               >
@@ -46,12 +51,34 @@ export default function SignIn() {
                   fill="#EA4335"
                 />
               </svg>
+            </div>
 
-              <span className="relative z-10">ورود با گوگل</span>
-            </button>
-          </form>
-        </div>
-      </div>
-    </main>
+            {/* Text with gradient */}
+            <span className="relative z-10 bg-gradient-to-r from-gray-200 to-gray-400 bg-clip-text text-sm font-semibold text-transparent drop-shadow-lg group-hover:from-white group-hover:to-gray-200 transition-all duration-300">
+              ورود با گوگل
+            </span>
+
+            {/* Animated arrow */}
+            <div className="relative overflow-hidden">
+              <svg 
+                className="h-4 w-4 text-gray-400 transition-all duration-300 group-hover:translate-x-1 group-hover:text-cyan-400" 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+            </div>
+          </div>
+
+          {/* Ripple effect */}
+          <div className="absolute inset-0 -z-10 overflow-hidden rounded-[11px]">
+            <div className="absolute -inset-10 bg-gradient-to-r from-cyan-500/0 via-purple-500/10 to-pink-500/0 opacity-0 transition-opacity duration-500 group-hover:opacity-100 group-hover:animate-pulse"></div>
+          </div>
+        </button>
+      </form>
+
+
+    </div>
   );
 }
