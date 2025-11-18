@@ -532,8 +532,8 @@ export default function VideoPlayer({ videoUrl, subtitlesVtt, vocabularies }: Vi
       </div>
 
       {/* Footer - دکمه‌ها */}
-      <div className="flex-shrink-0 p-6 pt-4 border-t border-gray-700/50">
-        <div className="flex gap-3">
+      <div className="mb-7 flex-shrink-0 p-6 pt-4 border-t border-gray-700/50">
+        <div className="flex gap-3 ">
           <button 
             onClick={handleAddToFlashcards}
             disabled={isAddingCard || !customWord.trim() || !customMeaning.trim()}

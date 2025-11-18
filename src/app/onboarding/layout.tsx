@@ -14,5 +14,7 @@ export default async function OnboardingLayout({
     redirect('/login');
   }
 
+
+  
 return <>{children}</>;
 }
