@@ -445,7 +445,7 @@ export default function VideoPlayer({ videoUrl, subtitlesVtt, vocabularies }: Vi
           <video
             ref={videoRef}
             controls
-            src={videoUrl}
+            src="/test-video.mp4"
             className="w-full h-full relative z-0"
           >
             {vttTrackUrl && (
