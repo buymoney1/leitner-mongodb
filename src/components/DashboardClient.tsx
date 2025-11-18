@@ -322,8 +322,7 @@ export function DashboardClient({ userName, userRole }: DashboardClientProps) {
         )}
       </div>
 
-      {/* Mobile Navigation */}
-      <MobileNavBar />
+
     </div>
   );
 }

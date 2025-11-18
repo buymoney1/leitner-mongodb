@@ -226,7 +226,7 @@ export default function HomePage() {
           </p>
 
           {/* Free Offer Highlight */}
-          <div className="mb-10 p-6 rounded-2xl bg-gradient-to-r from-blue-900/20 to-purple-900/20 border border-blue-500/20 backdrop-blur-sm max-w-4xl mx-auto">
+          {/* <div className="mb-10 p-6 rounded-2xl bg-gradient-to-r from-blue-900/20 to-purple-900/20 border border-blue-500/20 backdrop-blur-sm max-w-4xl mx-auto">
             <div className="flex flex-col md:flex-row items-center justify-between mb-4">
               <div className="mb-4 md:mb-0">
                 <h2 className="text- md:text-2xl font-bold mb-2 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
@@ -249,7 +249,7 @@ export default function HomePage() {
                 style={{ width: `${(remainingSpots / 1000) * 100}%` }}
               ></div>
             </div>
-          </div>
+          </div> */}
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

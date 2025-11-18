@@ -1,8 +1,9 @@
 // app/videos/[id]/page.tsx
 
 import { PrismaClient } from '@prisma/client';
-import VideoPlayer, { Vocabulary } from '@/components/video/VideoPlayer'; // Subtitle دیگر نیازی به import نیست
-import { notFound } from 'next/navigation';
+import VideoPlayer, { Vocabulary } from '@/components/video/VideoPlayer';
+import { notFound, redirect } from 'next/navigation';
+import { auth } from '@/lib/auth';
 
 const prisma = new PrismaClient();
 
@@ -17,8 +18,8 @@ async function getVideoWithAllData(videoId: string) {
         videoUrl: true,
         thumbnailUrl: true,
         level: true,
-        subtitlesVtt: true, // <--- فیلد جدید VTT را انتخاب کن
-        vocabularies: true, // لغت‌های ویدیو را نیز دریافت کن
+        subtitlesVtt: true,
+        vocabularies: true,
       },
     });
     return video;
@@ -29,15 +30,18 @@ async function getVideoWithAllData(videoId: string) {
 }
 
 export default async function VideoPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+ 
+  const session = await auth();
+  if (!session?.user) redirect("/login");
 
+  const { id } = await params;
   const videoData = await getVideoWithAllData(id);
 
   if (!videoData) {
     notFound();
   }
 
-  // تبدیل داده‌های لغت‌ها به تایپ مورد نیاز (این بخش بدون تغییر باقی می‌ماند)
+  // تبدیل داده‌های لغت‌ها به تایپ مورد نیاز
   const vocabularies: Vocabulary[] = videoData.vocabularies.map(v => ({
     id: v.id,
     word: v.word,
@@ -48,7 +52,7 @@ export default async function VideoPage({ params }: { params: Promise<{ id: stri
   return (
     <VideoPlayer
       videoUrl={videoData.videoUrl}
-      subtitlesVtt={videoData.subtitlesVtt} // <--- prop صحیح را ارسال کن (رشته VTT)
+      subtitlesVtt={videoData.subtitlesVtt}
       vocabularies={vocabularies}
     />
   );
