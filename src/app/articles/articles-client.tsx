@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { FileText, Clock, Filter, Plus, Edit, Trash2, X, BookOpen } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface Article {
   id: string;
@@ -35,6 +36,7 @@ interface ArticleFormData {
 
 export default function ArticlesClient() {
   const { data: session, status } = useSession();
+  const router = useRouter();
   const userWithRole = session?.user as any;
   const isAdmin = userWithRole?.role === 'admin';
   
@@ -44,12 +46,6 @@ export default function ArticlesClient() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingArticle, setEditingArticle] = useState<Article | null>(null);
   const [saving, setSaving] = useState(false);
-
-    // برای دیباگ، وضعیت session را چاپ کنید
-    console.log('Session status:', status);
-    console.log('Session data:', session);
-    console.log('Is admin:', isAdmin);
-
 
   const levels = [
     { value: '', label: 'همه سطوح' },
@@ -142,6 +138,11 @@ export default function ArticlesClient() {
     }
   };
 
+  // تابع برای مدیریت کلیک روی کارت
+  const handleCardClick = (articleId: string) => {
+    router.push(`/articles/${articleId}`);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300 p-8">
@@ -162,7 +163,6 @@ export default function ArticlesClient() {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300 p-8">
       <div className="max-w-6xl mx-auto">
-
 
         {/* Admin Controls */}
         {isAdmin && (
@@ -196,76 +196,82 @@ export default function ArticlesClient() {
         {/* Articles Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {articles.map(article => (
-            <article 
+            <div 
               key={article.id}
-              className="bg-white dark:bg-gray-800/50 rounded-2xl p-6 border border-gray-300 dark:border-gray-700/50 hover:border-green-500/30 transition-all duration-300 hover:shadow-xl dark:hover:shadow-2xl dark:hover:shadow-green-500/10 group"
+              className="bg-white dark:bg-gray-800/50 rounded-2xl border border-gray-300 dark:border-gray-700/50 hover:border-green-500/30 transition-all duration-300 hover:shadow-xl dark:hover:shadow-2xl dark:hover:shadow-green-500/10 group cursor-pointer"
+              onClick={() => handleCardClick(article.id)}
             >
-              {/* Cover Image */}
-              {article.coverUrl && (
-                <div className="mb-4">
-                  <img 
-                    src={article.coverUrl} 
-                    alt={article.title}
-                    className="w-full h-48 object-cover rounded-xl group-hover:scale-105 transition-transform duration-300"
-                  />
-                </div>
-              )}
+              <div className="p-6">
+                {/* Cover Image */}
+                {article.coverUrl && (
+                  <div className="mb-4">
+                    <img 
+                      src={article.coverUrl} 
+                      alt={article.title}
+                      className="w-full h-48 object-cover rounded-xl group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+                )}
 
-              {/* Content */}
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="px-3 py-1 bg-green-500/20 text-green-600 dark:text-green-400 rounded-full text-sm border border-green-500/30">
-                    {article.level}
-                  </span>
-                  {article.readingTime && (
-                    <div className="flex items-center gap-1 text-gray-500 dark:text-gray-400 text-sm">
-                      <Clock className="h-4 w-4" />
-                      {article.readingTime} دقیقه
+                {/* Content */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="px-3 py-1 bg-green-500/20 text-green-600 dark:text-green-400 rounded-full text-sm border border-green-500/30">
+                      {article.level}
+                    </span>
+                    {article.readingTime && (
+                      <div className="flex items-center gap-1 text-gray-500 dark:text-gray-400 text-sm">
+                        <Clock className="h-4 w-4" />
+                        {article.readingTime} دقیقه
+                      </div>
+                    )}
+                  </div>
+
+                  <h3 className="font-semibold text-gray-900 dark:text-white text-lg leading-tight group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors">
+                    {article.title}
+                  </h3>
+
+                  {article.excerpt && (
+                    <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed line-clamp-3">
+                      {article.excerpt}
+                    </p>
+                  )}
+
+                  <div className="flex items-center justify-between pt-2">
+                    <span className="text-xs text-gray-500 dark:text-gray-500">
+                      {article.vocabularies.length} لغت جدید
+                    </span>
+                    <div className="flex items-center gap-1 text-green-500 dark:text-green-400 text-sm font-medium">
+                      مطالعه مقاله
+                      <BookOpen className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </div>
+
+                  {/* Admin Actions */}
+                  {isAdmin && (
+                    <div 
+                      className="flex items-center gap-2 mt-4 pt-4 border-t border-gray-300 dark:border-gray-700/50"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <button
+                        onClick={() => setEditingArticle(article)}
+                        className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-600 dark:text-blue-400 rounded-lg transition-colors border border-blue-500/30"
+                      >
+                        <Edit className="h-4 w-4" />
+                        ویرایش
+                      </button>
+                      <button
+                        onClick={() => handleDeleteArticle(article.id)}
+                        className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-600 dark:text-red-400 rounded-lg transition-colors border border-red-500/30"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        حذف
+                      </button>
                     </div>
                   )}
                 </div>
-
-                <h3 className="font-semibold text-gray-900 dark:text-white text-lg leading-tight group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors">
-                  {article.title}
-                </h3>
-
-                {article.excerpt && (
-                  <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed line-clamp-3">
-                    {article.excerpt}
-                  </p>
-                )}
-
-                <div className="flex items-center justify-between pt-2">
-                  <span className="text-xs text-gray-500 dark:text-gray-500">
-                    {article.vocabularies.length} لغت جدید
-                  </span>
-                  <button className="flex items-center gap-1 text-green-500 dark:text-green-400 hover:text-green-600 dark:hover:text-green-300 text-sm font-medium transition-colors group">
-                    مطالعه مقاله
-                    <BookOpen className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                  </button>
-                </div>
-
-                {/* Admin Actions */}
-                {!isAdmin && (
-                  <div className="flex items-center gap-2 mt-4 pt-4 border-t border-gray-300 dark:border-gray-700/50">
-                    <button
-                      onClick={() => setEditingArticle(article)}
-                      className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-600 dark:text-blue-400 rounded-lg transition-colors border border-blue-500/30"
-                    >
-                      <Edit className="h-4 w-4" />
-                      ویرایش
-                    </button>
-                    <button
-                      onClick={() => handleDeleteArticle(article.id)}
-                      className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-600 dark:text-red-400 rounded-lg transition-colors border border-red-500/30"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                      حذف
-                    </button>
-                  </div>
-                )}
               </div>
-            </article>
+            </div>
           ))}
         </div>
 

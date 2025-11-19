@@ -194,7 +194,7 @@ export default function PodcastsClient() {
         </div>
 
         {/* Podcasts Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="mb-15 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {podcasts.map(podcast => (
             <div 
               key={podcast.id}
@@ -218,7 +218,7 @@ export default function PodcastsClient() {
               )}
 
               {/* Content */}
-              <div className="space-y-3">
+              <div className="space-y-3 ">
                 <div className="flex items-center justify-between">
                   <span className="px-3 py-1 bg-purple-500/20 text-purple-600 dark:text-purple-400 rounded-full text-sm border border-purple-500/30">
                     {podcast.level}
@@ -380,7 +380,7 @@ function PodcastModal({ podcast, onClose, onSave, loading = false }: PodcastModa
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center p-4 z-50 transition-colors duration-300">
+    <div className="mb-15 fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center p-4 z-50 transition-colors duration-300">
       <div className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto transition-colors duration-300">
         <div className="flex items-center justify-between p-6 border-b border-gray-300 dark:border-gray-700">
           <h2 className="text-xl font-bold text-gray-900 dark:text-white">

@@ -465,15 +465,10 @@ export default function VideoPlayer({ videoUrl, subtitlesVtt, vocabularies }: Vi
       {selectedWord && (
         <div className="fixed inset-0 z-50 flex items-start justify-center p-4 bg-black/50 dark:bg-black/50 backdrop-blur-sm">
           <div className="bg-white dark:bg-gray-900 border border-gray-300 dark:border-cyan-400/30 rounded-2xl backdrop-blur-xl shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col">
-            {/* Header */}
-            <div className="flex-shrink-0 pt-4 pb-1">
-              <div className="text-center">
-                <p className="text-gray-900 dark:text-white font-bold text-lg mb-3">افزودن به فلش‌کارت</p>
-              </div>
-            </div>
+
 
             {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto px-6 pb-6 custom-popup-scrollbar">
+            <div className="flex-1 mt-3 pt-3 overflow-y-auto px-6 pb-6 custom-popup-scrollbar">
               <div className="space-y-4">
                 <div className="space-y-2">
                   <label className="text-gray-900 dark:text-white text-sm font-medium">کلمه انگلیسی:</label>
