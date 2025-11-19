@@ -328,9 +328,9 @@ export default function ProfilePage() {
   const EditButton = ({ onClick }: { onClick: () => void }) => (
     <button
       onClick={onClick}
-      className="flex items-center gap-2 px-4 py-2 text-sm bg-cyan-600 hover:bg-cyan-700 text-white rounded-xl transition-colors"
+      className="flex items-center gap-2 px-3 py-2 text-xs bg-cyan-600 hover:bg-cyan-700 text-white rounded-xl transition-colors"
     >
-      <Edit3 className="h-4 w-4" />
+      <Edit3 className="h-3 w-3" />
       ویرایش
     </button>
   )
@@ -462,7 +462,7 @@ export default function ProfilePage() {
                         />
                       ) : (
                         <div className="w-16 h-16 rounded-full bg-gradient-to-br from-cyan-500/20 to-purple-500/20 flex items-center justify-center border-2 border-cyan-500/30">
-                          <span className="text-xl font-light text-white">
+                          <span className="text-lg font-light text-white">
                             {(profile.name || profile.email).charAt(0).toUpperCase()}
                           </span>
                         </div>
@@ -540,14 +540,13 @@ export default function ProfilePage() {
                           value={editForm.targetScore}
                           onChange={(e) => handleInputChange('targetScore', e.target.value)}
                           min="0"
-                          max="100"
                           step="0.1"
                           className="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-gray-900 dark:text-white focus:outline-none focus:border-cyan-500 mt-1"
-                          placeholder="نمره هدف (0-100)"
+                          placeholder="نمره هدف"
                         />
                       ) : (
                         <p className="text-gray-900 dark:text-white mt-1">
-                          {profile.targetScore ? `${profile.targetScore}%` : 'تعیین نشده'}
+                          {profile.targetScore ? `${profile.targetScore}` : 'تعیین نشده'}
                         </p>
                       )}
                     </div>

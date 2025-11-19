@@ -116,10 +116,7 @@ export default function OnboardingPage() {
             className="w-full px-4 py-3 rounded-xl bg-white dark:bg-gray-800/50 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all duration-300 backdrop-blur-sm text-center text-lg"
             autoFocus
           />
-          <div className="flex justify-between text-xs text-gray-500 dark:text-gray-500">
-            <span>۰</span>
-            <span>{formData.learningGoal === 'IELTS' ? '۹' : '۱۲۰'}</span>
-          </div>
+  
         </div>
       ) : (
         <div className="text-center py-4">

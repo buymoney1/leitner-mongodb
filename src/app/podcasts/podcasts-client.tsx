@@ -198,7 +198,7 @@ export default function PodcastsClient() {
           {podcasts.map(podcast => (
             <div 
               key={podcast.id}
-              className="bg-white dark:bg-gray-800/50 rounded-2xl p-6 border border-gray-300 dark:border-gray-700/50 hover:border-purple-500/30 transition-all duration-300 hover:shadow-xl dark:hover:shadow-2xl dark:hover:shadow-purple-500/10"
+              className="bg-white dark:bg-gray-800/50 rounded-2xl p-3 border border-gray-300 dark:border-gray-700/50 hover:border-purple-500/30 transition-all duration-300 hover:shadow-xl dark:hover:shadow-2xl dark:hover:shadow-purple-500/10"
             >
               {/* Cover Image */}
               {podcast.coverUrl && (

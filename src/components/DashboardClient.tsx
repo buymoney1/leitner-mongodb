@@ -162,10 +162,6 @@ export function DashboardClient({ userName, userRole }: DashboardClientProps) {
               </h1>
               <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">امروز چه برنامه‌ای دارید؟</p>
             </div> */}
-            <div className="hidden md:flex items-center gap-2 bg-gray-100 dark:bg-gray-800/50 px-3 py-2 rounded-full border border-gray-300 dark:border-gray-700">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-sm text-gray-700 dark:text-gray-300">آنلاین</span>
-            </div>
           </div>
         </div>
 

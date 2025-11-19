@@ -194,14 +194,14 @@ export default function ArticlesClient() {
         </div>
 
         {/* Articles Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className=" grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {articles.map(article => (
             <div 
               key={article.id}
-              className="bg-white dark:bg-gray-800/50 rounded-2xl border border-gray-300 dark:border-gray-700/50 hover:border-green-500/30 transition-all duration-300 hover:shadow-xl dark:hover:shadow-2xl dark:hover:shadow-green-500/10 group cursor-pointer"
+              className="bg-white mb-12 dark:bg-gray-800/50 rounded-2xl border border-gray-300 dark:border-gray-700/50 hover:border-green-500/30 transition-all duration-300 hover:shadow-xl dark:hover:shadow-2xl dark:hover:shadow-green-500/10 group cursor-pointer"
               onClick={() => handleCardClick(article.id)}
             >
-              <div className="p-6">
+              <div className="p-4">
                 {/* Cover Image */}
                 {article.coverUrl && (
                   <div className="mb-4">
