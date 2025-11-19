@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { BookOpen, Brain, Plus, Play, Home, Video, Settings } from "lucide-react";
+import { BookOpen, Brain, Plus, Play, Home, Video, Settings, Mic } from "lucide-react";
 import { ManageCardsClient } from "./ManageCardsClient";
 import { AdminPanel } from "./video/AdminPanel";
 import { VideoList } from "./video/VideoList";
@@ -63,10 +63,10 @@ export function DashboardClient({ userName, userRole }: DashboardClientProps) {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-900 via-black to-gray-900">
+      <div className="flex min-h-screen items-center justify-center bg-white dark:bg-gray-900">
         <div className="text-center">
           <div className="h-16 w-16 animate-spin rounded-full border-4 border-solid border-cyan-500 border-t-transparent mx-auto mb-4"></div>
-          <p className="text-gray-400">در حال بارگذاری...</p>
+          <p className="text-gray-600 dark:text-gray-400">در حال بارگذاری...</p>
         </div>
       </div>
     );
@@ -74,12 +74,12 @@ export function DashboardClient({ userName, userRole }: DashboardClientProps) {
 
   if (!stats) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white flex items-center justify-center">
+      <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white flex items-center justify-center">
         <div className="text-center">
-          <p className="text-gray-400 mb-4">خطا در بارگذاری اطلاعات</p>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">خطا در بارگذاری اطلاعات</p>
           <button 
             onClick={() => window.location.reload()}
-            className="px-6 py-2 bg-cyan-600 rounded-lg hover:bg-cyan-700 transition-colors"
+            className="px-6 py-2 bg-cyan-600 rounded-lg hover:bg-cyan-700 transition-colors text-white"
           >
             تلاش مجدد
           </button>
@@ -90,14 +90,14 @@ export function DashboardClient({ userName, userRole }: DashboardClientProps) {
 
   const QuickActionButton = ({ href, icon: Icon, label, color, description }: any) => (
     <Link href={href} className="block group">
-      <div className={`relative overflow-hidden rounded-2xl border ${color.border} bg-gradient-to-br ${color.bg} p-6 backdrop-blur-sm transition-all duration-300 group-hover:scale-105 group-hover:shadow-2xl h-full`}>
+      <div className={`relative overflow-hidden rounded-2xl border border-gray-300 dark:border-gray-800 bg-white dark:bg-gray-800/30 bg-gradient-to-br ${color.bg} p-6 backdrop-blur-sm transition-all duration-300 group-hover:scale-105 group-hover:shadow-lg dark:group-hover:shadow-2xl h-full`}>
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <div className={`p-3 rounded-xl ${color.iconBg} w-12 h-12 flex items-center justify-center mb-3`}>
               <Icon className={`h-6 w-6 ${color.icon}`} />
             </div>
-            <h3 className="font-semibold text-white mb-2 text-lg">{label}</h3>
-            <p className="text-gray-400 text-sm leading-relaxed">{description}</p>
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-2 text-lg">{label}</h3>
+            <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">{description}</p>
           </div>
           <div className={`w-2 h-2 rounded-full ${color.dot} mt-2`}></div>
         </div>
@@ -107,14 +107,14 @@ export function DashboardClient({ userName, userRole }: DashboardClientProps) {
   );
 
   const MobileNavBar = () => (
-    <div className="fixed bottom-0 left-0 right-0 bg-gray-900/95 backdrop-blur-xl border-t border-gray-800 z-50 md:hidden">
+    <div className="fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-t border-gray-300 dark:border-gray-800 z-50 md:hidden">
       <div className="flex justify-around items-center p-3">
         <button
           onClick={() => setActiveTab('overview')}
           className={`flex flex-col items-center p-3 rounded-xl transition-all duration-300 ${
             activeTab === 'overview' 
-              ? 'bg-cyan-500/20 text-cyan-400' 
-              : 'text-gray-400 hover:text-white'
+              ? 'bg-cyan-500/20 text-cyan-600 dark:text-cyan-400' 
+              : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
           }`}
         >
           <Home className="h-5 w-5 mb-1" />
@@ -124,8 +124,8 @@ export function DashboardClient({ userName, userRole }: DashboardClientProps) {
           onClick={() => setActiveTab('videos')}
           className={`flex flex-col items-center p-3 rounded-xl transition-all duration-300 ${
             activeTab === 'videos' 
-              ? 'bg-purple-500/20 text-purple-400' 
-              : 'text-gray-400 hover:text-white'
+              ? 'bg-purple-500/20 text-purple-600 dark:text-purple-400' 
+              : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
           }`}
         >
           <Video className="h-5 w-5 mb-1" />
@@ -135,8 +135,8 @@ export function DashboardClient({ userName, userRole }: DashboardClientProps) {
           onClick={() => setActiveTab('manage')}
           className={`flex flex-col items-center p-3 rounded-xl transition-all duration-300 ${
             activeTab === 'manage' 
-              ? 'bg-green-500/20 text-green-400' 
-              : 'text-gray-400 hover:text-white'
+              ? 'bg-green-500/20 text-green-600 dark:text-green-400' 
+              : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
           }`}
         >
           <Settings className="h-5 w-5 mb-1" />
@@ -147,30 +147,30 @@ export function DashboardClient({ userName, userRole }: DashboardClientProps) {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white pb-20 md:pb-0">
+    <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white pb-20 md:pb-0 transition-colors duration-300">
       {/* Background Effects */}
-      <div className="fixed inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,black,transparent)]"></div>
+      <div className="fixed inset-0 bg-[linear-gradient(rgba(0,0,0,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.02)_1px,transparent_1px)] dark:bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,black,transparent)]"></div>
       
       <div className="relative z-10">
 
         {/* Header */}
-        <div className="p-6 pb-4">
-          <div className="flex items-center justify-between mb-2">
-            <div>
-              <h1 className="text-sm md:text-xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+        <div className="p-5 pb-1">
+          <div className="flex items-center justify-between">
+            {/* <div>
+              <h1 className="text-sm md:text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
                 خوش آمدید، {userName}!
               </h1>
-              <p className="text-gray-400 text-sm mt-1">امروز چه برنامه‌ای دارید؟</p>
-            </div>
-            <div className="hidden md:flex items-center gap-2 bg-gray-800/50 px-3 py-2 rounded-full border border-gray-700">
+              <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">امروز چه برنامه‌ای دارید؟</p>
+            </div> */}
+            <div className="hidden md:flex items-center gap-2 bg-gray-100 dark:bg-gray-800/50 px-3 py-2 rounded-full border border-gray-300 dark:border-gray-700">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-sm text-gray-300">آنلاین</span>
+              <span className="text-sm text-gray-700 dark:text-gray-300">آنلاین</span>
             </div>
           </div>
         </div>
 
         {/* Desktop Tabs */}
-        <div className="hidden md:flex space-x-1 border-b border-gray-800 mx-6 mb-6">
+        <div className="hidden md:flex space-x-1 border-b border-gray-300 dark:border-gray-800 mx-6 mb-6">
           {[
             { id: 'overview', label: 'نمای کلی', icon: Home },
             { id: 'videos', label: 'ویدیوها', icon: Video },
@@ -181,8 +181,8 @@ export function DashboardClient({ userName, userRole }: DashboardClientProps) {
               onClick={() => setActiveTab(tab.id as any)}
               className={`flex items-center gap-2 pb-4 px-4 text-sm font-medium transition-all duration-300 ${
                 activeTab === tab.id
-                  ? 'text-cyan-400 border-b-2 border-cyan-400'
-                  : 'text-gray-400 hover:text-white hover:bg-gray-800/50 rounded-t-lg'
+                  ? 'text-cyan-600 dark:text-cyan-400 border-b-2 border-cyan-600 dark:border-cyan-400'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800/50 rounded-t-lg'
               }`}
             >
               <tab.icon className="h-4 w-4" />
@@ -197,7 +197,7 @@ export function DashboardClient({ userName, userRole }: DashboardClientProps) {
             <div className="space-y-6">
               {/* Quick Actions Grid */}
               <section>
-                <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                   <div className="w-1 h-6 bg-cyan-500 rounded-full"></div>
                   دسترسی سریع
                 </h2>
@@ -211,7 +211,7 @@ export function DashboardClient({ userName, userRole }: DashboardClientProps) {
                       border: "border-cyan-500/20",
                       bg: "from-cyan-500/10 to-cyan-600/5",
                       iconBg: "bg-cyan-500/20",
-                      icon: "text-cyan-400",
+                      icon: "text-cyan-600 dark:text-cyan-400",
                       dot: "bg-cyan-500",
                       glow: "bg-cyan-500"
                     }}
@@ -225,23 +225,9 @@ export function DashboardClient({ userName, userRole }: DashboardClientProps) {
                       border: "border-purple-500/20",
                       bg: "from-purple-500/10 to-purple-600/5",
                       iconBg: "bg-purple-500/20",
-                      icon: "text-purple-400",
+                      icon: "text-purple-600 dark:text-purple-400",
                       dot: "bg-purple-500",
                       glow: "bg-purple-500"
-                    }}
-                  />
-                  <QuickActionButton
-                    href="/add-card"
-                    icon={Plus}
-                    label="افزودن کارت"
-                    description="ایجاد کارت جدید"
-                    color={{
-                      border: "border-green-500/20",
-                      bg: "from-green-500/10 to-green-600/5",
-                      iconBg: "bg-green-500/20",
-                      icon: "text-green-400",
-                      dot: "bg-green-500",
-                      glow: "bg-green-500"
                     }}
                   />
                   <QuickActionButton
@@ -253,9 +239,51 @@ export function DashboardClient({ userName, userRole }: DashboardClientProps) {
                       border: "border-orange-500/20",
                       bg: "from-orange-500/10 to-orange-600/5",
                       iconBg: "bg-orange-500/20",
-                      icon: "text-orange-400",
+                      icon: "text-orange-600 dark:text-orange-400",
                       dot: "bg-orange-500",
                       glow: "bg-orange-500"
+                    }}
+                  />
+                  <QuickActionButton
+                    href="/podcasts"
+                    icon={Mic}
+                    label="پادکست‌های آموزشی"
+                    description="یادگیری در هر مکان"
+                    color={{
+                      border: "border-purple-500/20",
+                      bg: "from-purple-500/10 to-purple-600/5",
+                      iconBg: "bg-purple-500/20",
+                      icon: "text-purple-600 dark:text-purple-400",
+                      dot: "bg-purple-500",
+                      glow: "bg-purple-500"
+                    }}
+                  />
+                  <QuickActionButton
+                    href="/articles"
+                    icon={BookOpen}
+                    label="مقاله‌های آموزشی"
+                    description="مطالعه عمیق و دقیق"
+                    color={{
+                      border: "border-green-500/20",
+                      bg: "from-green-500/10 to-green-600/5",
+                      iconBg: "bg-green-500/20",
+                      icon: "text-green-600 dark:text-green-400",
+                      dot: "bg-green-500",
+                      glow: "bg-green-500"
+                    }}
+                  />
+                  <QuickActionButton
+                    href="/add-card"
+                    icon={Plus}
+                    label="افزودن کارت"
+                    description="ایجاد کارت جدید"
+                    color={{
+                      border: "border-green-500/20",
+                      bg: "from-green-500/10 to-green-600/5",
+                      iconBg: "bg-green-500/20",
+                      icon: "text-green-600 dark:text-green-400",
+                      dot: "bg-green-500",
+                      glow: "bg-green-500"
                     }}
                   />
                 </div>
@@ -263,7 +291,7 @@ export function DashboardClient({ userName, userRole }: DashboardClientProps) {
 
               {/* Stats Overview */}
               <section>
-                <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                   <div className="w-1 h-6 bg-purple-500 rounded-full"></div>
                   آمار یادگیری
                 </h2>
@@ -271,20 +299,17 @@ export function DashboardClient({ userName, userRole }: DashboardClientProps) {
                   {[
                     { label: "کل کارت‌ها", value: stats.totalCards, color: "bg-blue-500" },
                     { label: "کارت‌های برای مرور", value: stats.dueCards, color: "bg-amber-500" },
-
                   ].map((stat, index) => (
-                    <div key={index} className="bg-gray-800/30 rounded-2xl p-4 border border-gray-700/50 backdrop-blur-sm">
+                    <div key={index} className="bg-gray-50/80 dark:bg-gray-800/30 rounded-2xl p-4 border border-gray-300 dark:border-gray-700/50 backdrop-blur-sm">
                       <div className="flex items-center justify-between">
-                        <span className="text-gray-400 text-sm">{stat.label}</span>
+                        <span className="text-gray-600 dark:text-gray-400 text-sm">{stat.label}</span>
                         <div className={`w-3 h-3 rounded-full ${stat.color}`}></div>
                       </div>
-                      <p className="text-2xl font-bold text-white mt-2">{stat.value}</p>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-white mt-2">{stat.value}</p>
                     </div>
                   ))}
                 </div>
               </section>
-
-
             </div>
           )}
 
@@ -308,7 +333,7 @@ export function DashboardClient({ userName, userRole }: DashboardClientProps) {
           )}
 
           {activeTab === 'manage' && (
-            <div className="bg-gray-800/20 rounded-2xl border border-gray-700/50 backdrop-blur-sm">
+            <div className="bg-gray-50/80 dark:bg-gray-800/20 rounded-2xl border border-gray-300 dark:border-gray-700/50 backdrop-blur-sm">
               <ManageCardsClient />
             </div>
           )}
@@ -321,7 +346,6 @@ export function DashboardClient({ userName, userRole }: DashboardClientProps) {
           </div>
         )}
       </div>
-
 
     </div>
   );

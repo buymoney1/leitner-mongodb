@@ -58,7 +58,7 @@ model User {
   learningGoal           String?
   targetScore            Float?
   suggestedReviewTime    ReviewTimePreference? 
-  isOnboardingComplete   Boolean   @default(false) //test
+  isOnboardingComplete   Boolean   @default(false)
   lastReviewNotificationAt DateTime? 
   books         Book[]
   cards         Card[]
@@ -66,6 +66,10 @@ model User {
   role String @default("user") // user | admin
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  
+  // اضافه کردن رابطه‌های جدید
+  podcasts Podcast[]
+  articles Article[]
 }
 
 // --- مدل اصلاح شده VerificationToken ---
@@ -126,7 +130,6 @@ model Review {
   updatedAt DateTime @updatedAt
 }
 
-
 enum VideoLevel {
   A1
   A2
@@ -136,25 +139,83 @@ enum VideoLevel {
   C2
 }
 
-// 2. مدل Video را برای استفاده از enum تغییر دهید
 model Video {
   id          String         @id @default(auto()) @map("_id") @db.ObjectId
   title       String
   videoUrl    String
   thumbnailUrl String?
-  level       VideoLevel     // <-- از enum استفاده می‌کنیم
+  level       VideoLevel
   subtitlesVtt  String? 
   vocabularies VideoVocabulary[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-
-
 model VideoVocabulary {
   id          String @id @default(auto()) @map("_id") @db.ObjectId
   videoId     String @db.ObjectId
   video       Video  @relation(fields: [videoId], references: [id], onDelete: Cascade)
-  word        String // لغت یا عبارت
-  meaning     String // معنی آن
+  word        String
+  meaning     String
+}
+
+enum ContentLevel {
+  A1
+  A2
+  B1
+  B2
+  C1
+  C2
+}
+
+model Podcast {
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String?
+  audioUrl    String
+  coverUrl    String?
+  duration    Int? // مدت زمان به ثانیه
+  level       ContentLevel
+  vocabularies PodcastVocabulary[]
+  isPublished Boolean @default(false)
+  createdById String? @db.ObjectId
+  createdBy   User?   @relation(fields: [createdById], references: [id])
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PodcastVocabulary {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  podcastId   String  @db.ObjectId
+  podcast     Podcast @relation(fields: [podcastId], references: [id], onDelete: Cascade)
+  word        String
+  meaning     String
+  timestamp   Int? // زمان در ثانیه که لغت گفته شده
+}
+
+model Article {
+  id          String         @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  content     String
+  excerpt     String?
+  coverUrl    String?
+  level       ContentLevel
+  readingTime Int? // زمان مطالعه به دقیقه
+  vocabularies ArticleVocabulary[]
+  isPublished Boolean @default(false)
+  createdById String? @db.ObjectId
+  createdBy   User?   @relation(fields: [createdById], references: [id])
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ArticleVocabulary {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  articleId   String  @db.ObjectId
+  article     Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  word        String
+  meaning     String
+  paragraph   Int? // پاراگراف مربوطه
 }

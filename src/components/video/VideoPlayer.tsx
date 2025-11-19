@@ -74,18 +74,18 @@ const DictionarySection = ({ word, onWordSelect }: { word: string; onWordSelect:
   }
 
   return (
-    <div className="bg-gray-900/50 rounded-xl border border-gray-700/50 p-4">
+    <div className="bg-gray-100 dark:bg-gray-900/50 rounded-xl border border-gray-300 dark:border-gray-700/50 p-4">
       <div className="flex items-center gap-2 mb-3">
-        <svg className="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-5 h-5 text-cyan-600 dark:text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
         </svg>
-        <h3 className="text-white font-semibold">اطلاعات دیکشنری</h3>
+        <h3 className="text-gray-900 dark:text-white font-semibold">اطلاعات دیکشنری</h3>
       </div>
 
       {isLoading ? (
         <div className="flex items-center justify-center py-4">
-          <div className="w-6 h-6 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
-          <span className="text-cyan-400 text-sm mr-2">در حال دریافت اطلاعات...</span>
+          <div className="w-6 h-6 border-2 border-cyan-600 dark:border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+          <span className="text-cyan-600 dark:text-cyan-400 text-sm mr-2">در حال دریافت اطلاعات...</span>
         </div>
       ) : dictionaryData ? (
         <div className="space-y-3">
@@ -93,14 +93,14 @@ const DictionarySection = ({ word, onWordSelect }: { word: string; onWordSelect:
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               {dictionaryData.phonetic && (
-                <span className="text-gray-400 text-sm">/{dictionaryData.phonetic}/</span>
+                <span className="text-gray-600 dark:text-gray-400 text-sm">/{dictionaryData.phonetic}/</span>
               )}
             </div>
             <div className="flex gap-2">
               {dictionaryData.meanings?.slice(0, 2).map((meaning: any, index: number) => (
                 <span 
                   key={index}
-                  className="px-2 py-1 bg-cyan-500/20 text-cyan-300 rounded-lg text-xs"
+                  className="px-2 py-1 bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 rounded-lg text-xs"
                 >
                   {meaning.partOfSpeech}
                 </span>
@@ -112,13 +112,13 @@ const DictionarySection = ({ word, onWordSelect }: { word: string; onWordSelect:
           <div className="space-y-2">
             {dictionaryData.meanings?.slice(0, 3).map((meaning: any, meaningIndex: number) => (
               <div key={meaningIndex} className="border-r-2 border-cyan-500/30 pr-3">
-                <p className="text-cyan-300 text-sm font-medium mb-1">
+                <p className="text-cyan-700 dark:text-cyan-300 text-sm font-medium mb-1">
                   {meaning.partOfSpeech}
                 </p>
                 <ul className="space-y-1">
                   {meaning.definitions?.slice(0, 3).map((def: any, defIndex: number) => (
-                    <li key={defIndex} className="text-gray-300 text-sm flex items-start gap-2">
-                      <span className="text-cyan-400 mt-1">•</span>
+                    <li key={defIndex} className="text-gray-700 dark:text-gray-300 text-sm flex items-start gap-2">
+                      <span className="text-cyan-600 dark:text-cyan-400 mt-1">•</span>
                       <span>{def.definition}</span>
                     </li>
                   ))}
@@ -126,9 +126,9 @@ const DictionarySection = ({ word, onWordSelect }: { word: string; onWordSelect:
                 
                 {/* مثال‌ها */}
                 {meaning.definitions?.[0]?.example && (
-                  <div className="mt-2 p-2 bg-gray-800/50 rounded-lg border-r-2 border-purple-500/30">
-                    <p className="text-purple-300 text-xs font-medium mb-1">مثال:</p>
-                    <p className="text-gray-300 text-sm italic">"{meaning.definitions[0].example}"</p>
+                  <div className="mt-2 p-2 bg-gray-200 dark:bg-gray-800/50 rounded-lg border-r-2 border-purple-500/30">
+                    <p className="text-purple-700 dark:text-purple-300 text-xs font-medium mb-1">مثال:</p>
+                    <p className="text-gray-700 dark:text-gray-300 text-sm italic">"{meaning.definitions[0].example}"</p>
                   </div>
                 )}
               </div>
@@ -137,13 +137,13 @@ const DictionarySection = ({ word, onWordSelect }: { word: string; onWordSelect:
 
           {/* مترادف‌ها */}
           {dictionaryData.meanings?.[0]?.synonyms && dictionaryData.meanings[0].synonyms.length > 0 && (
-            <div className="pt-2 border-t border-gray-700/50">
-              <p className="text-cyan-300 text-sm font-medium mb-2">مترادف‌ها:</p>
+            <div className="pt-2 border-t border-gray-300 dark:border-gray-700/50">
+              <p className="text-cyan-700 dark:text-cyan-300 text-sm font-medium mb-2">مترادف‌ها:</p>
               <div className="flex flex-wrap gap-1">
                 {dictionaryData.meanings[0].synonyms.slice(0, 5).map((synonym: string, index: number) => (
                   <span 
                     key={index}
-                    className="px-2 py-1 bg-gray-700/50 text-gray-300 rounded text-xs hover:bg-gray-600/50 transition-colors cursor-pointer"
+                    className="px-2 py-1 bg-gray-300 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 rounded text-xs hover:bg-gray-400 dark:hover:bg-gray-600/50 transition-colors cursor-pointer"
                     onClick={() => onWordSelect(synonym)}
                   >
                     {synonym}
@@ -155,10 +155,10 @@ const DictionarySection = ({ word, onWordSelect }: { word: string; onWordSelect:
         </div>
       ) : (
         <div className="text-center py-4">
-          <svg className="w-8 h-8 text-gray-600 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-8 h-8 text-gray-400 dark:text-gray-600 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <p className="text-gray-500 text-sm">اطلاعاتی برای این کلمه یافت نشد</p>
+          <p className="text-gray-500 dark:text-gray-500 text-sm">اطلاعاتی برای این کلمه یافت نشد</p>
         </div>
       )}
     </div>
@@ -414,7 +414,7 @@ export default function VideoPlayer({ videoUrl, subtitlesVtt, vocabularies }: Vi
         <span
           key={`word-${index}`}
           onClick={() => handleWordClick(word)}
-          className="cursor-pointer hover:text-cyan-300 hover:bg-cyan-500/20 px-1 rounded transition-all duration-200 border-b border-dashed border-cyan-500/50"
+          className="cursor-pointer hover:text-cyan-600 dark:hover:text-cyan-300 hover:bg-cyan-500/20 px-1 rounded transition-all duration-200 border-b border-dashed border-cyan-500/50"
           title="کلیک برای افزودن به فلش‌کارت"
         >
           {word}
@@ -437,10 +437,10 @@ export default function VideoPlayer({ videoUrl, subtitlesVtt, vocabularies }: Vi
   };
 
   return (
-    <div className="fixed inset-0 bg-black z-50 flex flex-col overflow-hidden">
+    <div className="fixed inset-0 bg-white dark:bg-black z-50 flex flex-col overflow-hidden transition-colors duration-300">
       {/* Video Container */}
-      <div className="w-full flex items-center justify-center p-4 bg-black">
-        <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-gradient-to-br from-gray-900 to-black border border-gray-800 aspect-video w-full max-w-4xl">
+      <div className="w-full flex items-center justify-center p-4 bg-white dark:bg-black">
+        <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-gradient-to-br from-gray-100 to-white dark:from-gray-900 dark:to-black border border-gray-300 dark:border-gray-800 aspect-video w-full max-w-4xl">
           <div className="absolute inset-0 bg-gradient-to-tr from-cyan-500/10 to-purple-500/10 z-10 pointer-events-none"></div>
           <video
             ref={videoRef}
@@ -462,127 +462,127 @@ export default function VideoPlayer({ videoUrl, subtitlesVtt, vocabularies }: Vi
         </div>
       </div>
 
-{selectedWord && (
-  <div className="fixed inset-0 z-50 flex items-start justify-center p-4 bg-black/50 backdrop-blur-sm">
-    <div className="bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border border-cyan-400/30 rounded-2xl backdrop-blur-xl shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col">
-      {/* Header */}
-      <div className="flex-shrink-0 p-6 pb-4">
-        <div className="text-center">
-          <p className="text-white font-bold text-xl mb-3">افزودن به فلش‌کارت</p>
-        </div>
-      </div>
-
-      {/* Scrollable Content */}
-      <div className="flex-1 overflow-y-auto px-6 pb-6 custom-popup-scrollbar">
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <label className="text-white text-sm font-medium">کلمه انگلیسی:</label>
-            <input
-              type="text"
-              value={customWord}
-              onChange={(e) => setCustomWord(e.target.value)}
-              placeholder="کلمه انگلیسی را وارد کنید..."
-              className="w-full p-3 rounded-xl bg-gray-900/80 border border-gray-700 text-white placeholder-gray-400 focus:outline-none focus:border-cyan-500 transition-colors"
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <label className="text-white text-sm font-medium">معنی فارسی:</label>
-              <button
-                onClick={handleManualTranslate}
-                disabled={isTranslating || !customWord.trim()}
-                className="text-cyan-400 hover:text-cyan-300 text-xs flex items-center gap-1 disabled:opacity-50"
-              >
-                {isTranslating ? (
-                  <>
-                    <div className="w-3 h-3 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
-                    در حال ترجمه...
-                  </>
-                ) : (
-                  <>
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                    </svg>
-                    ترجمه خودکار
-                  </>
-                )}
-              </button>
+      {selectedWord && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center p-4 bg-black/50 dark:bg-black/50 backdrop-blur-sm">
+          <div className="bg-white dark:bg-gray-900 border border-gray-300 dark:border-cyan-400/30 rounded-2xl backdrop-blur-xl shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col">
+            {/* Header */}
+            <div className="flex-shrink-0 pt-4 pb-1">
+              <div className="text-center">
+                <p className="text-gray-900 dark:text-white font-bold text-lg mb-3">افزودن به فلش‌کارت</p>
+              </div>
             </div>
-            <input
-              type="text"
-              value={customMeaning}
-              onChange={(e) => setCustomMeaning(e.target.value)}
-              placeholder={isTranslating ? "در حال ترجمه..." : "معنی فارسی را وارد کنید..."}
-              className="w-full p-3 rounded-xl bg-gray-900/80 border border-gray-700 text-white placeholder-gray-400 focus:outline-none focus:border-cyan-500 transition-colors"
-              onKeyPress={(e) => e.key === 'Enter' && handleAddToFlashcards()}
-              disabled={isTranslating}
-            />
-            {isTranslating && (
-              <p className="text-cyan-400 text-xs flex items-center gap-1">
-                <div className="w-3 h-3 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
-                در حال ترجمه خودکار...
-              </p>
-            )}
+
+            {/* Scrollable Content */}
+            <div className="flex-1 overflow-y-auto px-6 pb-6 custom-popup-scrollbar">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-gray-900 dark:text-white text-sm font-medium">کلمه انگلیسی:</label>
+                  <input
+                    type="text"
+                    value={customWord}
+                    onChange={(e) => setCustomWord(e.target.value)}
+                    placeholder="کلمه انگلیسی را وارد کنید..."
+                    className="w-full p-3 rounded-xl bg-gray-100 dark:bg-gray-900/80 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:border-cyan-500 transition-colors"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-gray-900 dark:text-white text-sm font-medium">معنی فارسی:</label>
+                    <button
+                      onClick={handleManualTranslate}
+                      disabled={isTranslating || !customWord.trim()}
+                      className="text-cyan-600 dark:text-cyan-400 hover:text-cyan-500 dark:hover:text-cyan-300 text-xs flex items-center gap-1 disabled:opacity-50"
+                    >
+                      {isTranslating ? (
+                        <>
+                          <div className="w-3 h-3 border-2 border-cyan-600 dark:border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+                          در حال ترجمه...
+                        </>
+                      ) : (
+                        <>
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                          </svg>
+                          ترجمه خودکار
+                        </>
+                      )}
+                    </button>
+                  </div>
+                  <input
+                    type="text"
+                    value={customMeaning}
+                    onChange={(e) => setCustomMeaning(e.target.value)}
+                    placeholder={isTranslating ? "در حال ترجمه..." : "معنی فارسی را وارد کنید..."}
+                    className="w-full p-3 rounded-xl bg-gray-100 dark:bg-gray-900/80 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:border-cyan-500 transition-colors"
+                    onKeyPress={(e) => e.key === 'Enter' && handleAddToFlashcards()}
+                    disabled={isTranslating}
+                  />
+                  {isTranslating && (
+                    <div className="text-cyan-600 dark:text-cyan-400 text-xs flex items-center gap-1">
+                      <div className="w-3 h-3 border-2 border-cyan-600 dark:border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+                      در حال ترجمه خودکار...
+                    </div>
+                  )}
+                </div>
+
+                {/* بخش دیکشنری */}
+                <DictionarySection word={customWord} onWordSelect={handleWordSelect} />
+              </div>
+            </div>
+
+            {/* Footer - دکمه‌ها */}
+            <div className="mb-7 flex-shrink-0 p-6 pt-4 border-t border-gray-300 dark:border-gray-700/50">
+              <div className="flex gap-3">
+                <button 
+                  onClick={handleAddToFlashcards}
+                  disabled={isAddingCard || !customWord.trim() || !customMeaning.trim()}
+                  className={`flex-1 py-3 rounded-xl text-white font-medium transition-all duration-300 flex items-center justify-center gap-2 ${
+                    isAddingCard || !customWord.trim() || !customMeaning.trim()
+                      ? "bg-gray-400 dark:bg-gray-600 cursor-not-allowed"
+                      : "bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 shadow-lg shadow-cyan-500/25"
+                  }`}
+                >
+                  {isAddingCard ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      در حال افزودن...
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                      </svg>
+                      افزودن به فلش‌کارت
+                    </>
+                  )}
+                </button>
+                
+                <button 
+                  onClick={() => {
+                    setSelectedWord(null);
+                    setCustomWord("");
+                    setCustomMeaning("");
+                  }}
+                  className="px-6 py-3 rounded-xl bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-white hover:bg-gray-400 dark:hover:bg-gray-600 transition-colors"
+                >
+                  انصراف
+                </button>
+              </div>
+            </div>
           </div>
-
-          {/* بخش دیکشنری */}
-          <DictionarySection word={customWord} onWordSelect={handleWordSelect} />
         </div>
-      </div>
-
-      {/* Footer - دکمه‌ها */}
-      <div className="mb-7 flex-shrink-0 p-6 pt-4 border-t border-gray-700/50">
-        <div className="flex gap-3 ">
-          <button 
-            onClick={handleAddToFlashcards}
-            disabled={isAddingCard || !customWord.trim() || !customMeaning.trim()}
-            className={`flex-1 py-3 rounded-xl text-white font-medium transition-all duration-300 flex items-center justify-center gap-2 ${
-              isAddingCard || !customWord.trim() || !customMeaning.trim()
-                ? "bg-gray-600 cursor-not-allowed"
-                : "bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 shadow-lg shadow-cyan-500/25"
-            }`}
-          >
-            {isAddingCard ? (
-              <>
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                در حال افزودن...
-              </>
-            ) : (
-              <>
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                </svg>
-                افزودن به فلش‌کارت
-              </>
-            )}
-          </button>
-          
-          <button 
-            onClick={() => {
-              setSelectedWord(null);
-              setCustomWord("");
-              setCustomMeaning("");
-            }}
-            className="px-6 py-3 rounded-xl bg-gray-700 text-white hover:bg-gray-600 transition-colors"
-          >
-            انصراف
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-)}
+      )}
 
       {/* Tabs */}
       <div className="px-4 pt-2">
-        <div className="flex bg-gray-900 rounded-xl p-1 border border-gray-800 shadow-lg">
+        <div className="flex bg-gray-200 dark:bg-gray-900 rounded-xl p-1 border border-gray-300 dark:border-gray-800 shadow-lg">
           <button
             onClick={() => setActiveTab("subtitles")}
             className={`flex-1 py-3 px-4 rounded-xl font-medium transition-all duration-300 relative overflow-hidden ${
               activeTab === "subtitles"
                 ? "bg-gradient-to-r from-cyan-600 to-purple-600 text-white shadow-lg"
-                : "text-gray-400 hover:text-white bg-transparent"
+                : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white bg-transparent"
             }`}
           >
             {activeTab === "subtitles" && (
@@ -596,7 +596,7 @@ export default function VideoPlayer({ videoUrl, subtitlesVtt, vocabularies }: Vi
             className={`flex-1 py-3 px-4 rounded-xl font-medium transition-all duration-300 relative overflow-hidden ${
               activeTab === "vocabulary"
                 ? "bg-gradient-to-r from-cyan-600 to-purple-600 text-white shadow-lg"
-                : "text-gray-400 hover:text-white bg-transparent"
+                : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white bg-transparent"
             }`}
           >
             {activeTab === "vocabulary" && (
@@ -608,7 +608,7 @@ export default function VideoPlayer({ videoUrl, subtitlesVtt, vocabularies }: Vi
       </div>
 
       {/* Scrollable Content */}
-      <div className="flex-1 bg-gradient-to-b from-gray-900 to-black p-4 overflow-y-auto custom-scrollbar">
+      <div className="flex-1 bg-gradient-to-b from-gray-100 to-white dark:from-gray-900 dark:to-black p-4 overflow-y-auto custom-scrollbar">
         {activeTab === "subtitles" && (
           <div className="space-y-3">
             {processedSubtitles.length ? (
@@ -619,7 +619,7 @@ export default function VideoPlayer({ videoUrl, subtitlesVtt, vocabularies }: Vi
                   className={`p-4 rounded-xl border transition-all duration-300 cursor-pointer relative overflow-hidden group ${
                     index === activeSubtitleIndex
                       ? "bg-gradient-to-r from-cyan-600/30 to-purple-600/30 border-cyan-400/50 shadow-xl scale-[1.02]"
-                      : "bg-gray-800/30 border-gray-700 hover:bg-gray-800/50 hover:border-gray-600"
+                      : "bg-gray-200/50 dark:bg-gray-800/30 border-gray-300 dark:border-gray-700 hover:bg-gray-300/50 dark:hover:bg-gray-800/50 hover:border-gray-400 dark:hover:border-gray-600"
                   }`}
                   onClick={() => {
                     if (videoRef.current) {
@@ -635,8 +635,8 @@ export default function VideoPlayer({ videoUrl, subtitlesVtt, vocabularies }: Vi
                     <p
                       className={`font-medium mb-2 leading-relaxed ${
                         index === activeSubtitleIndex 
-                          ? "text-cyan-200" 
-                          : "text-gray-200 group-hover:text-white"
+                          ? "text-cyan-700 dark:text-cyan-200" 
+                          : "text-gray-700 dark:text-gray-200 group-hover:text-gray-900 dark:group-hover:text-white"
                       }`}
                     >
                       <ClickableText text={subtitle.englishText} />
@@ -644,8 +644,8 @@ export default function VideoPlayer({ videoUrl, subtitlesVtt, vocabularies }: Vi
                     <p
                       className={`text-sm leading-relaxed ${
                         index === activeSubtitleIndex 
-                          ? "text-gray-100" 
-                          : "text-gray-400 group-hover:text-gray-300"
+                          ? "text-gray-600 dark:text-gray-100" 
+                          : "text-gray-500 dark:text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300"
                       }`}
                     >
                       {subtitle.persianText}
@@ -657,8 +657,8 @@ export default function VideoPlayer({ videoUrl, subtitlesVtt, vocabularies }: Vi
               ))
             ) : (
               <div className="text-center py-10">
-                <div className="text-gray-500 text-lg mb-2">زیرنویسی موجود نیست</div>
-                <div className="text-gray-600 text-sm">ویدیو فاقد زیرنویس است</div>
+                <div className="text-gray-500 dark:text-gray-500 text-lg mb-2">زیرنویسی موجود نیست</div>
+                <div className="text-gray-400 dark:text-gray-600 text-sm">ویدیو فاقد زیرنویس است</div>
               </div>
             )}
           </div>
@@ -672,49 +672,13 @@ export default function VideoPlayer({ videoUrl, subtitlesVtt, vocabularies }: Vi
         )}
       </div>
 
-
-      // در انتهای کامپوننت VideoPlayer، استایل‌های زیر را اضافه کنید:
-<style jsx>{`
-  .custom-scrollbar::-webkit-scrollbar {
-    width: 6px;
-  }
-  .custom-scrollbar::-webkit-scrollbar-track {
-    background: rgba(15, 23, 42, 0.5);
-    border-radius: 10px;
-  }
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: linear-gradient(to bottom, #06b6d4, #8b5cf6);
-    border-radius: 10px;
-  }
-  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(to bottom, #0891b2, #7c3aed);
-  }
-
-  /* استایل مخصوص اسکرول بار پاپ‌آپ */
-  .custom-popup-scrollbar::-webkit-scrollbar {
-    width: 6px;
-  }
-  .custom-popup-scrollbar::-webkit-scrollbar-track {
-    background: rgba(15, 23, 42, 0.3);
-    border-radius: 10px;
-    margin: 4px 0;
-  }
-  .custom-popup-scrollbar::-webkit-scrollbar-thumb {
-    background: linear-gradient(to bottom, #06b6d4, #8b5cf6);
-    border-radius: 10px;
-  }
-  .custom-popup-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(to bottom, #0891b2, #7c3aed);
-  }
-`}</style>
-
       {/* Custom Scrollbar Styles */}
       <style jsx>{`
         .custom-scrollbar::-webkit-scrollbar {
           width: 6px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
-          background: rgba(15, 23, 42, 0.5);
+          background: rgba(0, 0, 0, 0.1);
           border-radius: 10px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
@@ -723,6 +687,31 @@ export default function VideoPlayer({ videoUrl, subtitlesVtt, vocabularies }: Vi
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
           background: linear-gradient(to bottom, #0891b2, #7c3aed);
+        }
+
+        .custom-popup-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        .custom-popup-scrollbar::-webkit-scrollbar-track {
+          background: rgba(0, 0, 0, 0.1);
+          border-radius: 10px;
+          margin: 4px 0;
+        }
+        .custom-popup-scrollbar::-webkit-scrollbar-thumb {
+          background: linear-gradient(to bottom, #06b6d4, #8b5cf6);
+          border-radius: 10px;
+        }
+        .custom-popup-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: linear-gradient(to bottom, #0891b2, #7c3aed);
+        }
+
+        @media (prefers-color-scheme: dark) {
+          .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+          }
+          .custom-popup-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+          }
         }
       `}</style>
     </div>

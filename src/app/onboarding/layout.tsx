@@ -1,6 +1,7 @@
 // app/onboarding/layout.tsx
 import { redirect } from 'next/navigation';
 import { auth } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
 
 export default async function OnboardingLayout({
   children,
@@ -14,7 +15,17 @@ export default async function OnboardingLayout({
     redirect('/login');
   }
 
+  // چک کردن وضعیت onboarding کاربر
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: {
+      isOnboardingComplete: true,
+    },
+  });
 
-  
-return <>{children}</>;
+if (user && user.isOnboardingComplete) {
+    redirect('/dashboard');
+  }
+
+  return <>{children}</>;
 }

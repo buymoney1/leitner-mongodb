@@ -12,16 +12,16 @@ export default function SignIn() {
       >
         <button
           type="submit"
-          className="group relative mb-5 w-full cursor-pointer overflow-hidden rounded-xl bg-gradient-to-br from-gray-900 to-black p-px transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/20"
+          className="group relative mb-5 w-full cursor-pointer overflow-hidden rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-black p-px transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/20 dark:hover:shadow-blue-500/20"
         >
           {/* گرادیانت border */}
           <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
           
           {/* Background glow effect */}
-          <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/20 via-purple-500/20 to-pink-500/20 blur-lg opacity-0 transition-opacity duration-500 group-hover:opacity-100 "></div>
+          <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/20 via-purple-500/20 to-pink-500/20 blur-lg opacity-0 transition-opacity duration-500 group-hover:opacity-100"></div>
           
           {/* Main button content */}
-          <div className="relative  flex w-full items-center justify-center gap-3 rounded-[11px] bg-gradient-to-br from-gray-900 to-gray-800 px-6 py-4 transition-all duration-300 group-hover:bg-gray-800/90 group-hover:from-gray-800 group-hover:to-gray-700">
+          <div className="relative flex w-full items-center justify-center gap-3 rounded-[11px] bg-gradient-to-br from-white to-gray-100 dark:from-gray-900 dark:to-gray-800 px-6 py-4 transition-all duration-300 group-hover:bg-gray-50 dark:group-hover:bg-gray-800/90 group-hover:from-gray-50 group-hover:to-gray-200 dark:group-hover:from-gray-800 dark:group-hover:to-gray-700">
             
             {/* Animated gradient overlay */}
             <div className="absolute inset-0 -z-10 bg-gradient-to-r from-cyan-500/0 via-purple-500/5 to-pink-500/0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"></div>
@@ -54,14 +54,14 @@ export default function SignIn() {
             </div>
 
             {/* Text with gradient */}
-            <span className="relative z-10 bg-gradient-to-r from-gray-200 to-gray-400 bg-clip-text text-sm font-semibold text-transparent drop-shadow-lg group-hover:from-white group-hover:to-gray-200 transition-all duration-300">
+            <span className="relative z-10 bg-gradient-to-r from-gray-700 to-gray-900 dark:from-gray-200 dark:to-gray-400 bg-clip-text text-sm font-semibold text-transparent drop-shadow-lg group-hover:from-gray-900 group-hover:to-black dark:group-hover:from-white dark:group-hover:to-gray-200 transition-all duration-300">
               ورود با گوگل
             </span>
 
             {/* Animated arrow */}
             <div className="relative overflow-hidden">
               <svg 
-                className="h-4 w-4 text-gray-400 transition-all duration-300 group-hover:translate-x-1 group-hover:text-cyan-400" 
+                className="h-4 w-4 text-gray-500 dark:text-gray-400 transition-all duration-300 group-hover:translate-x-1 group-hover:text-cyan-500 dark:group-hover:text-cyan-400" 
                 fill="none" 
                 stroke="currentColor" 
                 viewBox="0 0 24 24"
@@ -77,8 +77,6 @@ export default function SignIn() {
           </div>
         </button>
       </form>
-
-
     </div>
   );
 }

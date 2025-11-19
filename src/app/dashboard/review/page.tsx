@@ -128,14 +128,14 @@ export default function ReviewPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-black to-gray-900">
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900 transition-colors duration-300">
         <div className="text-center">
           <div className="relative">
             <div className="h-20 w-20 animate-spin rounded-full border-4 border-solid border-cyan-500/30 border-t-cyan-500 mx-auto"></div>
             <div className="absolute inset-0 h-20 w-20 animate-ping rounded-full border-4 border-cyan-500/20 mx-auto"></div>
           </div>
-          <p className="mt-6 text-gray-400 font-medium text-lg">در حال آماده‌سازی کارت‌ها...</p>
-          <p className="text-gray-500 text-sm mt-2">لطفاً چند لحظه صبر کنید</p>
+          <p className="mt-6 text-gray-600 dark:text-gray-400 font-medium text-lg">در حال آماده‌سازی کارت‌ها...</p>
+          <p className="text-gray-500 dark:text-gray-500 text-sm mt-2">لطفاً چند لحظه صبر کنید</p>
         </div>
       </div>
     );
@@ -143,40 +143,40 @@ export default function ReviewPage() {
 
   if (cards.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-black to-gray-900 p-4">
-        <div className="text-center bg-gradient-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-xl p-12 rounded-3xl shadow-2xl max-w-md border border-gray-700/50 relative overflow-hidden">
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900 p-4 transition-colors duration-300">
+        <div className="text-center bg-white dark:bg-gray-800/80 bg-gradient-to-br from-gray-50/80 to-white/60 dark:from-gray-800/80 dark:to-gray-900/80 backdrop-blur-xl p-8 sm:p-12 rounded-3xl shadow-xl dark:shadow-2xl max-w-md border border-gray-300 dark:border-gray-700/50 relative overflow-hidden transition-all duration-300">
           {/* Background Effects */}
-          <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-blue-500/5"></div>
-          <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/10 rounded-full blur-3xl"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-blue-500/5 dark:from-green-500/5 dark:to-blue-500/5"></div>
+          <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/10 dark:bg-green-500/10 rounded-full blur-3xl"></div>
           
           <div className="relative z-10">
-            <div className="mx-auto flex items-center justify-center h-20 w-20 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 mb-6 shadow-lg shadow-green-500/30">
-              <Sparkles className="h-10 w-10 text-white" strokeWidth={2.5} />
+            <div className="mx-auto flex items-center justify-center h-16 w-16 sm:h-20 sm:w-20 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 mb-4 sm:mb-6 shadow-lg shadow-green-500/30">
+              <Sparkles className="h-8 w-8 sm:h-10 sm:w-10 text-white" strokeWidth={2.5} />
             </div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-3">
+            <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-3">
               آفرین! 🎉
             </h1>
-            <p className="text-gray-400 text-lg mb-2">همه کارت‌های امروز رو مرور کردی</p>
-            <p className="text-gray-500 text-sm">کارت‌های جدید فردا برای مرور آماده می‌شن</p>
+            <p className="text-gray-600 dark:text-gray-400 text-base sm:text-lg mb-2">همه کارت‌های امروز رو مرور کردی</p>
+            <p className="text-gray-500 dark:text-gray-500 text-sm">کارت‌های جدید فردا برای مرور آماده می‌شن</p>
             
-            <div className="mt-8 grid grid-cols-2 gap-4 text-center">
-              <div className="bg-gray-700/30 rounded-xl p-4 border border-gray-600/30">
-                <div className="text-2xl font-bold text-green-400">{sessionStats.correct}</div>
-                <div className="text-gray-400 text-sm">پاسخ صحیح</div>
+            <div className="mt-6 sm:mt-8 grid grid-cols-2 gap-3 sm:gap-4 text-center">
+              <div className="bg-gray-100 dark:bg-gray-700/30 rounded-xl p-3 sm:p-4 border border-gray-200 dark:border-gray-600/30">
+                <div className="text-xl sm:text-2xl font-bold text-green-600 dark:text-green-400">{sessionStats.correct}</div>
+                <div className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm">پاسخ صحیح</div>
               </div>
-              <div className="bg-gray-700/30 rounded-xl p-4 border border-gray-600/30">
-                <div className="text-2xl font-bold text-amber-400">{sessionStats.incorrect}</div>
-                <div className="text-gray-400 text-sm">نیاز به تمرین</div>
+              <div className="bg-gray-100 dark:bg-gray-700/30 rounded-xl p-3 sm:p-4 border border-gray-200 dark:border-gray-600/30">
+                <div className="text-xl sm:text-2xl font-bold text-amber-600 dark:text-amber-400">{sessionStats.incorrect}</div>
+                <div className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm">نیاز به تمرین</div>
               </div>
             </div>
 
             <button
               onClick={() => router.push("/dashboard")}
-              className="cursor-pointer mt-8 px-8 py-4 bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-xl hover:from-cyan-500 hover:to-blue-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-gray-900 w-full font-semibold shadow-lg shadow-cyan-500/30 transition-all duration-200 hover:scale-[1.02] group"
+              className="cursor-pointer mt-6 sm:mt-8 px-6 py-3 sm:px-8 sm:py-4 bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-xl hover:from-cyan-500 hover:to-blue-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900 w-full font-semibold shadow-lg shadow-cyan-500/30 transition-all duration-200 hover:scale-[1.02] group"
             >
-              <span className="flex items-center justify-center gap-2">
+              <span className="flex items-center justify-center gap-2 text-sm sm:text-base">
                 بازگشت به داشبورد
-                <ChevronLeft className="h-5 w-5 group-hover:-translate-x-1 transition-transform" />
+                <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5 group-hover:-translate-x-1 transition-transform" />
               </span>
             </button>
           </div>
@@ -189,12 +189,12 @@ export default function ReviewPage() {
   const progress = ((currentCardIndex + 1) / cards.length) * 100;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div className="min-h-screen bg-white dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden transition-colors duration-300">
       {/* Background Effects */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-10 left-10 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-10 right-10 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl"></div>
+        <div className="absolute top-10 left-10 w-80 h-80 bg-cyan-500/10 dark:bg-cyan-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-10 right-10 w-80 h-80 bg-purple-500/10 dark:bg-purple-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-500/5 dark:bg-blue-500/5 rounded-full blur-3xl"></div>
       </div>
 
       {/* Confetti Effect */}
@@ -208,26 +208,25 @@ export default function ReviewPage() {
             <h2 className="text-5xl font-bold bg-gradient-to-r from-yellow-400 to-amber-400 bg-clip-text text-transparent mb-4">
               تبریک! 🎊
             </h2>
-            <p className="text-2xl text-white/80">مرور امروزت تموم شد!</p>
+            <p className="text-2xl text-gray-900 dark:text-white/80">مرور امروزت تموم شد!</p>
           </div>
         </div>
       )}
 
       <div className="max-w-4xl mx-auto w-full relative z-10">
 
-
         {/* Progress Bar */}
         <div className="mb-8">
           <div className="flex justify-between items-center mb-3">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 bg-cyan-500 rounded-full animate-pulse"></div>
-              <span className="text-sm text-gray-400">در حال مرور</span>
+              <span className="text-sm text-gray-600 dark:text-gray-400">در حال مرور</span>
             </div>
-            <span className="text-sm text-cyan-400 font-medium">
+            <span className="text-sm text-cyan-600 dark:text-cyan-400 font-medium">
               {currentCardIndex + 1} / {cards.length}
             </span>
           </div>
-          <div className="bg-gray-800/50 rounded-full h-3 backdrop-blur-sm border border-gray-700/50 overflow-hidden">
+          <div className="bg-gray-200 dark:bg-gray-800/50 rounded-full h-3 backdrop-blur-sm border border-gray-300 dark:border-gray-700/50 overflow-hidden">
             <div
               className="bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 h-3 rounded-full transition-all duration-1000 ease-out relative overflow-hidden"
               style={{ width: `${progress}%` }}
@@ -252,17 +251,17 @@ export default function ReviewPage() {
               }`}
               style={{ transformStyle: 'preserve-3d', backfaceVisibility: 'hidden' }}
             >
-              <div className="w-full h-full bg-gradient-to-br from-gray-800/90 to-gray-900/90 backdrop-blur-xl rounded-3xl shadow-2xl border-2 border-gray-700/50 p-2 relative overflow-hidden group-hover:border-cyan-500/30 transition-all duration-500">
+              <div className="w-full h-full bg-white dark:bg-gray-800/90 bg-gradient-to-br from-white to-gray-50/80 dark:from-gray-800/90 dark:to-gray-900/90 backdrop-blur-xl rounded-3xl shadow-xl dark:shadow-2xl border-2 border-gray-300 dark:border-gray-700/50 p-2 relative overflow-hidden group-hover:border-cyan-500/30 transition-all duration-500">
                 <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 
                 {/* Header */}
                 <div className="flex items-center justify-between mb-8">
-                  <div className="flex items-center gap-2 text-xs text-cyan-400 bg-cyan-500/10 px-3 py-1.5 rounded-full border border-cyan-500/20">
+                  <div className="flex items-center gap-2 text-xs text-cyan-600 dark:text-cyan-400 bg-cyan-500/10 dark:bg-cyan-500/20 px-3 py-1.5 rounded-full border border-cyan-500/20 dark:border-cyan-500/30">
                     <RotateCcw className="h-3 w-3" />
                     <span>برای دیدن پاسخ کلیک کن</span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-400 bg-gray-700/30 px-3 py-1.5 rounded-full">
-                    <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
+                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 bg-gray-200 dark:bg-gray-700/30 px-3 py-1.5 rounded-full">
+                    <div className="w-2 h-2 bg-cyan-500 dark:bg-cyan-400 rounded-full animate-pulse"></div>
                     <span>جعبه {currentCard.boxNumber}</span>
                   </div>
                 </div>
@@ -271,8 +270,8 @@ export default function ReviewPage() {
                 <div className="relative z-10 flex flex-col items-center justify-center min-h-[300px] gap-8">
                   {/* Main Word */}
                   <div className="text-center">
-                    <div className=" items-center gap-4 justify-center mb-10">
-                      <p className="text-2xl md:text-3xl font-bold text-white leading-relaxed">
+                    <div className="flex items-center gap-4 justify-center mb-10">
+                      <p className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white leading-relaxed">
                         {currentCard.front}
                       </p>
                       <button
@@ -280,24 +279,24 @@ export default function ReviewPage() {
                           e.stopPropagation();
                           playTextToSpeech(currentCard.front, 'word');
                         }}
-                        className="p-1 text-gray-400 hover:text-cyan-400 transition-all duration-200 hover:bg-gray-700/50 rounded-xl hover:scale-110"
+                        className="p-1 text-gray-500 dark:text-gray-400 hover:text-cyan-600 dark:hover:text-cyan-400 transition-all duration-200 hover:bg-gray-200 dark:hover:bg-gray-700/50 rounded-xl hover:scale-110"
                       >
                         <Volume2 className="h-6 w-6" />
                       </button>
                     </div>
                     
                     {currentCard.pronunciation && (
-                      <p className="text-gray-400 text-lg">{currentCard.pronunciation}</p>
+                      <p className="text-gray-500 dark:text-gray-400 text-lg">{currentCard.pronunciation}</p>
                     )}
                   </div>
                   
                   {/* Example */}
                   {currentCard.example && (
                     <div className="text-center w-full max-w-2xl">
-                      <div className="bg-gray-700/30 rounded-2xl p-6 border border-gray-600/30">
-                        <p className="text-gray-400 text-sm mb-3 font-medium">مثال کاربردی</p>
+                      <div className="bg-gray-100 dark:bg-gray-700/30 rounded-2xl p-6 border border-gray-200 dark:border-gray-600/30">
+                        <p className="text-gray-500 dark:text-gray-400 text-sm mb-3 font-medium">مثال کاربردی</p>
                         <div className="flex items-center gap-3 justify-center mb-3">
-                          <p className="text-xl text-gray-300 leading-relaxed">
+                          <p className="text-xl text-gray-700 dark:text-gray-300 leading-relaxed">
                             {currentCard.example}
                           </p>
                           <button
@@ -305,13 +304,13 @@ export default function ReviewPage() {
                               e.stopPropagation();
                               playTextToSpeech(currentCard.example!, 'sentence');
                             }}
-                            className="p-2 text-gray-500 hover:text-cyan-400 transition-colors duration-200 hover:bg-gray-600/50 rounded-lg"
+                            className="p-2 text-gray-400 dark:text-gray-500 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors duration-200 hover:bg-gray-200 dark:hover:bg-gray-600/50 rounded-lg"
                           >
                             <Volume2 className="h-5 w-5" />
                           </button>
                         </div>
                         {currentCard.exampleTranslation && (
-                          <p className="text-gray-400 text-lg leading-relaxed border-t border-gray-600/30 pt-3">
+                          <p className="text-gray-500 dark:text-gray-400 text-lg leading-relaxed border-t border-gray-300 dark:border-gray-600/30 pt-3">
                             {currentCard.exampleTranslation}
                           </p>
                         )}
@@ -357,7 +356,6 @@ export default function ReviewPage() {
                         {currentCard.back}
                       </p>
                     </div>
-                 
                   </div>
                   
                   {/* Example */}
@@ -395,52 +393,48 @@ export default function ReviewPage() {
 
         {/* Action Buttons */}
         <div className="flex items-center justify-center gap-2 sm:gap-3">
-  {/* قبلی */}
-  <button
-    onClick={handlePrev}
-    disabled={currentCardIndex === 0}
-    className="flex items-center gap-1 px-4 py-3 bg-gray-700/50 text-gray-300 rounded-xl hover:bg-gray-600/50 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200 font-medium border border-gray-600/50 text-sm"
-  >
-    <ChevronRight className="h-4 w-4" />
-    <span className="hidden xs:block">قبلی</span>
-  </button>
+          {/* قبلی */}
+          <button
+            onClick={handlePrev}
+            disabled={currentCardIndex === 0}
+            className="flex items-center gap-1 px-4 py-3 bg-gray-200 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600/50 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200 font-medium border border-gray-300 dark:border-gray-600/50 text-sm"
+          >
+            <ChevronRight className="h-4 w-4" />
+            <span className="hidden xs:block">قبلی</span>
+          </button>
 
-  {/* بلد نبودم */}
-  <button
-    onClick={handleIncorrect}
-    disabled={isSubmitting || !isFlipped}
-    className="group flex items-center gap-2 px-4 py-3 bg-gradient-to-br from-red-600 to-rose-700 text-white rounded-xl hover:from-red-500 hover:to-rose-600 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed font-medium shadow-lg shadow-red-500/30 transition-all duration-200 hover:scale-[1.02] disabled:hover:scale-100 relative overflow-hidden border border-red-500/30 text-sm"
-  >
-    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700"></div>
-    <X className="h-4 w-4 relative z-10" strokeWidth={2.5} />
-    <span className="relative z-10">بلد نبودم</span>
-  </button>
+          {/* بلد نبودم */}
+          <button
+            onClick={handleIncorrect}
+            disabled={isSubmitting || !isFlipped}
+            className="group flex items-center gap-2 px-4 py-3 bg-gradient-to-br from-red-600 to-rose-700 text-white rounded-xl hover:from-red-500 hover:to-rose-600 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed font-medium shadow-lg shadow-red-500/30 transition-all duration-200 hover:scale-[1.02] disabled:hover:scale-100 relative overflow-hidden border border-red-500/30 text-sm"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700"></div>
+            <X className="h-4 w-4 relative z-10" strokeWidth={2.5} />
+            <span className="relative z-10">بلد نبودم</span>
+          </button>
 
-  {/* بلد بودم */}
-  <button
-    onClick={handleCorrect}
-    disabled={isSubmitting || !isFlipped}
-    className="group flex items-center gap-2 px-4 py-3 bg-gradient-to-br from-green-600 to-emerald-700 text-white rounded-xl hover:from-green-500 hover:to-emerald-600 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed font-medium shadow-lg shadow-green-500/30 transition-all duration-200 hover:scale-[1.02] disabled:hover:scale-100 relative overflow-hidden border border-green-500/30 text-sm"
-  >
-    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700"></div>
-    <Check className="h-4 w-4 relative z-10" strokeWidth={2.5} />
-    <span className="relative z-10">بلد بودم</span>
-  </button>
+          {/* بلد بودم */}
+          <button
+            onClick={handleCorrect}
+            disabled={isSubmitting || !isFlipped}
+            className="group flex items-center gap-2 px-4 py-3 bg-gradient-to-br from-green-600 to-emerald-700 text-white rounded-xl hover:from-green-500 hover:to-emerald-600 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed font-medium shadow-lg shadow-green-500/30 transition-all duration-200 hover:scale-[1.02] disabled:hover:scale-100 relative overflow-hidden border border-green-500/30 text-sm"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700"></div>
+            <Check className="h-4 w-4 relative z-10" strokeWidth={2.5} />
+            <span className="relative z-10">بلد بودم</span>
+          </button>
 
-  {/* بعدی */}
-  <button
-    onClick={handleNext}
-    disabled={currentCardIndex === cards.length - 1}
-    className="flex items-center gap-1 px-4 py-3 bg-gray-700/50 text-gray-300 rounded-xl hover:bg-gray-600/50 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200 font-medium border border-gray-600/50 text-sm"
-  >
-    <span className="hidden xs:block">بعدی</span>
-    <ChevronLeft className="h-4 w-4" />
-  </button>
-</div>
-
-
-
-
+          {/* بعدی */}
+          <button
+            onClick={handleNext}
+            disabled={currentCardIndex === cards.length - 1}
+            className="flex items-center gap-1 px-4 py-3 bg-gray-200 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600/50 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200 font-medium border border-gray-300 dark:border-gray-600/50 text-sm"
+          >
+            <span className="hidden xs:block">بعدی</span>
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+        </div>
       </div>
 
       <style jsx>{`

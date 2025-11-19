@@ -33,9 +33,7 @@ export function TemplateBookCard({ book }: TemplateBookCardProps) {
       const data = await response.json();
 
       if (response.ok) {
-        // استفاده از toast به جای alert برای تجربه بهتر
         console.log("کتاب با موفقیت به مجموعه شما اضافه شد!");
-        // می‌توانید اینجا state مربوط به کتاب‌های کاربر را آپدیت کنید
       } else {
         console.error(data.error || "خطا در افزودن کتاب");
       }
@@ -72,7 +70,7 @@ export function TemplateBookCard({ book }: TemplateBookCardProps) {
 
   return (
     <div 
-      className="group relative flex flex-col rounded-2xl border border-gray-700/50 bg-gradient-to-br from-gray-800/50 to-gray-900/30 backdrop-blur-xl shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 overflow-hidden"
+      className="group relative flex flex-col rounded-2xl border border-gray-300 dark:border-gray-700/50 bg-white dark:bg-gray-800/50 bg-gradient-to-br from-white to-gray-50/80 dark:from-gray-800/50 dark:to-gray-900/30 backdrop-blur-xl shadow-lg dark:shadow-xl hover:shadow-xl dark:hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 overflow-hidden"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -100,7 +98,7 @@ export function TemplateBookCard({ book }: TemplateBookCardProps) {
           
           {/* Popularity Badge */}
           {book.popularity && book.popularity > 100 && (
-            <div className="flex items-center gap-1 bg-amber-500/20 text-amber-400 px-2 py-1 rounded-full text-xs border border-amber-500/30">
+            <div className="flex items-center gap-1 bg-amber-500/20 text-amber-600 dark:text-amber-400 px-2 py-1 rounded-full text-xs border border-amber-500/30">
               <Sparkles className="h-3 w-3" />
               پرطرفدار
             </div>
@@ -109,17 +107,17 @@ export function TemplateBookCard({ book }: TemplateBookCardProps) {
 
         {/* Book Info */}
         <div className="flex-1">
-          <h3 className="text-sm font-bold text-white mb-3 line-clamp-2 group-hover:text-cyan-400 transition-colors duration-300 leading-tight">
+          <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-3 line-clamp-2 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors duration-300 leading-tight">
             {book.title}
           </h3>
-          <p className="text-gray-300 text-xs mb-4 line-clamp-3 leading-relaxed">
+          <p className="text-gray-600 dark:text-gray-300 text-xs mb-4 line-clamp-3 leading-relaxed">
             {book.description}
           </p>
         </div>
 
         {/* Stats */}
-        <div className="flex items-center justify-between mb-4 pt-4 border-t border-gray-700/50">
-          <div className="flex items-center gap-4 text-xs text-gray-400">
+        <div className="flex items-center justify-between mb-4 pt-4 border-t border-gray-200 dark:border-gray-700/50">
+          <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
             <div className="flex items-center gap-1">
               <BookOpen className="h-4 w-4" />
               <span>{book.cards.length} کارت</span>
@@ -139,7 +137,7 @@ export function TemplateBookCard({ book }: TemplateBookCardProps) {
           </div>
           
           {book.category && (
-            <span className="text-xs text-gray-400 bg-gray-700/50 px-2 py-1 rounded-lg">
+            <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700/50 px-2 py-1 rounded-lg border border-gray-200 dark:border-gray-600/50">
               {book.category}
             </span>
           )}
@@ -178,7 +176,7 @@ export function TemplateBookCard({ book }: TemplateBookCardProps) {
 
       {/* Hover Effects */}
       <div className={`absolute inset-0 rounded-2xl bg-gradient-to-r ${getLevelColor(book.level)} opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10`}>
-        <div className="absolute inset-[1px] rounded-2xl bg-gray-900"></div>
+        <div className="absolute inset-[1px] rounded-2xl bg-white dark:bg-gray-900"></div>
       </div>
     </div>
   );
