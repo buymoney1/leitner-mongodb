@@ -1,10 +1,9 @@
-//onboarding/page.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { UserCheck, Clock, Target, BookOpen, Sparkles } from 'lucide-react';
+import { UserCheck, Clock, BookOpen } from 'lucide-react';
 
 const REVIEW_TIME_OPTIONS = [
   { value: 'MORNING', label: 'صبح‌ها ☀️', time: '۸-۱۲' },
@@ -27,7 +26,6 @@ export default function OnboardingPage() {
   const [formData, setFormData] = useState({
     name: '',
     learningGoal: '',
-    targetScore: '',
     reviewTimePreference: '',
   });
   const [isLoading, setIsLoading] = useState(false);
@@ -41,8 +39,6 @@ export default function OnboardingPage() {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
-
-  const isIELTSOrTOEFL = formData.learningGoal === 'IELTS' || formData.learningGoal === 'TOEFL';
 
   const steps = [
     {
@@ -95,38 +91,6 @@ export default function OnboardingPage() {
       isValid: formData.learningGoal !== '',
     },
     {
-      title: 'نمره هدف شما چقدر است؟',
-      icon: <Target className="h-6 w-6" />,
-      content: isIELTSOrTOEFL ? (
-        <div className="space-y-4">
-          <p className="text-gray-600 dark:text-gray-400 text-sm text-center">
-            {formData.learningGoal === 'IELTS' 
-              ? 'نمره هدف خود در آیلتس را وارد کنید (۰-۹)' 
-              : 'نمره هدف خود در تافل را وارد کنید (۰-۱۲۰)'}
-          </p>
-          <input
-            name="targetScore"
-            type="number"
-            step="0.5"
-            min="0"
-            max={formData.learningGoal === 'IELTS' ? "9" : "120"}
-            value={formData.targetScore}
-            onChange={handleChange}
-            placeholder={formData.learningGoal === 'IELTS' ? 'مثلاً: ۷.۵' : 'مثلاً: ۱۰۰'}
-            className="w-full px-4 py-3 rounded-xl bg-white dark:bg-gray-800/50 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all duration-300 backdrop-blur-sm text-center text-lg"
-            autoFocus
-          />
-  
-        </div>
-      ) : (
-        <div className="text-center py-4">
-          <div className="text-green-500 dark:text-green-400 text-4xl mb-2">🎯</div>
-          <p className="text-gray-600 dark:text-gray-400">برنامه یادگیری شما بر اساس هدف انتخاب شده تنظیم خواهد شد</p>
-        </div>
-      ),
-      isValid: isIELTSOrTOEFL ? formData.targetScore.trim() !== '' : true,
-    },
-    {
       title: 'ترجیح می‌دهید چه زمانی مرور کنید؟',
       icon: <Clock className="h-6 w-6" />,
       content: (
@@ -177,7 +141,6 @@ export default function OnboardingPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
-          targetScore: formData.targetScore ? parseFloat(formData.targetScore) : null,
           suggestedReviewTime: formData.reviewTimePreference,
         }),
       });
@@ -200,8 +163,6 @@ export default function OnboardingPage() {
       <div className="fixed bottom-1/4 -right-10 w-72 h-72 bg-purple-500/10 dark:bg-purple-500/10 rounded-full blur-3xl"></div>
 
       <div className="relative w-full max-w-md max-h-[95vh] overflow-y-auto scrollbar-hide">
-
-
         {/* Main Card */}
         <div className="bg-white dark:bg-gray-800/50 rounded-3xl p-6 shadow-xl dark:shadow-2xl border border-gray-300 dark:border-gray-700/50 backdrop-blur-xl transition-colors duration-300">
           {/* Step Header */}

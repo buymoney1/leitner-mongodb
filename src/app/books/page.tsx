@@ -12,8 +12,7 @@ export default async function BooksPage() {
     redirect("/login");
   }
 
-  // --- دریافت کتاب‌های الگو از فایل JSON ---
-  // دیگر نیازی به گرفتن کتاب‌های شخصی از دیتابیس نیست
+
   const filePath = path.join(process.cwd(), 'data', 'template-books.json');
   const fileContent = await readFile(filePath, 'utf-8');
   const templateBooks = JSON.parse(fileContent);
@@ -21,7 +20,6 @@ export default async function BooksPage() {
   return (
     <main className="container mx-auto p-6 md:p-8">
 
-      {/* --- فقط initialTemplateBooks پاس داده می‌شود --- */}
       <BooksClient initialTemplateBooks={templateBooks} />
     </main>
   );

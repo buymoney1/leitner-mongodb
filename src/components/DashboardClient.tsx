@@ -198,6 +198,21 @@ export function DashboardClient({ userName, userRole }: DashboardClientProps) {
                   دسترسی سریع
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                
+                <QuickActionButton
+                    href="/planner"
+                    icon={Plus}
+                    label="نقشه راه"
+                    description="من تو این راه دستیار شما هستم"
+                    color={{
+                      border: "border-orange-500/20",
+                      bg: "from-orange-500/10 to-orange-600/5",
+                      iconBg: "bg-orange-500/20",
+                      icon: "text-orange-600 dark:text-orange-400",
+                      dot: "bg-orange-500",
+                      glow: "bg-orange-500"
+                    }}
+                  />
                   <QuickActionButton
                     href="/dashboard/review"
                     icon={Brain}
@@ -260,12 +275,12 @@ export function DashboardClient({ userName, userRole }: DashboardClientProps) {
                     label="مقاله‌های آموزشی"
                     description="مطالعه عمیق و دقیق"
                     color={{
-                      border: "border-green-500/20",
-                      bg: "from-green-500/10 to-green-600/5",
-                      iconBg: "bg-green-500/20",
-                      icon: "text-green-600 dark:text-green-400",
-                      dot: "bg-green-500",
-                      glow: "bg-green-500"
+                      border: "border-cyan-500/20",
+                      bg: "from-cyan-500/10 to-cyan-600/5",
+                      iconBg: "bg-cyan-500/20",
+                      icon: "text-cyan-600 dark:text-cyan-400",
+                      dot: "bg-cyan-500",
+                      glow: "bg-cyan-500"
                     }}
                   />
                   <QuickActionButton
@@ -282,6 +297,7 @@ export function DashboardClient({ userName, userRole }: DashboardClientProps) {
                       glow: "bg-green-500"
                     }}
                   />
+
                 </div>
               </section>
 

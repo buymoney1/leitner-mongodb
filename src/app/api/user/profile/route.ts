@@ -19,7 +19,6 @@ export async function GET() {
         email: true,
         image: true,
         learningGoal: true,
-        targetScore: true,
         suggestedReviewTime: true,
         isOnboardingComplete: true,
         createdAt: true,
@@ -54,7 +53,6 @@ export async function PATCH(request: Request) {
     const { 
       name, 
       learningGoal, 
-      targetScore, 
       suggestedReviewTime 
     } = body;
 
@@ -66,31 +64,6 @@ export async function PATCH(request: Request) {
       );
     }
 
-    // اعتبارسنجی targetScore برای IELTS و TOEFL
-    if (learningGoal === 'IELTS' || learningGoal === 'TOEFL') {
-      if (!targetScore) {
-        return NextResponse.json(
-          { error: 'Target score is required for IELTS/TOEFL goals' },
-          { status: 400 }
-        );
-      }
-
-      const score = parseFloat(targetScore);
-      if (learningGoal === 'IELTS' && (score < 0 || score > 9)) {
-        return NextResponse.json(
-          { error: 'IELTS score must be between 0 and 9' },
-          { status: 400 }
-        );
-      }
-
-      if (learningGoal === 'TOEFL' && (score < 0 || score > 120)) {
-        return NextResponse.json(
-          { error: 'TOEFL score must be between 0 and 120' },
-          { status: 400 }
-        );
-      }
-    }
-
     // آماده کردن داده برای آپدیت
     const updateData: any = {
       name: name.trim(),
@@ -98,14 +71,8 @@ export async function PATCH(request: Request) {
       suggestedReviewTime,
       isOnboardingComplete: true,
       updatedAt: new Date(),
+      targetScore: null, // حذف نمره هدف
     };
-
-    // فقط اگر targetScore وجود داشت اضافه کن
-    if (targetScore) {
-      updateData.targetScore = parseFloat(targetScore);
-    } else {
-      updateData.targetScore = null;
-    }
 
     // آپدیت کاربر
     const updatedUser = await prisma.user.update({
@@ -117,7 +84,6 @@ export async function PATCH(request: Request) {
         email: true,
         image: true,
         learningGoal: true,
-        targetScore: true,
         suggestedReviewTime: true,
         isOnboardingComplete: true,
         updatedAt: true,

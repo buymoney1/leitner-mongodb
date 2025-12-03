@@ -7,6 +7,7 @@ import { MobileNavBar } from "@/components/MobileNavBar";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
+import EnhancedActivityTracker from "@/components/EnhancedActivityTracker";
 
 const vazir = Vazirmatn({
   subsets: ["arabic"],
@@ -66,6 +67,7 @@ export default async function RootLayout({
       <body className={`${vazir.variable} font-sans antialiased bg-white dark:bg-black text-gray-900 dark:text-white transition-colors duration-300`}>
         <ThemeProvider>
           <SessionProvider session={session}>
+          <EnhancedActivityTracker />
             {children}
             <MobileNavBar />
             

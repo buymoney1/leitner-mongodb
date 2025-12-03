@@ -63,13 +63,19 @@ model User {
   books         Book[]
   cards         Card[]
   reviews       Review[]
-  role String @default("user") // user | admin
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
   
   // اضافه کردن رابطه‌های جدید
   podcasts Podcast[]
   articles Article[]
+  
+  activityTrackings ActivityTracking[]
+
+  // اضافه کردن رابطه با DailyActivity
+  dailyActivities DailyActivity[]
+  
+  role String @default("user") // user | admin
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // --- مدل اصلاح شده VerificationToken ---
@@ -147,6 +153,10 @@ model Video {
   level       VideoLevel
   subtitlesVtt  String? 
   vocabularies VideoVocabulary[]
+  
+  // اضافه کردن رابطه با DailyActivity
+  dailyActivities DailyActivity[]
+  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -181,6 +191,9 @@ model Podcast {
   createdById String? @db.ObjectId
   createdBy   User?   @relation(fields: [createdById], references: [id])
   
+  // اضافه کردن رابطه با DailyActivity
+  dailyActivities DailyActivity[]
+  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -207,6 +220,9 @@ model Article {
   createdById String? @db.ObjectId
   createdBy   User?   @relation(fields: [createdById], references: [id])
   
+  // اضافه کردن رابطه با DailyActivity
+  dailyActivities DailyActivity[]
+  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -218,4 +234,64 @@ model ArticleVocabulary {
   word        String
   meaning     String
   paragraph   Int? // پاراگراف مربوطه
+}
+
+// --- مدل جدید برای فعالیت‌های روزانه (Planner) ---
+model DailyActivity {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId          String   @db.ObjectId
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  date            DateTime
+  
+  // فعالیت‌های روزانه
+  videoWatched    Boolean  @default(false)
+  podcastListened Boolean  @default(false)
+  wordsReviewed   Boolean  @default(false)
+  articleRead     Boolean  @default(false)
+  
+  // محتوای انجام شده (اختیاری)
+  videoId         String?  @db.ObjectId
+  video           Video?   @relation(fields: [videoId], references: [id])
+  
+  podcastId       String?  @db.ObjectId
+  podcast         Podcast? @relation(fields: [podcastId], references: [id])
+  
+  articleId       String?  @db.ObjectId
+  article         Article? @relation(fields: [articleId], references: [id])
+  
+  // پیشرفت کلی
+  progress        Float    @default(0) // 0-100
+  
+  // متادیتا
+  completedAt     DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([userId, date])
+  @@index([userId])
+  @@index([date])
+}
+
+
+model ActivityTracking {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId       String   @db.ObjectId
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  activityType String   // video, podcast, article, words
+  contentId    String?  @db.ObjectId // آیدی محتوای خاص (برای video/podcast/article)
+  duration     Int      // مدت زمان به ثانیه
+  pathname     String?  // مسیر کامل صفحه (مثال: /video/123)
+  isRegistered Boolean  @default(false) // آیا در DailyActivity ثبت شده یا نه
+  registeredAt DateTime? // زمان ثبت در DailyActivity
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([userId])
+  @@index([activityType])
+  @@index([createdAt])
+  @@index([isRegistered])
+  @@index([userId, isRegistered])
 }

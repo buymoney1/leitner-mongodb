@@ -51,9 +51,9 @@ export default async function VideoPage({ params }: { params: Promise<{ id: stri
   // کامپوننت VideoPlayer را با داده‌های جدید رندر کن
   return (
     <VideoPlayer
-      videoUrl={videoData.videoUrl}
-      subtitlesVtt={videoData.subtitlesVtt}
-      vocabularies={vocabularies}
+      videoUrl="/test-video.mp4"
+      subtitleUrl="/text.vtt"
+      
     />
   );
 }

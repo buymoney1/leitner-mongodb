@@ -13,7 +13,7 @@ const withPWA = require('next-pwa')({
 const nextConfig: NextConfig = {
   /* config options here */
   experimental: {
-    optimizeCss: false, // غیرفعال کردن lightningcss
+    optimizeCss: true, // غیرفعال کردن lightningcss
   },
   typescript: {
     ignoreBuildErrors: true, // موقتاً برای جلوگیری از خطای build
@@ -24,6 +24,11 @@ const nextConfig: NextConfig = {
   images: {
     domains: ["lh3.googleusercontent.com"],
   },
+
+  reactStrictMode: true,
+  swcMinify: true,
+
+
 };
 
 export default withNextVideo(nextConfig);

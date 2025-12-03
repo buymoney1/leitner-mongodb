@@ -257,7 +257,7 @@ export default function HomePage() {
               href="/login"
               className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-10 py-4 text-lg font-semibold text-white shadow-lg shadow-blue-600/20 transition-all duration-300 hover:scale-105 hover:shadow-blue-600/40"
             >
-              جایگاه رایگان خود را بگیرید
+              شروع یادگیری رایگان
             </Link>
             <Link
               href="#demo"
