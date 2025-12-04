@@ -36,6 +36,8 @@ export default function ProfessionalPlanner() {
       <div className="max-w-7xl mx-auto">
         {/* هدر */}
         <header className="mb-8">
+
+          
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
               <h1 className="text-3xl md:text-4xl font-bold text-gray-800 dark:text-white flex items-center gap-3">
@@ -61,22 +63,22 @@ export default function ProfessionalPlanner() {
       
                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
   <div className="flex justify-between items-center mb-6">
-    <h2 className="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+    <h2 className="text-sm font-bold text-gray-800 dark:text-white flex items-center gap-2">
       <CalendarDays className="w-5 h-5 text-blue-600 dark:text-blue-400" />
       تقویم فعالیت‌ها
     </h2>
     <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
       <div className="flex items-center gap-1">
         <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
-        <span>روز کامل</span>
+        <span className="text-xs">روز کامل</span>
       </div>
       <div className="flex items-center gap-1">
         <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-        <span>امروز</span>
+        <span className="text-xs">امروز</span>
       </div>
       <div className="flex items-center gap-1">
         <div className="w-3 h-3 rounded-full bg-blue-500/30"></div>
-        <span>انتخاب</span>
+        <span className="text-xs">انتخاب</span>
       </div>
     </div>
   </div>
@@ -100,14 +102,7 @@ export default function ProfessionalPlanner() {
               <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
                 ثبات کلید موفقیت است. حتی در روزهای سخت، انجام کوچکترین فعالیت‌ها نیز شما را به هدفتان نزدیک‌تر می‌کند.
               </p>
-              <div className="mt-4 pt-4 border-t border-purple-500/20">
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-green-500" />
-                  <span className="text-xs text-gray-600 dark:text-gray-400">
-                    امروز {Math.round(progress)}% از اهدافتان را محقق کرده‌اید
-                  </span>
-                </div>
-              </div>
+  
             </div>
           </div>
         </div>

@@ -120,46 +120,50 @@ export default function EnhancedActivityTracker() {
   if (loading) return null;
 
   return (
-    <div style={{
-      position: 'fixed',
-      bottom: '10px',
-      right: '10px',
-      zIndex: 9999,
-      opacity: 0.8,
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '2px'
-    }}>
-      {(Object.entries(processedStatus) as [keyof ActivityStatus, boolean][]).map(([type, processed]) => (
-        <div
-          key={type}
-          style={{
-            background: processed ? '#10B981' : '#F59E0B',
-            color: 'white',
-            padding: '2px 6px',
-            borderRadius: '3px',
-            fontSize: '9px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '3px'
-          }}
-          title={processed ? `${type} امروز پردازش شده` : `${type} نیاز به پردازش`}
-        >
-          <div style={{
-            width: '4px',
-            height: '4px',
-            borderRadius: '50%',
-            background: processed ? '#047857' : '#D97706'
-          }} />
-          <span>
-            {type === 'video' && '🎬'}
-            {type === 'podcast' && '🎧'}
-            {type === 'words' && '📚'}
-            {type === 'article' && '📖'}
-            {processed ? '✅' : '🔄'}
-          </span>
+    <>
+      {process.env.NODE_ENV === 'development' && (
+        <div style={{
+          position: 'fixed',
+          bottom: '10px',
+          right: '10px',
+          zIndex: 9999,
+          opacity: 0.8,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '2px'
+        }}>
+          {(Object.entries(processedStatus) as [keyof ActivityStatus, boolean][]).map(([type, processed]) => (
+            <div
+              key={type}
+              style={{
+                background: processed ? '#10B981' : '#F59E0B',
+                color: 'white',
+                padding: '2px 6px',
+                borderRadius: '3px',
+                fontSize: '9px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '3px'
+              }}
+              title={processed ? `${type} امروز پردازش شده` : `${type} نیاز به پردازش`}
+            >
+              <div style={{
+                width: '4px',
+                height: '4px',
+                borderRadius: '50%',
+                background: processed ? '#047857' : '#D97706'
+              }} />
+              <span>
+                {type === 'video' && '🎬'}
+                {type === 'podcast' && '🎧'}
+                {type === 'words' && '📚'}
+                {type === 'article' && '📖'}
+                {processed ? '✅' : '🔄'}
+              </span>
+            </div>
+          ))}
         </div>
-      ))}
-    </div>
+      )}
+    </>
   );
 }

@@ -1,42 +1,109 @@
-import { auth } from '@/lib/auth';
 import { NextRequest, NextResponse } from 'next/server';
-
+import { auth } from '@/lib/auth';
+import {prisma} from '@/lib/prisma';
 
 export async function GET(req: NextRequest) {
   try {
+    console.log('📅 درخواست فعالیت امروز...');
+    
     const session = await auth();
-
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    
+    if (!session?.user?.id) {
+      console.log('❌ کاربر لاگین نیست');
+      return NextResponse.json(
+        { success: false, message: 'لطفاً وارد شوید' },
+        { status: 401 }
+      );
     }
 
-
+    const userId = session.user.id;
     const today = new Date();
     today.setHours(0, 0, 0, 0);
+    
+    console.log('👤 کاربر:', userId);
+    console.log('📅 تاریخ امروز:', today.toLocaleDateString('fa-IR'));
 
-    const activity = await prisma.dailyActivity.findUnique({
+    // --- یافتن یا ایجاد DailyActivity برای امروز ---
+    let dailyActivity = await prisma.dailyActivity.findUnique({
       where: {
         userId_date: {
-          userId: session.user.id,
+          userId: userId,
           date: today
         }
       },
       include: {
-        video: true,
-        podcast: true,
-        article: true
+        video: { select: { title: true } },
+        podcast: { select: { title: true } },
+        article: { select: { title: true } }
       }
+    });
+
+    if (!dailyActivity) {
+      console.log('🆕 ایجاد DailyActivity جدید');
+      dailyActivity = await prisma.dailyActivity.create({
+        data: {
+          userId: userId,
+          date: today,
+          progress: 0
+        },
+        include: {
+          video: { select: { title: true } },
+          podcast: { select: { title: true } },
+          article: { select: { title: true } }
+        }
+      });
+    }
+
+    // --- فیکس خودکار پیشرفت ---
+    const completedCount = [
+      dailyActivity.videoWatched,
+      dailyActivity.podcastListened,
+      dailyActivity.wordsReviewed,
+      dailyActivity.articleRead
+    ].filter(Boolean).length;
+
+    const correctProgress = Math.min(100, (completedCount / 4) * 100);
+    
+    // اگر progress اشتباه است، آپدیت کن
+    if (dailyActivity.progress !== correctProgress) {
+      console.log(`🔧 فیکس خودکار: ${dailyActivity.progress}% -> ${correctProgress}%`);
+      
+      await prisma.dailyActivity.update({
+        where: { id: dailyActivity.id },
+        data: { progress: correctProgress }
+      });
+      
+      // دوباره بگیر با اطلاعات به‌روز شده
+      dailyActivity = await prisma.dailyActivity.findUnique({
+        where: { id: dailyActivity.id },
+        include: {
+          video: { select: { title: true } },
+          podcast: { select: { title: true } },
+          article: { select: { title: true } }
+        }
+      });
+    }
+
+    console.log('📈 وضعیت نهایی:', {
+      progress: dailyActivity.progress,
+      video: dailyActivity.videoWatched,
+      podcast: dailyActivity.podcastListened,
+      words: dailyActivity.wordsReviewed,
+      article: dailyActivity.articleRead
     });
 
     return NextResponse.json({
       success: true,
-      data: activity
+      data: dailyActivity
     });
 
   } catch (error) {
-    console.error('Error fetching today activity:', error);
+    console.error('❌ خطا در دریافت فعالیت امروز:', error);
     return NextResponse.json(
-      { success: false, message: 'خطا در دریافت فعالیت امروز' },
+      { 
+        success: false, 
+        message: 'خطا در دریافت فعالیت امروز'
+      },
       { status: 500 }
     );
   }

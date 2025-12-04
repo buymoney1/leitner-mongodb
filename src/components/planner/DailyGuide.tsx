@@ -3,6 +3,7 @@
 
 import { BookOpen, Headphones, Video, FileText, ArrowRight, CheckCircle } from 'lucide-react';
 import { useState } from 'react';
+import Link from 'next/link';
 
 export default function DailyGuide() {
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
@@ -14,12 +15,15 @@ export default function DailyGuide() {
       description: 'روزانه حداقل یک ویدیو آموزشی در زمینه تخصصی خود تماشا کنید',
       icon: Video,
       color: 'bg-red-500/10 text-red-600 dark:text-red-400',
+      startLink: '/video-levels',
+      startText: 'انتخاب ویدیو',
       steps: [
         'ویدیویی با موضوع مرتبط با اهداف یادگیری خود انتخاب کنید',
         'در حین تماشا لغات مهم و جدید رو به لایتنر خود اضافه کنید',
         'مدت زمان پیشنهادی: ۱۵-۳۰ دقیقه',
         'پس از اتمام، سه نکته کلیدی را مرور کنید'
-      ]
+      ],
+      recommendedLevel: 'B1 یا بالاتر'
     },
     {
       id: 'podcast',
@@ -27,13 +31,16 @@ export default function DailyGuide() {
       description: 'یک اپیزود پادکست در حین فعالیت‌های روزانه گوش دهید',
       icon: Headphones,
       color: 'bg-purple-500/10 text-purple-600 dark:text-purple-400',
+      startLink: '/podcasts',
+      startText: 'مشاهده پادکست‌ها',
       steps: [
         'پادکستی در حوزه دلخواه انتخاب کنید',
         'لغات جدید رو به لایتنر خود اضافه کنید',
         'می‌توانید در حین رفت و آمد یا ورزش گوش دهید',
         'مدت زمان پیشنهادی: ۲۰-۴۵ دقیقه',
         'یک ایده جدید از پادکست استخراج کنید'
-      ]
+      ],
+      recommendedLevel: 'A2 یا بالاتر'
     },
     {
       id: 'words',
@@ -41,12 +48,15 @@ export default function DailyGuide() {
       description: 'کلمات جدید را در سیستم لایتنر مرور و تثبیت کنید',
       icon: BookOpen,
       color: 'bg-green-500/10 text-green-600 dark:text-green-400',
+      startLink: '/dashboard/review',
+      startText: 'شروع مرور',
       steps: [
         'کارت‌های لغت روزانه را بررسی کنید',
         'کلمات مشکل‌دار را علامت‌گذاری کنید',
         'تعداد پیشنهادی: ۱۰-۲۰ کلمه جدید',
         'کلمات را در جمله به کار ببرید'
-      ]
+      ],
+      recommendedLevel: 'همه سطوح'
     },
     {
       id: 'article',
@@ -54,12 +64,15 @@ export default function DailyGuide() {
       description: 'یک مقاله معتبر در حوزه کاری خود مطالعه کنید',
       icon: FileText,
       color: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
+      startLink: '/articles',
+      startText: 'مطالعه مقالات',
       steps: [
         'مقاله‌ای را به دلخواه انتخاب کنید',
         'ابتدا چکیده و نتیجه‌گیری را بخوانید',
         'لغات جدید رو به لایتنر خود اضافه کنید',
         'مدت زمان پیشنهادی: ۱۰-۲۰ دقیقه'
-      ]
+      ],
+      recommendedLevel: 'B1 یا بالاتر'
     }
   ];
 
@@ -83,7 +96,7 @@ export default function DailyGuide() {
         </div>
       </div>
 
-      <div className="space-y-4 ">
+      <div className="space-y-4">
         {guides.map((guide) => {
           const Icon = guide.icon;
           const isExpanded = expandedSection === guide.id;
@@ -133,18 +146,21 @@ export default function DailyGuide() {
                       </div>
                     ))}
                   </div>
-                  <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-gray-500 dark:text-gray-400">
-                        زمان تخمینی: ۶۰-۹۰ دقیقه
-                      </span>
-                      <button className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300">
-                        شروع فعالیت →
-                      </button>
-                    </div>
-                  </div>
+                  
+             
                 </div>
               )}
+              
+              {/* دکمه شروع سریع (همیشه نمایش داده می‌شود) */}
+              <div className="px-4 pb-4 pt-2 border-t border-gray-100 dark:border-gray-700">
+                <Link 
+                  href={guide.startLink}
+                  className="flex items-center justify-center gap-2 w-full py-2.5 text-sm font-medium rounded-lg bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 transition-colors"
+                >
+                  <Icon className="w-4 h-4" />
+                  شروع  {guide.title}
+                </Link>
+              </div>
             </div>
           );
         })}
@@ -163,6 +179,74 @@ export default function DailyGuide() {
               حتی اگر زمان کمی دارید، یکی از فعالیت‌ها را با تمرکز کامل انجام دهید
             </p>
           </div>
+        </div>
+      </div>
+      
+      {/* بخش شروع سریع همه فعالیت‌ها */}
+      <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+        <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-4">
+          شروع سریع همه فعالیت‌ها
+        </h3>
+        <div className="grid grid-cols-2 gap-3">
+          <Link 
+            href="/video-levels"
+            className="group p-3 rounded-lg bg-gradient-to-r from-red-500/10 to-pink-500/10 hover:from-red-500/20 hover:to-pink-500/20 border border-red-500/20 hover:border-red-500/40 transition-all duration-300"
+          >
+            <div className="flex items-center gap-2">
+              <Video className="w-4 h-4 text-red-600 dark:text-red-400" />
+              <span className="text-sm font-medium text-gray-800 dark:text-white group-hover:text-red-600 dark:group-hover:text-red-400">
+                ویدیو آموزشی
+              </span>
+            </div>
+            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+              یادگیری با ویدیو
+            </p>
+          </Link>
+          
+          <Link 
+            href="/podcasts"
+            className="group p-3 rounded-lg bg-gradient-to-r from-purple-500/10 to-violet-500/10 hover:from-purple-500/20 hover:to-violet-500/20 border border-purple-500/20 hover:border-purple-500/40 transition-all duration-300"
+          >
+            <div className="flex items-center gap-2">
+              <Headphones className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+              <span className="text-sm font-medium text-gray-800 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400">
+                پادکست
+              </span>
+            </div>
+            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+              گوش دادن و یادگیری
+            </p>
+          </Link>
+          
+          <Link 
+            href="/dashboard/review"
+            className="group p-3 rounded-lg bg-gradient-to-r from-green-500/10 to-emerald-500/10 hover:from-green-500/20 hover:to-emerald-500/20 border border-green-500/20 hover:border-green-500/40 transition-all duration-300"
+          >
+            <div className="flex items-center gap-2">
+              <BookOpen className="w-4 h-4 text-green-600 dark:text-green-400" />
+              <span className="text-sm font-medium text-gray-800 dark:text-white group-hover:text-green-600 dark:group-hover:text-green-400">
+                مرور لغات
+              </span>
+            </div>
+            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+              تثبیت کلمات جدید
+            </p>
+          </Link>
+          
+          <Link 
+            href="/articles"
+            className="group p-3 rounded-lg bg-gradient-to-r from-blue-500/10 to-cyan-500/10 hover:from-blue-500/20 hover:to-cyan-500/20 border border-blue-500/20 hover:border-blue-500/40 transition-all duration-300"
+          >
+            <div className="flex items-center gap-2">
+              <FileText className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+              <span className="text-sm font-medium text-gray-800 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                مقاله تخصصی
+              </span>
+            </div>
+            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+              مطالعه عمیق
+            </p>
+          </Link>
         </div>
       </div>
     </div>

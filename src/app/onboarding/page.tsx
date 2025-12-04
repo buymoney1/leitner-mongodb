@@ -144,7 +144,7 @@ export default function OnboardingPage() {
           suggestedReviewTime: formData.reviewTimePreference,
         }),
       });
-      if (response.ok) router.push('/dashboard');
+      if (response.ok) router.push('/planner');
       else alert('خطایی در ثبت اطلاعات رخ داد.');
     } catch {
       alert('خطا در ارتباط با سرور.');

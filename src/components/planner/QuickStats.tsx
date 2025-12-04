@@ -62,11 +62,14 @@ export default function QuickStats() {
         fetch('/api/planner/today'),
         fetch('/api/planner/recent-activities?limit=5')
       ]);
-
+  
       const statsData = await statsRes.json();
       const todayData = await todayRes.json();
       const activitiesData = await activitiesRes.json();
-
+  
+      console.log('📊 داده‌های آمار:', statsData);
+      console.log('📅 داده‌های امروز:', todayData);
+  
       if (statsData.success) {
         // محاسبه زمان کل از ActivityTracking
         const totalMinutes = Math.floor(statsData.data.totalTime / 60);
@@ -76,10 +79,10 @@ export default function QuickStats() {
         const timeSpent = hours > 0 
           ? `${hours} ساعت و ${minutes} دقیقه`
           : `${minutes} دقیقه`;
-
-        // محاسبه استریک (تعداد روزهای متوالی با فعالیت)
-        const streak = calculateStreak(statsData.data.recentDays || []);
-
+  
+        // محاسبه استریک
+        const streak = statsData.data.streak || 0;
+  
         setStats({
           videos: statsData.data.totalActivities?.videos || 0,
           podcasts: statsData.data.totalActivities?.podcasts || 0,
@@ -90,15 +93,16 @@ export default function QuickStats() {
           weeklyAverage: statsData.data.weeklyAverage || 0,
           todaysProgress: statsData.data.todaysProgress || 0
         });
-
+  
         if (todayData.success && todayData.data) {
           setTodaysActivity(todayData.data);
+          console.log('✅ فعالیت امروز:', todayData.data);
         }
-
+  
         if (activitiesData.success) {
           setRecentActivities(activitiesData.data);
         }
-
+  
         setLastUpdated(new Date().toLocaleTimeString('fa-IR', {
           hour: '2-digit',
           minute: '2-digit',
@@ -111,7 +115,6 @@ export default function QuickStats() {
       setIsLoading(false);
     }
   };
-
   const calculateStreak = (recentDays: any[]): number => {
     if (!recentDays.length) return 0;
     
