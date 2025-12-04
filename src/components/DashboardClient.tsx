@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { BookOpen, Brain, Plus, Play, Home, Video, Settings, Mic } from "lucide-react";
+import { BookOpen, Brain, Plus, Play, Home, Video, Settings, Mic, Music } from "lucide-react";
 import { ManageCardsClient } from "./ManageCardsClient";
 import { AdminPanel } from "./video/AdminPanel";
 import { VideoList } from "./video/VideoList";
@@ -255,6 +255,20 @@ export function DashboardClient({ userName, userRole }: DashboardClientProps) {
                       glow: "bg-orange-500"
                     }}
                   />
+                    <QuickActionButton
+                      href="/songs"
+                      icon={Music}
+                      label="آهنگ‌های انگلیسی"
+                      description="گوش کنید و یاد بگیرید"
+                      color={{
+                        border: "border-green-500/20",
+                        bg: "from-green-500/10 to-green-600/5",
+                        iconBg: "bg-green-500/20",
+                        icon: "text-green-600 dark:text-green-400",
+                        dot: "bg-green-500",
+                        glow: "bg-green-500"
+                      }}
+                    />
                   <QuickActionButton
                     href="/podcasts"
                     icon={Mic}

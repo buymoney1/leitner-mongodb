@@ -46,7 +46,6 @@ enum ReviewTimePreference {
   NIGHT
 }
 
-
 model User {
   id            String          @id @default(auto()) @map("_id") @db.ObjectId
   name          String?
@@ -67,6 +66,7 @@ model User {
   // اضافه کردن رابطه‌های جدید
   podcasts Podcast[]
   articles Article[]
+  songs    Song[]  // اضافه کردن رابطه با Song
   
   activityTrackings ActivityTracking[]
 
@@ -249,6 +249,7 @@ model DailyActivity {
   podcastListened Boolean  @default(false)
   wordsReviewed   Boolean  @default(false)
   articleRead     Boolean  @default(false)
+  songListened    Boolean  @default(false) // اضافه کردن آهنگ
   
   // محتوای انجام شده (اختیاری)
   videoId         String?  @db.ObjectId
@@ -259,6 +260,9 @@ model DailyActivity {
   
   articleId       String?  @db.ObjectId
   article         Article? @relation(fields: [articleId], references: [id])
+  
+  songId          String?  @db.ObjectId  // اضافه کردن آهنگ
+  song            Song?    @relation(fields: [songId], references: [id]) // اضافه کردن آهنگ
   
   // پیشرفت کلی
   progress        Float    @default(0) // 0-100
@@ -273,14 +277,13 @@ model DailyActivity {
   @@index([date])
 }
 
-
 model ActivityTracking {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   userId       String   @db.ObjectId
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   
-  activityType String   // video, podcast, article, words
-  contentId    String?  @db.ObjectId // آیدی محتوای خاص (برای video/podcast/article)
+  activityType String   // video, podcast, article, words, song (اضافه کردن song)
+  contentId    String?  @db.ObjectId // آیدی محتوای خاص (برای video/podcast/article/song)
   duration     Int      // مدت زمان به ثانیه
   pathname     String?  // مسیر کامل صفحه (مثال: /video/123)
   isRegistered Boolean  @default(false) // آیا در DailyActivity ثبت شده یا نه
@@ -294,4 +297,29 @@ model ActivityTracking {
   @@index([createdAt])
   @@index([isRegistered])
   @@index([userId, isRegistered])
+}
+
+// --- مدل جدید برای آهنگ‌ها (Songs) ---
+model Song {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  title         String
+  artist        String
+  album         String?
+  duration      Int      // مدت زمان به ثانیه
+  audioUrl      String   // لینک فایل صوتی
+  coverUrl      String?  // لینک کاور آهنگ
+  lyrics        String   // متن آهنگ با ترجمه (یک خط انگلیسی، یک خط فارسی)
+  isPublished   Boolean  @default(false)
+  createdById   String?  @db.ObjectId
+  createdBy     User?    @relation(fields: [createdById], references: [id])
+  
+  // اضافه کردن رابطه با DailyActivity
+  dailyActivities DailyActivity[]
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([title])
+  @@index([artist])
+  @@index([createdById])
 }

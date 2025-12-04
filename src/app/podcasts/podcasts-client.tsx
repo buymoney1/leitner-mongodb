@@ -241,14 +241,7 @@ export default function PodcastsClient() {
                   </p>
                 )}
 
-                <div className="flex items-center justify-between pt-3">
-                  <span className="text-xs text-gray-500 dark:text-gray-500">
-                    {podcast.vocabularies.length} لغت جدید
-                  </span>
-                  <button className="text-purple-500 dark:text-purple-400 hover:text-purple-600 dark:hover:text-purple-300 text-sm font-medium transition-colors">
-                    مطالعه لغات →
-                  </button>
-                </div>
+
 
                 {/* Admin Actions */}
                 {isAdmin && (
