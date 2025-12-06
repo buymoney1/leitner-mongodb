@@ -7,6 +7,7 @@ import { BookOpen, Brain, Plus, Play, Home, Video, Settings, Mic, Music } from "
 import { ManageCardsClient } from "./ManageCardsClient";
 import { AdminPanel } from "./video/AdminPanel";
 import { VideoList } from "./video/VideoList";
+import { SimpleNotificationPrompt } from "./SimpleNotificationPrompt";
 
 interface Stats {
   totalCards: number;
@@ -372,7 +373,7 @@ export function DashboardClient({ userName, userRole }: DashboardClientProps) {
           </div>
         )}
       </div>
-
+      <SimpleNotificationPrompt />
     </div>
   );
 }

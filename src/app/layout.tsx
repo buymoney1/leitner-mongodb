@@ -8,6 +8,9 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
 import EnhancedActivityTracker from "@/components/EnhancedActivityTracker";
+import { Toaster } from 'sonner';
+import { NotificationSetup } from "@/components/NotificationSetup";
+
 
 const vazir = Vazirmatn({
   subsets: ["arabic"],
@@ -67,11 +70,28 @@ export default async function RootLayout({
       <body className={`${vazir.variable} font-sans antialiased bg-white dark:bg-black text-gray-900 dark:text-white transition-colors duration-300`}>
         <ThemeProvider>
           <SessionProvider session={session}>
+          {session?.user?.id && (
+              <NotificationSetup userId={session.user.id} />
+            )}
           <EnhancedActivityTracker />
             {children}
+            <Toaster
+              position="top-right"
+              dir="rtl"
+              expand={false}
+              richColors
+              closeButton
+              duration={5000}
+              toastOptions={{
+                classNames: {
+                  toast: 'group toast group-[.toaster]:bg-background group-[.toaster]:text-foreground group-[.toaster]:border-border group-[.toaster]:shadow-lg',
+                  description: 'group-[.toast]:text-muted-foreground',
+                  actionButton: 'group-[.toast]:bg-primary group-[.toast]:text-primary-foreground',
+                  cancelButton: 'group-[.toast]:bg-muted group-[.toast]:text-muted-foreground',
+                },
+              }}
+            />
             <MobileNavBar />
-            
-            {/* کامپوننت‌های PWA */}
             <PWAInstallPrompt />
             <OfflineIndicator />
           </SessionProvider>

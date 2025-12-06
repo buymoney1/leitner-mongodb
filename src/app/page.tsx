@@ -259,12 +259,7 @@ export default function HomePage() {
             >
               شروع یادگیری رایگان
             </Link>
-            <Link
-              href="#demo"
-              className="inline-flex items-center justify-center rounded-xl border border-gray-700 bg-transparent px-10 py-4 text-lg font-semibold text-white transition-all duration-300 hover:bg-white/5 hover:border-gray-600"
-            >
-              مشاهده دمو
-            </Link>
+
           </div>
 
           {/* Social Proof */}

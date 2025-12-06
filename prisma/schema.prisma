@@ -47,33 +47,42 @@ enum ReviewTimePreference {
 }
 
 model User {
-  id            String          @id @default(auto()) @map("_id") @db.ObjectId
-  name          String?
-  email         String?         @unique
-  emailVerified DateTime?
-  image         String?
-  accounts      Account[]
-  sessions      Session[]
-  learningGoal           String?
-  targetScore            Float?
-  suggestedReviewTime    ReviewTimePreference? 
-  isOnboardingComplete   Boolean   @default(false)
-  lastReviewNotificationAt DateTime? 
-  books         Book[]
-  cards         Card[]
-  reviews       Review[]
-  
+  id                       String                @id @default(auto()) @map("_id") @db.ObjectId
+  name                     String?
+  email                    String?               @unique
+  emailVerified            DateTime?
+  image                    String?
+  accounts                 Account[]
+  sessions                 Session[]
+  learningGoal             String?
+  targetScore              Float?
+  suggestedReviewTime      ReviewTimePreference?
+  isOnboardingComplete     Boolean               @default(false)
+  lastReviewNotificationAt DateTime?
+  books                    Book[]
+  cards                    Card[]
+  reviews                  Review[]
+
   // اضافه کردن رابطه‌های جدید
   podcasts Podcast[]
   articles Article[]
-  songs    Song[]  // اضافه کردن رابطه با Song
-  
+  songs    Song[] // اضافه کردن رابطه با Song
+
   activityTrackings ActivityTracking[]
 
   // اضافه کردن رابطه با DailyActivity
   dailyActivities DailyActivity[]
-  
-  role String @default("user") // user | admin
+
+  // === اضافه کردن Notification Settings ===
+  notificationToken   String? // توکن push notification
+  notificationEnabled Boolean   @default(true) // فعال بودن نوتیفیکیشن
+  lastNotificationAt  DateTime? // آخرین زمان دریافت نوتیفیکیشن
+
+  // === اضافه کردن روابط Notification ===
+  notificationLogs  NotificationLog[] // رابطه با NotificationLog
+  pushSubscriptions PushSubscription[] // رابطه با PushSubscription
+
+  role      String   @default("user") // user | admin
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -92,13 +101,13 @@ model VerificationToken {
 // --- مدل‌های جدید برای سیستم فلش‌کارت ---
 
 model Book {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
   title       String
   description String?
- 
-  userId      String   @db.ObjectId
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  cards       Card[]
+
+  userId String @db.ObjectId
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cards  Card[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -113,24 +122,24 @@ model Card {
   lastReviewedAt DateTime @default(now())
   nextReviewAt   DateTime @default(now())
 
-  bookId         String?  @db.ObjectId
-  book           Book?    @relation(fields: [bookId], references: [id], onDelete: Cascade)
-  userId         String?  @db.ObjectId
-  user           User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  reviews        Review[]
+  bookId  String?  @db.ObjectId
+  book    Book?    @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  userId  String?  @db.ObjectId
+  user    User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reviews Review[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Review {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
   isCorrect Boolean
-  
-  cardId    String   @db.ObjectId
-  card      Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
-  userId    String   @db.ObjectId
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  cardId String @db.ObjectId
+  card   Card   @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  userId String @db.ObjectId
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -146,27 +155,27 @@ enum VideoLevel {
 }
 
 model Video {
-  id          String         @id @default(auto()) @map("_id") @db.ObjectId
-  title       String
-  videoUrl    String
+  id           String            @id @default(auto()) @map("_id") @db.ObjectId
+  title        String
+  videoUrl     String
   thumbnailUrl String?
-  level       VideoLevel
-  subtitlesVtt  String? 
+  level        VideoLevel
+  subtitlesVtt String?
   vocabularies VideoVocabulary[]
-  
+
   // اضافه کردن رابطه با DailyActivity
   dailyActivities DailyActivity[]
-  
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model VideoVocabulary {
-  id          String @id @default(auto()) @map("_id") @db.ObjectId
-  videoId     String @db.ObjectId
-  video       Video  @relation(fields: [videoId], references: [id], onDelete: Cascade)
-  word        String
-  meaning     String
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  videoId String @db.ObjectId
+  video   Video  @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  word    String
+  meaning String
 }
 
 enum ContentLevel {
@@ -179,98 +188,98 @@ enum ContentLevel {
 }
 
 model Podcast {
-  id          String       @id @default(auto()) @map("_id") @db.ObjectId
-  title       String
-  description String?
-  audioUrl    String
-  coverUrl    String?
-  duration    Int? // مدت زمان به ثانیه
-  level       ContentLevel
+  id           String              @id @default(auto()) @map("_id") @db.ObjectId
+  title        String
+  description  String?
+  audioUrl     String
+  coverUrl     String?
+  duration     Int? // مدت زمان به ثانیه
+  level        ContentLevel
   vocabularies PodcastVocabulary[]
-  isPublished Boolean @default(false)
-  createdById String? @db.ObjectId
-  createdBy   User?   @relation(fields: [createdById], references: [id])
-  
+  isPublished  Boolean             @default(false)
+  createdById  String?             @db.ObjectId
+  createdBy    User?               @relation(fields: [createdById], references: [id])
+
   // اضافه کردن رابطه با DailyActivity
   dailyActivities DailyActivity[]
-  
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model PodcastVocabulary {
-  id          String  @id @default(auto()) @map("_id") @db.ObjectId
-  podcastId   String  @db.ObjectId
-  podcast     Podcast @relation(fields: [podcastId], references: [id], onDelete: Cascade)
-  word        String
-  meaning     String
-  timestamp   Int? // زمان در ثانیه که لغت گفته شده
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  podcastId String  @db.ObjectId
+  podcast   Podcast @relation(fields: [podcastId], references: [id], onDelete: Cascade)
+  word      String
+  meaning   String
+  timestamp Int? // زمان در ثانیه که لغت گفته شده
 }
 
 model Article {
-  id          String         @id @default(auto()) @map("_id") @db.ObjectId
-  title       String
-  content     String
-  excerpt     String?
-  coverUrl    String?
-  level       ContentLevel
-  readingTime Int? // زمان مطالعه به دقیقه
+  id           String              @id @default(auto()) @map("_id") @db.ObjectId
+  title        String
+  content      String
+  excerpt      String?
+  coverUrl     String?
+  level        ContentLevel
+  readingTime  Int? // زمان مطالعه به دقیقه
   vocabularies ArticleVocabulary[]
-  isPublished Boolean @default(false)
-  createdById String? @db.ObjectId
-  createdBy   User?   @relation(fields: [createdById], references: [id])
-  
+  isPublished  Boolean             @default(false)
+  createdById  String?             @db.ObjectId
+  createdBy    User?               @relation(fields: [createdById], references: [id])
+
   // اضافه کردن رابطه با DailyActivity
   dailyActivities DailyActivity[]
-  
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model ArticleVocabulary {
-  id          String  @id @default(auto()) @map("_id") @db.ObjectId
-  articleId   String  @db.ObjectId
-  article     Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
-  word        String
-  meaning     String
-  paragraph   Int? // پاراگراف مربوطه
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  articleId String  @db.ObjectId
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  word      String
+  meaning   String
+  paragraph Int? // پاراگراف مربوطه
 }
 
 // --- مدل جدید برای فعالیت‌های روزانه (Planner) ---
 model DailyActivity {
-  id              String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId          String   @db.ObjectId
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  date            DateTime
-  
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  date DateTime
+
   // فعالیت‌های روزانه
-  videoWatched    Boolean  @default(false)
-  podcastListened Boolean  @default(false)
-  wordsReviewed   Boolean  @default(false)
-  articleRead     Boolean  @default(false)
-  songListened    Boolean  @default(false) // اضافه کردن آهنگ
-  
+  videoWatched    Boolean @default(false)
+  podcastListened Boolean @default(false)
+  wordsReviewed   Boolean @default(false)
+  articleRead     Boolean @default(false)
+  songListened    Boolean @default(false) // اضافه کردن آهنگ
+
   // محتوای انجام شده (اختیاری)
-  videoId         String?  @db.ObjectId
-  video           Video?   @relation(fields: [videoId], references: [id])
-  
-  podcastId       String?  @db.ObjectId
-  podcast         Podcast? @relation(fields: [podcastId], references: [id])
-  
-  articleId       String?  @db.ObjectId
-  article         Article? @relation(fields: [articleId], references: [id])
-  
-  songId          String?  @db.ObjectId  // اضافه کردن آهنگ
-  song            Song?    @relation(fields: [songId], references: [id]) // اضافه کردن آهنگ
-  
+  videoId String? @db.ObjectId
+  video   Video?  @relation(fields: [videoId], references: [id])
+
+  podcastId String?  @db.ObjectId
+  podcast   Podcast? @relation(fields: [podcastId], references: [id])
+
+  articleId String?  @db.ObjectId
+  article   Article? @relation(fields: [articleId], references: [id])
+
+  songId String? @db.ObjectId // اضافه کردن آهنگ
+  song   Song?   @relation(fields: [songId], references: [id]) // اضافه کردن آهنگ
+
   // پیشرفت کلی
-  progress        Float    @default(0) // 0-100
-  
+  progress Float @default(0) // 0-100
+
   // متادیتا
-  completedAt     DateTime?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   @@unique([userId, date])
   @@index([userId])
@@ -278,19 +287,19 @@ model DailyActivity {
 }
 
 model ActivityTracking {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId       String   @db.ObjectId
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  activityType String   // video, podcast, article, words, song (اضافه کردن song)
-  contentId    String?  @db.ObjectId // آیدی محتوای خاص (برای video/podcast/article/song)
-  duration     Int      // مدت زمان به ثانیه
-  pathname     String?  // مسیر کامل صفحه (مثال: /video/123)
-  isRegistered Boolean  @default(false) // آیا در DailyActivity ثبت شده یا نه
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  activityType String // video, podcast, article, words, song (اضافه کردن song)
+  contentId    String?   @db.ObjectId // آیدی محتوای خاص (برای video/podcast/article/song)
+  duration     Int // مدت زمان به ثانیه
+  pathname     String? // مسیر کامل صفحه (مثال: /video/123)
+  isRegistered Boolean   @default(false) // آیا در DailyActivity ثبت شده یا نه
   registeredAt DateTime? // زمان ثبت در DailyActivity
-  
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId])
   @@index([activityType])
@@ -301,25 +310,72 @@ model ActivityTracking {
 
 // --- مدل جدید برای آهنگ‌ها (Songs) ---
 model Song {
-  id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  title         String
-  artist        String
-  album         String?
-  duration      Int      // مدت زمان به ثانیه
-  audioUrl      String   // لینک فایل صوتی
-  coverUrl      String?  // لینک کاور آهنگ
-  lyrics        String   // متن آهنگ با ترجمه (یک خط انگلیسی، یک خط فارسی)
-  isPublished   Boolean  @default(false)
-  createdById   String?  @db.ObjectId
-  createdBy     User?    @relation(fields: [createdById], references: [id])
-  
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  artist      String
+  album       String?
+  duration    Int // مدت زمان به ثانیه
+  audioUrl    String // لینک فایل صوتی
+  coverUrl    String? // لینک کاور آهنگ
+  lyrics      String // متن آهنگ با ترجمه (یک خط انگلیسی، یک خط فارسی)
+  isPublished Boolean @default(false)
+  createdById String? @db.ObjectId
+  createdBy   User?   @relation(fields: [createdById], references: [id])
+
   // اضافه کردن رابطه با DailyActivity
   dailyActivities DailyActivity[]
-  
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([title])
   @@index([artist])
   @@index([createdById])
+}
+
+// === اضافه کردن مدل‌های Notification ===
+
+model NotificationLog {
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  title String
+  body  String
+  type  String @default("reminder") // reminder, alert, info
+
+  // وضعیت ارسال
+  status String   @default("sent") // sent, failed, pending
+  sentAt DateTime @default(now())
+
+  // اطلاعات Push
+  pushToken String?
+  error     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([sentAt])
+  @@index([status])
+  @@index([type])
+}
+
+// مدل برای ذخیره توکن‌های push
+model PushSubscription {
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // اطلاعات subscription
+  endpoint String
+  keys     Json // { p256dh: string, auth: string }
+
+  // زمان‌ها
+  expiresAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@unique([endpoint])
+  @@index([userId])
 }
