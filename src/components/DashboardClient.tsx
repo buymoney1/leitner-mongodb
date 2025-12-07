@@ -194,10 +194,7 @@ export function DashboardClient({ userName, userRole }: DashboardClientProps) {
             <div className="space-y-6">
               {/* Quick Actions Grid */}
               <section>
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                  <div className="w-1 h-6 bg-cyan-500 rounded-full"></div>
-                  دسترسی سریع
-                </h2>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 
                 <QuickActionButton
@@ -212,6 +209,20 @@ export function DashboardClient({ userName, userRole }: DashboardClientProps) {
                       icon: "text-orange-600 dark:text-orange-400",
                       dot: "bg-orange-500",
                       glow: "bg-orange-500"
+                    }}
+                  />
+                                  <QuickActionButton
+                    href="/profile"
+                    icon={Plus}
+                    label="پروفایل"
+                    description="پروفایل کاربری"
+                    color={{
+                      border: "border-purple-500/20",
+                      bg: "from-purple-500/10 to-purple-600/5",
+                      iconBg: "bg-purple-500/20",
+                      icon: "text-purple-600 dark:text-purple-400",
+                      dot: "bg-purple-500",
+                      glow: "bg-purple-500"
                     }}
                   />
                   <QuickActionButton
@@ -245,7 +256,7 @@ export function DashboardClient({ userName, userRole }: DashboardClientProps) {
                   <QuickActionButton
                     href="/video-levels"
                     icon={Play}
-                    label="ویدیوهای آموزشی"
+                    label="فیلم و سریال"
                     description="یادگیری از طریق فیلم"
                     color={{
                       border: "border-orange-500/20",

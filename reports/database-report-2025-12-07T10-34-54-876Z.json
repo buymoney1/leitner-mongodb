@@ -1,0 +1,848 @@
+{
+  "summary": {
+    "totalModels": 18,
+    "totalRecords": 0,
+    "issuesFound": 13,
+    "startTime": "2025-12-07T10:34:33.718Z",
+    "endTime": "2025-12-07T10:34:54.830Z",
+    "duration": 21112
+  },
+  "models": {
+    "User": {
+      "error": "\nInvalid `this.prisma[modelName].findFirst()` invocation in\nD:\\projects\\dsa\\leitner-mongodb\\scripts\\check-data-issues.ts:76:63\n\n  73 console.log(`   📈 تعداد رکوردها: ${count}`);\n  74 \n  75 // نمونه‌ای از داده‌ها\n→ 76 const sample = count > 0 ? await this.prisma[modelName].findFirst(\nInconsistent column data: Failed to convert '\"2025-12-06T10:38:17.283Z\"' to 'DateTime' for the field 'updatedAt'."
+    },
+    "Account": {
+      "exists": true,
+      "recordCount": 9,
+      "sample": {
+        "id": "6915bf9b2868cbe79a124351",
+        "userId": "6915bf992868cbe79a124350",
+        "type": "oidc",
+        "provider": "google",
+        "providerAccountId": "103730867095074270426",
+        "refresh_token": null,
+        "access_token": "ya29.a0ATi6K2vW0dbUsiIH5CJP2z0VTmIWn_f-nklB165GOgPHyJL0bkjE7EPZdib-9PuGkwEpskhY8fmg3QR2ynNTiX3t0ZBz0...",
+        "expires_at": 1763036573,
+        "token_type": "bearer",
+        "scope": "https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile open...",
+        "id_token": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjRmZWI0NGYwZjdhN2UyN2M3YzQwMzM3OWFmZjIwYWY1YzhjZjUyZGMiLCJ0eXAiOiJKV1Qi...",
+        "session_state": null
+      },
+      "dateFields": {
+        "expires_at": {
+          "type": "number",
+          "value": 1763036573,
+          "isValid": false,
+          "isoString": null
+        },
+        "session_state": {
+          "type": "object",
+          "value": null,
+          "isValid": false,
+          "isoString": null
+        }
+      }
+    },
+    "Session": {
+      "exists": true,
+      "recordCount": 33,
+      "sample": {
+        "id": "6915bf9e2868cbe79a124352",
+        "sessionToken": "020881f6-b4b0-4bac-ac00-ef44ad3091d4",
+        "userId": "6915bf992868cbe79a124350",
+        "expires": "2025-12-14T12:34:45.641Z"
+      },
+      "dateFields": {
+        "expires": {
+          "type": "object",
+          "value": "2025-12-14T12:34:45.641Z",
+          "isValid": true,
+          "isoString": "2025-12-14T12:34:45.641Z"
+        }
+      }
+    },
+    "VerificationToken": {
+      "exists": true,
+      "recordCount": 0,
+      "sample": null,
+      "dateFields": {}
+    },
+    "Book": {
+      "exists": true,
+      "recordCount": 10,
+      "sample": {
+        "id": "6915dee370a5acf4bc4eea5f",
+        "title": "لغات ضروری آیلتس (Collins)",
+        "description": "مجموعه‌ای از مهم‌ترین لغات کتاب معروف Collins برای آزمون آیلتس.",
+        "userId": "6915bf992868cbe79a124350",
+        "createdAt": "2025-11-13T13:36:35.006Z",
+        "updatedAt": "2025-11-13T13:36:35.006Z"
+      },
+      "dateFields": {
+        "createdAt": {
+          "type": "object",
+          "value": "2025-11-13T13:36:35.006Z",
+          "isValid": true,
+          "isoString": "2025-11-13T13:36:35.006Z"
+        },
+        "updatedAt": {
+          "type": "object",
+          "value": "2025-11-13T13:36:35.006Z",
+          "isValid": true,
+          "isoString": "2025-11-13T13:36:35.006Z"
+        }
+      }
+    },
+    "Card": {
+      "exists": true,
+      "recordCount": 80,
+      "sample": {
+        "id": "6915dee470a5acf4bc4eea63",
+        "front": "Significant",
+        "back": "مهم، قابل توجه",
+        "hint": "Significance",
+        "boxNumber": 2,
+        "lastReviewedAt": "2025-11-13T13:51:25.416Z",
+        "nextReviewAt": "2025-11-17T13:51:25.414Z",
+        "bookId": "6915dee370a5acf4bc4eea5f",
+        "userId": "6915bf992868cbe79a124350",
+        "createdAt": "2025-11-13T13:36:36.698Z",
+        "updatedAt": "2025-11-13T13:51:25.418Z"
+      },
+      "dateFields": {
+        "lastReviewedAt": {
+          "type": "object",
+          "value": "2025-11-13T13:51:25.416Z",
+          "isValid": true,
+          "isoString": "2025-11-13T13:51:25.416Z"
+        },
+        "nextReviewAt": {
+          "type": "object",
+          "value": "2025-11-17T13:51:25.414Z",
+          "isValid": true,
+          "isoString": "2025-11-17T13:51:25.414Z"
+        },
+        "createdAt": {
+          "type": "object",
+          "value": "2025-11-13T13:36:36.698Z",
+          "isValid": true,
+          "isoString": "2025-11-13T13:36:36.698Z"
+        },
+        "updatedAt": {
+          "type": "object",
+          "value": "2025-11-13T13:51:25.418Z",
+          "isValid": true,
+          "isoString": "2025-11-13T13:51:25.418Z"
+        }
+      }
+    },
+    "Review": {
+      "exists": true,
+      "recordCount": 55,
+      "sample": {
+        "id": "6915e24270a5acf4bc4eea65",
+        "isCorrect": true,
+        "cardId": "6915dee470a5acf4bc4eea60",
+        "userId": "6915bf992868cbe79a124350",
+        "createdAt": "2025-11-13T13:50:58.530Z",
+        "updatedAt": "2025-11-13T13:50:58.530Z"
+      },
+      "dateFields": {
+        "createdAt": {
+          "type": "object",
+          "value": "2025-11-13T13:50:58.530Z",
+          "isValid": true,
+          "isoString": "2025-11-13T13:50:58.530Z"
+        },
+        "updatedAt": {
+          "type": "object",
+          "value": "2025-11-13T13:50:58.530Z",
+          "isValid": true,
+          "isoString": "2025-11-13T13:50:58.530Z"
+        }
+      }
+    },
+    "Video": {
+      "exists": true,
+      "recordCount": 9,
+      "sample": {
+        "id": "69185bb81c33cabd7a08ff94",
+        "title": "top notch 1 unit 1 ",
+        "videoUrl": "https://drive.google.com/file/d/1kgOZChjFnZ7QIpakBUaKmlsdusWVNwru/view?usp=sharing",
+        "thumbnailUrl": null,
+        "level": "A1",
+        "subtitlesVtt": null,
+        "createdAt": "2025-11-15T10:53:42.262Z",
+        "updatedAt": "2025-11-15T10:53:42.262Z"
+      },
+      "dateFields": {
+        "createdAt": {
+          "type": "object",
+          "value": "2025-11-15T10:53:42.262Z",
+          "isValid": true,
+          "isoString": "2025-11-15T10:53:42.262Z"
+        },
+        "updatedAt": {
+          "type": "object",
+          "value": "2025-11-15T10:53:42.262Z",
+          "isValid": true,
+          "isoString": "2025-11-15T10:53:42.262Z"
+        }
+      }
+    },
+    "VideoVocabulary": {
+      "exists": true,
+      "recordCount": 28,
+      "sample": {
+        "id": "6918f87699a55e7df12d837c",
+        "videoId": "6918f87599a55e7df12d833d",
+        "word": "Happens in some countries",
+        "meaning": "در بعضی کشورها اتفاق می‌افتد"
+      },
+      "dateFields": {}
+    },
+    "Podcast": {
+      "exists": true,
+      "recordCount": 1,
+      "sample": {
+        "id": "691df96d3bcf01970416e7cb",
+        "title": "?Are we too fixated on protein",
+        "description": "Protein, along with fat and carbohydrates, is key to keeping the body functioning properly. But peop...",
+        "audioUrl": "https://cms.melalinstitute.com/assets/59f6d43a-d40a-4036-86d2-ff82d3eb4781?download=",
+        "coverUrl": "https://media.labxchange.org/xblocks/lb-LabXchange-ffa43ab8-html-1/lxc_ap-bio_text-image-_-p312_the-...",
+        "duration": 375,
+        "level": "A2",
+        "isPublished": true,
+        "createdById": "6915bf992868cbe79a124350",
+        "createdAt": "2025-11-19T17:07:57.805Z",
+        "updatedAt": "2025-12-04T11:38:05.727Z"
+      },
+      "dateFields": {
+        "duration": {
+          "type": "number",
+          "value": 375,
+          "isValid": false,
+          "isoString": null
+        },
+        "createdById": {
+          "type": "string",
+          "value": "6915bf992868cbe79a124350",
+          "isValid": false,
+          "isoString": null
+        },
+        "createdAt": {
+          "type": "object",
+          "value": "2025-11-19T17:07:57.805Z",
+          "isValid": true,
+          "isoString": "2025-11-19T17:07:57.805Z"
+        },
+        "updatedAt": {
+          "type": "object",
+          "value": "2025-12-04T11:38:05.727Z",
+          "isValid": true,
+          "isoString": "2025-12-04T11:38:05.727Z"
+        }
+      }
+    },
+    "PodcastVocabulary": {
+      "exists": true,
+      "recordCount": 1,
+      "sample": {
+        "id": "6931729ea7d7f750b56c3170",
+        "podcastId": "691df96d3bcf01970416e7cb",
+        "word": "carbohydrates",
+        "meaning": "کربوهیدرات",
+        "timestamp": null
+      },
+      "dateFields": {}
+    },
+    "Article": {
+      "exists": true,
+      "recordCount": 1,
+      "sample": {
+        "id": "691dd9113bcf01970416e7c4",
+        "title": "The sun is very active",
+        "content": "Scientists reported spectacular aurora borealis sightings across several US states and explained how...",
+        "excerpt": "Scientists reported spectacular aurora borealis sightings across several US states and explained how...",
+        "coverUrl": "https://mwallpaper.ir/wp-content/uploads/2022/06/%D8%B9%DA%A9%D8%B3-%D8%A8%D8%A7-%DA%A9%DB%8C%D9%81%...",
+        "level": "B1",
+        "readingTime": 3,
+        "isPublished": true,
+        "createdById": "6915bf992868cbe79a124350",
+        "createdAt": "2025-11-19T14:49:53.132Z",
+        "updatedAt": "2025-11-19T16:37:46.899Z"
+      },
+      "dateFields": {
+        "createdById": {
+          "type": "string",
+          "value": "6915bf992868cbe79a124350",
+          "isValid": false,
+          "isoString": null
+        },
+        "createdAt": {
+          "type": "object",
+          "value": "2025-11-19T14:49:53.132Z",
+          "isValid": true,
+          "isoString": "2025-11-19T14:49:53.132Z"
+        },
+        "updatedAt": {
+          "type": "object",
+          "value": "2025-11-19T16:37:46.899Z",
+          "isValid": true,
+          "isoString": "2025-11-19T16:37:46.899Z"
+        }
+      }
+    },
+    "ArticleVocabulary": {
+      "exists": true,
+      "recordCount": 2,
+      "sample": {
+        "id": "691df25b3bcf01970416e7c9",
+        "articleId": "691dd9113bcf01970416e7c4",
+        "word": "centimeters ",
+        "meaning": "سانتی متر",
+        "paragraph": 1
+      },
+      "dateFields": {}
+    },
+    "DailyActivity": {
+      "exists": true,
+      "recordCount": 9,
+      "sample": {
+        "id": "69302e7b928d994705de67db",
+        "userId": "6915bf992868cbe79a124350",
+        "date": "2025-12-02T20:30:00.000Z",
+        "videoWatched": false,
+        "podcastListened": false,
+        "wordsReviewed": false,
+        "articleRead": false,
+        "songListened": false,
+        "videoId": null,
+        "podcastId": null,
+        "articleId": null,
+        "songId": null,
+        "progress": 0,
+        "completedAt": null,
+        "createdAt": "2025-12-03T12:35:07.987Z",
+        "updatedAt": "2025-12-04T10:07:57.746Z"
+      },
+      "dateFields": {
+        "date": {
+          "type": "object",
+          "value": "2025-12-02T20:30:00.000Z",
+          "isValid": true,
+          "isoString": "2025-12-02T20:30:00.000Z"
+        },
+        "videoWatched": {
+          "type": "boolean",
+          "value": false,
+          "isValid": false,
+          "isoString": null
+        },
+        "completedAt": {
+          "type": "object",
+          "value": null,
+          "isValid": false,
+          "isoString": null
+        },
+        "createdAt": {
+          "type": "object",
+          "value": "2025-12-03T12:35:07.987Z",
+          "isValid": true,
+          "isoString": "2025-12-03T12:35:07.987Z"
+        },
+        "updatedAt": {
+          "type": "object",
+          "value": "2025-12-04T10:07:57.746Z",
+          "isValid": true,
+          "isoString": "2025-12-04T10:07:57.746Z"
+        }
+      }
+    },
+    "ActivityTracking": {
+      "exists": true,
+      "recordCount": 47,
+      "sample": {
+        "id": "6930a33d019f2702e9dec26c",
+        "userId": "6915bf992868cbe79a124350",
+        "activityType": "video",
+        "contentId": "693005c0bc0c8a2b5c4bb589",
+        "duration": 14,
+        "pathname": "/video/693005c0bc0c8a2b5c4bb589",
+        "isRegistered": true,
+        "registeredAt": "2025-12-03T20:59:52.527Z",
+        "createdAt": "2025-12-03T20:53:17.877Z",
+        "updatedAt": "2025-12-03T20:59:52.530Z"
+      },
+      "dateFields": {
+        "duration": {
+          "type": "number",
+          "value": 14,
+          "isValid": false,
+          "isoString": null
+        },
+        "pathname": {
+          "type": "string",
+          "value": "/video/693005c0bc0c8a2b5c4bb589",
+          "isValid": false,
+          "isoString": null
+        },
+        "registeredAt": {
+          "type": "object",
+          "value": "2025-12-03T20:59:52.527Z",
+          "isValid": true,
+          "isoString": "2025-12-03T20:59:52.527Z"
+        },
+        "createdAt": {
+          "type": "object",
+          "value": "2025-12-03T20:53:17.877Z",
+          "isValid": true,
+          "isoString": "2025-12-03T20:53:17.877Z"
+        },
+        "updatedAt": {
+          "type": "object",
+          "value": "2025-12-03T20:59:52.530Z",
+          "isValid": true,
+          "isoString": "2025-12-03T20:59:52.530Z"
+        }
+      }
+    },
+    "Song": {
+      "exists": true,
+      "recordCount": 1,
+      "sample": {
+        "id": "6931f5a2a8333b44d7ee2caa",
+        "title": "Text Book",
+        "artist": "Lana Del Rey",
+        "album": "Blue Banisters ",
+        "duration": 303,
+        "audioUrl": "https://ts9.tarafdari.com/contents/user760078/content-sound/text_book_cd_1_track_1_320.mp3",
+        "coverUrl": "https://musilon.com/wp-content/uploads/2024/08/500x500-000000-80-0-0-717.jpg",
+        "lyrics": "[Verse 1]\n\nI guess you could call it textbook\nحدس می‌زنم می تونی اون رو کتاب درسی صدا بزنی (بنامی)\n\n...",
+        "isPublished": true,
+        "createdById": "6915bf992868cbe79a124350",
+        "createdAt": "2025-12-04T20:57:06.883Z",
+        "updatedAt": "2025-12-04T21:19:24.237Z"
+      },
+      "dateFields": {
+        "duration": {
+          "type": "number",
+          "value": 303,
+          "isValid": false,
+          "isoString": null
+        },
+        "createdById": {
+          "type": "string",
+          "value": "6915bf992868cbe79a124350",
+          "isValid": false,
+          "isoString": null
+        },
+        "createdAt": {
+          "type": "object",
+          "value": "2025-12-04T20:57:06.883Z",
+          "isValid": true,
+          "isoString": "2025-12-04T20:57:06.883Z"
+        },
+        "updatedAt": {
+          "type": "object",
+          "value": "2025-12-04T21:19:24.237Z",
+          "isValid": true,
+          "isoString": "2025-12-04T21:19:24.237Z"
+        }
+      }
+    },
+    "NotificationLog": {
+      "exists": true,
+      "recordCount": 0,
+      "sample": null,
+      "dateFields": {}
+    },
+    "PushSubscription": {
+      "exists": true,
+      "recordCount": 1,
+      "sample": {
+        "id": "6934890fa30006fef6c88193",
+        "userId": "691654361a82021384e7cfaf",
+        "endpoint": "https://fcm.googleapis.com/fcm/send/deb5xwNJTTo:APA91bHOV23HCiv0KV_Lq980fMoTYGdbN7qJD-Bz0h8rJ-VbnBZz...",
+        "keys": {
+          "p256dh": "BGULNU2QIT8ThZzo_RBC718ZMsLOcC9qdH7K4NjyldrobJbHKsSJDH54h5Tdlf1RqeyqpKcgEdqLCI4jH9-yDKQ",
+          "auth": "Y22qkOw8XkSMKag_kJlXrQ"
+        },
+        "expiresAt": null,
+        "createdAt": "2025-12-06T19:50:39.130Z",
+        "updatedAt": "2025-12-06T19:50:39.130Z"
+      },
+      "dateFields": {
+        "expiresAt": {
+          "type": "object",
+          "value": null,
+          "isValid": false,
+          "isoString": null
+        },
+        "createdAt": {
+          "type": "object",
+          "value": "2025-12-06T19:50:39.130Z",
+          "isValid": true,
+          "isoString": "2025-12-06T19:50:39.130Z"
+        },
+        "updatedAt": {
+          "type": "object",
+          "value": "2025-12-06T19:50:39.130Z",
+          "isValid": true,
+          "isoString": "2025-12-06T19:50:39.130Z"
+        }
+      }
+    }
+  },
+  "rawCollections": {
+    "PodcastVocabulary": {
+      "count": 1,
+      "sample": {
+        "_id": "6931729ea7d7f750b56c3170",
+        "podcastId": "691df96d3bcf01970416e7cb",
+        "word": "carbohydrates",
+        "meaning": "کربوهیدرات",
+        "timestamp": null
+      },
+      "issues": []
+    },
+    "User": {
+      "count": 9,
+      "sample": {
+        "_id": "6915bf992868cbe79a124350",
+        "name": "mohammad alii baymani",
+        "email": "buymoney.10@gmail.com",
+        "emailVerified": null,
+        "image": "https://lh3.googleusercontent.com/a/ACg8ocIgutpv0ED5GDJAaKJe-1Co352dmbMXhk1_Z9gNpzmf5DS_nQ=s96-c",
+        "createdAt": "2025-11-13T11:23:05.817Z",
+        "updatedAt": "2025-12-06T10:38:17.283Z",
+        "role": "admin",
+        "lastReviewNotificationAt": "2025-11-18T14:51:36.482Z",
+        "learningGoal": "IELTS",
+        "targetScore": null,
+        "suggestedReviewTime": "NIGHT",
+        "isOnboardingComplete": true,
+        "calendarEnabled": true
+      },
+      "issues": [
+        {
+          "type": "DATE_AS_STRING",
+          "field": "updatedAt",
+          "message": "تاريخ به صورت رشته ذخيره شده: 2025-12-06T10:38:17.283Z...",
+          "severity": "HIGH"
+        }
+      ]
+    },
+    "Book": {
+      "count": 10,
+      "sample": {
+        "_id": "6915dee370a5acf4bc4eea5f",
+        "title": "لغات ضروری آیلتس (Collins)",
+        "description": "مجموعه‌ای از مهم‌ترین لغات کتاب معروف Collins برای آزمون آیلتس.",
+        "userId": "6915bf992868cbe79a124350",
+        "createdAt": "2025-11-13T13:36:35.006Z",
+        "updatedAt": "2025-11-13T13:36:35.006Z"
+      },
+      "issues": []
+    },
+    "Song": {
+      "count": 1,
+      "sample": {
+        "_id": "6931f5a2a8333b44d7ee2caa",
+        "title": "Text Book",
+        "artist": "Lana Del Rey",
+        "album": "Blue Banisters ",
+        "duration": 303,
+        "audioUrl": "https://ts9.tarafdari.com/contents/user760078/content-sound/text_book_cd_1_track_1_320.mp3",
+        "coverUrl": "https://musilon.com/wp-content/uploads/2024/08/500x500-000000-80-0-0-717.jpg",
+        "lyrics": "[Verse 1]\n\nI guess you could call it textbook\nحدس می‌زنم می تونی اون رو کتاب درسی صدا بزنی (بنامی)\n\n...",
+        "isPublished": true,
+        "createdById": "6915bf992868cbe79a124350",
+        "createdAt": "2025-12-04T20:57:06.883Z",
+        "updatedAt": "2025-12-04T21:19:24.237Z"
+      },
+      "issues": []
+    },
+    "VideoSubtitle": {
+      "count": 186,
+      "sample": {
+        "_id": "69185bb91c33cabd7a08ff95",
+        "startTime": 32.92,
+        "endTime": 35.66,
+        "englishText": "Well, it happens in some countries, but usually not over here.",
+        "persianText": "خب، در بعضی کشورها اتفاق می‌افتد، اما معمولاً اینجا نه.",
+        "videoId": "69185bb81c33cabd7a08ff94"
+      },
+      "issues": []
+    },
+    "Video": {
+      "count": 9,
+      "sample": {
+        "_id": "69185bb81c33cabd7a08ff94",
+        "title": "top notch 1 unit 1 ",
+        "videoUrl": "https://drive.google.com/file/d/1kgOZChjFnZ7QIpakBUaKmlsdusWVNwru/view?usp=sharing",
+        "level": "A1",
+        "createdAt": "2025-11-15T10:53:42.262Z",
+        "updatedAt": "2025-11-15T10:53:42.262Z"
+      },
+      "issues": []
+    },
+    "VideoVocabulary": {
+      "count": 28,
+      "sample": {
+        "_id": "6918f87699a55e7df12d837c",
+        "word": "Happens in some countries",
+        "meaning": "در بعضی کشورها اتفاق می‌افتد",
+        "videoId": "6918f87599a55e7df12d833d"
+      },
+      "issues": []
+    },
+    "Review": {
+      "count": 55,
+      "sample": {
+        "_id": "6915e24270a5acf4bc4eea65",
+        "isCorrect": true,
+        "cardId": "6915dee470a5acf4bc4eea60",
+        "userId": "6915bf992868cbe79a124350",
+        "createdAt": "2025-11-13T13:50:58.530Z",
+        "updatedAt": "2025-11-13T13:50:58.530Z"
+      },
+      "issues": []
+    },
+    "Account": {
+      "count": 9,
+      "sample": {
+        "_id": "6915bf9b2868cbe79a124351",
+        "userId": "6915bf992868cbe79a124350",
+        "type": "oidc",
+        "provider": "google",
+        "providerAccountId": "103730867095074270426",
+        "access_token": "ya29.a0ATi6K2vW0dbUsiIH5CJP2z0VTmIWn_f-nklB165GOgPHyJL0bkjE7EPZdib-9PuGkwEpskhY8fmg3QR2ynNTiX3t0ZBz0...",
+        "expires_at": 1763036573,
+        "token_type": "bearer",
+        "scope": "https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile open...",
+        "id_token": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjRmZWI0NGYwZjdhN2UyN2M3YzQwMzM3OWFmZjIwYWY1YzhjZjUyZGMiLCJ0eXAiOiJKV1Qi..."
+      },
+      "issues": [
+        {
+          "type": "INVALID_OBJECT_ID",
+          "field": "providerAccountId",
+          "message": "ObjectId نامعتبر: 103730867095074270426",
+          "severity": "MEDIUM"
+        }
+      ]
+    },
+    "Session": {
+      "count": 33,
+      "sample": {
+        "_id": "6915bf9e2868cbe79a124352",
+        "sessionToken": "020881f6-b4b0-4bac-ac00-ef44ad3091d4",
+        "userId": "6915bf992868cbe79a124350",
+        "expires": "2025-12-14T12:34:45.641Z"
+      },
+      "issues": []
+    },
+    "ArticleVocabulary": {
+      "count": 2,
+      "sample": {
+        "_id": "691df25b3bcf01970416e7c9",
+        "word": "centimeters ",
+        "meaning": "سانتی متر",
+        "paragraph": 1,
+        "articleId": "691dd9113bcf01970416e7c4"
+      },
+      "issues": []
+    },
+    "Podcast": {
+      "count": 1,
+      "sample": {
+        "_id": "691df96d3bcf01970416e7cb",
+        "title": "?Are we too fixated on protein",
+        "description": "Protein, along with fat and carbohydrates, is key to keeping the body functioning properly. But peop...",
+        "audioUrl": "https://cms.melalinstitute.com/assets/59f6d43a-d40a-4036-86d2-ff82d3eb4781?download=",
+        "coverUrl": "https://media.labxchange.org/xblocks/lb-LabXchange-ffa43ab8-html-1/lxc_ap-bio_text-image-_-p312_the-...",
+        "duration": 375,
+        "level": "A2",
+        "isPublished": true,
+        "createdById": "6915bf992868cbe79a124350",
+        "createdAt": "2025-11-19T17:07:57.805Z",
+        "updatedAt": "2025-12-04T11:38:05.727Z"
+      },
+      "issues": []
+    },
+    "Card": {
+      "count": 80,
+      "sample": {
+        "_id": "6915dee470a5acf4bc4eea63",
+        "front": "Significant",
+        "back": "مهم، قابل توجه",
+        "hint": "Significance",
+        "userId": "6915bf992868cbe79a124350",
+        "bookId": "6915dee370a5acf4bc4eea5f",
+        "boxNumber": 2,
+        "lastReviewedAt": "2025-11-13T13:51:25.416Z",
+        "nextReviewAt": "2025-11-17T13:51:25.414Z",
+        "createdAt": "2025-11-13T13:36:36.698Z",
+        "updatedAt": "2025-11-13T13:51:25.418Z"
+      },
+      "issues": []
+    },
+    "DailyActivity": {
+      "count": 9,
+      "sample": {
+        "_id": "69302e7b928d994705de67db",
+        "userId": "6915bf992868cbe79a124350",
+        "date": "2025-12-02T20:30:00.000Z",
+        "videoWatched": false,
+        "podcastListened": false,
+        "wordsReviewed": false,
+        "articleRead": false,
+        "progress": 0,
+        "createdAt": "2025-12-03T12:35:07.987Z",
+        "updatedAt": "2025-12-04T10:07:57.746Z"
+      },
+      "issues": []
+    },
+    "PushSubscription": {
+      "count": 1,
+      "sample": {
+        "_id": "6934890fa30006fef6c88193",
+        "userId": "691654361a82021384e7cfaf",
+        "endpoint": "https://fcm.googleapis.com/fcm/send/deb5xwNJTTo:APA91bHOV23HCiv0KV_Lq980fMoTYGdbN7qJD-Bz0h8rJ-VbnBZz...",
+        "keys": {
+          "p256dh": "BGULNU2QIT8ThZzo_RBC718ZMsLOcC9qdH7K4NjyldrobJbHKsSJDH54h5Tdlf1RqeyqpKcgEdqLCI4jH9-yDKQ",
+          "auth": "Y22qkOw8XkSMKag_kJlXrQ"
+        },
+        "createdAt": "2025-12-06T19:50:39.130Z",
+        "updatedAt": "2025-12-06T19:50:39.130Z"
+      },
+      "issues": []
+    },
+    "Article": {
+      "count": 1,
+      "sample": {
+        "_id": "691dd9113bcf01970416e7c4",
+        "title": "The sun is very active",
+        "content": "Scientists reported spectacular aurora borealis sightings across several US states and explained how...",
+        "excerpt": "Scientists reported spectacular aurora borealis sightings across several US states and explained how...",
+        "coverUrl": "https://mwallpaper.ir/wp-content/uploads/2022/06/%D8%B9%DA%A9%D8%B3-%D8%A8%D8%A7-%DA%A9%DB%8C%D9%81%...",
+        "level": "B1",
+        "readingTime": 3,
+        "isPublished": true,
+        "createdById": "6915bf992868cbe79a124350",
+        "createdAt": "2025-11-19T14:49:53.132Z",
+        "updatedAt": "2025-11-19T16:37:46.899Z"
+      },
+      "issues": []
+    },
+    "ActivityTracking": {
+      "count": 47,
+      "sample": {
+        "_id": "6930a33d019f2702e9dec26c",
+        "userId": "6915bf992868cbe79a124350",
+        "activityType": "video",
+        "contentId": "693005c0bc0c8a2b5c4bb589",
+        "duration": 14,
+        "pathname": "/video/693005c0bc0c8a2b5c4bb589",
+        "isRegistered": true,
+        "createdAt": "2025-12-03T20:53:17.877Z",
+        "updatedAt": "2025-12-03T20:59:52.530Z",
+        "registeredAt": "2025-12-03T20:59:52.527Z"
+      },
+      "issues": []
+    }
+  },
+  "issues": [
+    {
+      "type": "INVALID_DATE",
+      "model": "Account",
+      "field": "expires_at",
+      "value": 1763036573,
+      "severity": "HIGH"
+    },
+    {
+      "type": "INVALID_DATE",
+      "model": "Account",
+      "field": "session_state",
+      "value": null,
+      "severity": "HIGH"
+    },
+    {
+      "type": "INVALID_OBJECT_ID",
+      "model": "Account",
+      "field": "providerAccountId",
+      "value": "103730867095074270426",
+      "severity": "MEDIUM"
+    },
+    {
+      "type": "INVALID_DATE",
+      "model": "Podcast",
+      "field": "duration",
+      "value": 375,
+      "severity": "HIGH"
+    },
+    {
+      "type": "INVALID_DATE",
+      "model": "Podcast",
+      "field": "createdById",
+      "value": "6915bf992868cbe79a124350",
+      "severity": "HIGH"
+    },
+    {
+      "type": "INVALID_DATE",
+      "model": "Article",
+      "field": "createdById",
+      "value": "6915bf992868cbe79a124350",
+      "severity": "HIGH"
+    },
+    {
+      "type": "INVALID_DATE",
+      "model": "DailyActivity",
+      "field": "videoWatched",
+      "value": false,
+      "severity": "HIGH"
+    },
+    {
+      "type": "INVALID_DATE",
+      "model": "DailyActivity",
+      "field": "completedAt",
+      "value": null,
+      "severity": "HIGH"
+    },
+    {
+      "type": "INVALID_DATE",
+      "model": "ActivityTracking",
+      "field": "duration",
+      "value": 14,
+      "severity": "HIGH"
+    },
+    {
+      "type": "INVALID_DATE",
+      "model": "ActivityTracking",
+      "field": "pathname",
+      "value": "/video/693005c0bc0c8a2b5c4bb589",
+      "severity": "HIGH"
+    },
+    {
+      "type": "INVALID_DATE",
+      "model": "Song",
+      "field": "duration",
+      "value": 303,
+      "severity": "HIGH"
+    },
+    {
+      "type": "INVALID_DATE",
+      "model": "Song",
+      "field": "createdById",
+      "value": "6915bf992868cbe79a124350",
+      "severity": "HIGH"
+    },
+    {
+      "type": "INVALID_DATE",
+      "model": "PushSubscription",
+      "field": "expiresAt",
+      "value": null,
+      "severity": "HIGH"
+    }
+  ]
+}

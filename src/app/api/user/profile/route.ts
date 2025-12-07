@@ -86,7 +86,7 @@ export async function PATCH(request: Request) {
         learningGoal: true,
         suggestedReviewTime: true,
         isOnboardingComplete: true,
-        updatedAt: true,
+  
       },
     });
 
