@@ -198,7 +198,7 @@ export default function SongsClient() {
                 placeholder="جستجوی آهنگ، خواننده یا آلبوم..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-9 md:pl-10 pr-3 md:pr-12 py-2 md:py-3 bg-white dark:bg-gray-800/50 border border-gray-300 dark:border-gray-700 rounded-lg md:rounded-xl text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm md:text-base"
+                className="pr-8 w-full pl-9 md:pl-10 pr-3 md:pr-12 py-2 md:py-3 bg-white dark:bg-gray-800/50 border border-gray-300 dark:border-gray-700 rounded-lg md:rounded-xl text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm md:text-base"
               />
             </div>
 

@@ -1,25 +1,52 @@
 [
-    {
-      "id": "ielts-collins",
-      "title": "لغات ضروری آیلتس (Collins)",
-      "description": "مجموعه‌ای از مهم‌ترین لغات کتاب معروف Collins برای آزمون آیلتس.",
-      "cards": [
-        { "front": "Accommodate", "back": "جای دادن، اسکان دادن", "hint": "Accommodation" },
-        { "front": "Comprehensive", "back": "جامع، فراگیر", "hint": "Comprehension" },
-        { "front": "Subsequent", "back": "متعاقب، بعدی", "hint": "Subsequently" },
-        { "front": "Significant", "back": "مهم، قابل توجه", "hint": "Significance" },
-        { "front": "Alter", "back": "تغییر دادن، دگرگون کردن", "hint": "Alternative" }
-      ]
-    },
-    {
-      "id": "business-english",
-      "title": "واژگان پایه Business English",
-      "description": "اصطلاحات و کلمات کلیدی برای محیط کار و تجارت.",
-      "cards": [
-        { "front": "Negotiate", "back": "مذاکره کردن", "hint": "Negotiation" },
-        { "front": "Revenue", "back": "درآمد، عایدات", "hint": "Turnover" },
-        { "front": "Asset", "back": "دارایی، سرمایه", "hint": "Liability (مخالف)" }
-      ]
-    }
-    
-  ]
+  {
+    "id": "ielts-collins",
+    "title": "لغات ضروری آیلتس (Collins)",
+    "description": "مجموعه‌ای از مهم‌ترین لغات کتاب معروف Collins برای آزمون آیلتس.",
+    "image": "https://www.ieltsadvantage.com/wp-content/uploads/2015/06/IELTS-preparation-books.jpg",
+    "level": "B2",
+    "category": "لغات",
+    "estimatedTime": "۲۵ دقیقه",
+    "popularity": 320,
+    "cards": [
+      { "front": "Accommodate", "back": "جای دادن، اسکان دادن", "hint": "Accommodation" },
+      { "front": "Comprehensive", "back": "جامع، فراگیر", "hint": "Comprehension" },
+      { "front": "Subsequent", "back": "متعاقب، بعدی", "hint": "Subsequently" },
+      { "front": "Significant", "back": "مهم، قابل توجه", "hint": "Significance" },
+      { "front": "Alter", "back": "تغییر دادن، دگرگون کردن", "hint": "Alternative" }
+    ]
+  },
+
+  {
+    "id": "ielts",
+    "title": "لغات ضروری آیلتس",
+    "description": "مجموعه‌ای از مهم‌ترین لغات کتاب معروف برای آزمون آیلتس.",
+    "image": "https://www.ieltsadvantage.com/wp-content/uploads/2015/06/IELTS-preparation-books.jpg",
+    "level": "B1",
+    "category": "لغات",
+    "estimatedTime": "۲۰ دقیقه",
+    "popularity": 190,
+    "cards": [
+      { "front": "Accommodate", "back": "جای دادن، اسکان دادن", "hint": "Accommodation" },
+      { "front": "Comprehensive", "back": "جامع، فراگیر", "hint": "Comprehension" },
+      { "front": "Subsequent", "back": "متعاقب، بعدی", "hint": "Subsequently" },
+      { "front": "Significant", "back": "مهم، قابل توجه", "hint": "Significance" }
+    ]
+  },
+
+  {
+    "id": "business-english",
+    "title": "واژگان پایه Business English",
+    "description": "اصطلاحات و کلمات کلیدی برای محیط کار و تجارت.",
+    "image": "https://www.ieltsadvantage.com/wp-content/uploads/2015/06/IELTS-preparation-books.jpg",
+    "level": "B2",
+    "category": "تجاری",
+    "estimatedTime": "۱۵ دقیقه",
+    "popularity": 260,
+    "cards": [
+      { "front": "Negotiate", "back": "مذاکره کردن", "hint": "Negotiation" },
+      { "front": "Revenue", "back": "درآمد، عایدات", "hint": "Turnover" },
+      { "front": "Asset", "back": "دارایی، سرمایه", "hint": "Liability (مخالف)" }
+    ]
+  }
+]

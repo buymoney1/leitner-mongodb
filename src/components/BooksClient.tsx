@@ -1,10 +1,11 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { TemplateBookCard } from "./TemplateBookCard";
+
 import Link from "next/link";
 import { Plus, Search } from "lucide-react";
 import { useState } from "react";
+import { TemplateBookCard } from "./TemplateBookCard";
 
 interface TemplateBook {
   id: string;
@@ -42,7 +43,7 @@ export function BooksClient({ initialTemplateBooks }: BooksClientProps) {
   const categories = [...new Set(initialTemplateBooks.map(book => book.category).filter(Boolean))];
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300 pb-8 pt-3 px-4 sm:px-6 lg:px-8">
+    <div className="mb-10 transition-colors duration-300 pb-8 pt-3 px-4 sm:px-6 lg:px-8">
       {/* Background Effects */}
       <div className="fixed inset-0 bg-[linear-gradient(rgba(0,0,0,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.02)_1px,transparent_1px)] dark:bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,black,transparent)]"></div>
       
@@ -51,44 +52,7 @@ export function BooksClient({ initialTemplateBooks }: BooksClientProps) {
 
         {/* Action Bar */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-8">
-          {/* Search and Filters */}
-          <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Search */}
-            <div className="relative">
-              <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <input
-                type="text"
-                placeholder="جستجو در کتاب‌ها..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="text-sm w-full pl-4 pr-10 py-2.5 rounded-lg bg-gray-100 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-300 backdrop-blur-sm"
-              />
-            </div>
 
-            {/* Level Filter */}
-            <select
-              value={selectedLevel}
-              onChange={(e) => setSelectedLevel(e.target.value)}
-              className="text-sm w-full px-3 py-2.5 rounded-lg bg-gray-100 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 backdrop-blur-sm"
-            >
-              <option value="all">همه سطوح</option>
-              {levels.map(level => (
-                <option key={level} value={level}>{level}</option>
-              ))}
-            </select>
-
-            {/* Category Filter */}
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="text-sm w-full px-3 py-2.5 rounded-lg bg-gray-100 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-300 backdrop-blur-sm"
-            >
-              <option value="all">همه دسته‌ها</option>
-              {categories.map(category => (
-                <option key={category} value={category}>{category}</option>
-              ))}
-            </select>
-          </div>
 
           {/* Admin Action */}
           {isAdmin && (
@@ -167,27 +131,7 @@ export function BooksClient({ initialTemplateBooks }: BooksClientProps) {
           )}
         </section>
 
-        {/* Stats Section */}
-        <div className="mt-12 mb-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/5 dark:from-purple-500/20 dark:to-pink-500/10 rounded-2xl p-6 border border-purple-500/20 dark:border-purple-500/30 backdrop-blur-sm">
-            <div className="text-2xl font-bold text-purple-600 dark:text-purple-400 mb-2">
-              {initialTemplateBooks.length}
-            </div>
-            <div className="text-gray-600 dark:text-gray-400">کل کتاب‌ها</div>
-          </div>
-          <div className="bg-gradient-to-br from-blue-500/10 to-cyan-500/5 dark:from-blue-500/20 dark:to-cyan-500/10 rounded-2xl p-6 border border-blue-500/20 dark:border-blue-500/30 backdrop-blur-sm">
-            <div className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-2">
-              {levels.length}
-            </div>
-            <div className="text-gray-600 dark:text-gray-400">سطح مختلف</div>
-          </div>
-          <div className="bg-gradient-to-br from-green-500/10 to-emerald-500/5 dark:from-green-500/20 dark:to-emerald-500/10 rounded-2xl p-6 border border-green-500/20 dark:border-green-500/30 backdrop-blur-sm">
-            <div className="text-2xl font-bold text-green-600 dark:text-green-400 mb-2">
-              {categories.length}
-            </div>
-            <div className="text-gray-600 dark:text-gray-400">دسته‌بندی</div>
-          </div>
-        </div>
+
       </div>
     </div>
   );

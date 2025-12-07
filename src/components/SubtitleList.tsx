@@ -38,7 +38,7 @@ const ClickableText = ({ text, settings, onWordClick }: ClickableTextProps) => {
             }}
             className={`inline-block px-1.5 py-0.5 m-[2px] rounded-md border border-white/20 backdrop-blur-sm transition-all duration-200 ${
               isEnglishWord 
-                ? 'hover:scale-110 hover:bg-blue-500 pointer-events-auto' 
+                ? 'hover:scale-110 hover:bg-blue-500 dark:hover:bg-blue-600 pointer-events-auto' 
                 : 'pointer-events-none'
             }`}
           >
@@ -85,7 +85,7 @@ export default function SubtitleList({
   return (
     <div 
       ref={subtitlesContainerRef}
-      className="relative z-0 w-full bg-white"
+      className="relative z-0 w-full bg-white dark:bg-gray-900"
       style={{ 
         height: `calc(100vh - ${videoHeight}px)`,
         overflowY: 'auto'
@@ -93,7 +93,7 @@ export default function SubtitleList({
     >
       <div className="px-4 pt-4 pb-32 space-y-4">
         {subtitleSettings.mode === "none" && (
-          <span className="text-xs text-orange-600 bg-orange-50 px-3 py-2 rounded-full border border-orange-200 font-medium">
+          <span className="text-xs text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/30 px-3 py-2 rounded-full border border-orange-200 dark:border-orange-800 font-medium">
             زیرنویس غیرفعال
           </span>
         )}
@@ -109,22 +109,22 @@ export default function SubtitleList({
                   onClick={() => onSubtitleJump(sub.startTime)}
                   className={`p-4 rounded-xl cursor-pointer transition-all duration-300 border-2 ${
                     isActive 
-                      ? 'bg-blue-50 border-blue-200 shadow-lg ring-2 ring-blue-100 transform scale-101' 
-                      : 'bg-white border-gray-100 hover:bg-gray-50 hover:border-gray-200 hover:shadow-md'
+                      ? 'bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-700 shadow-lg ring-2 ring-blue-100 dark:ring-blue-800/50 transform scale-101' 
+                      : 'bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-200 dark:hover:border-gray-600 hover:shadow-md'
                   }`}
                 >
                   <div className="flex justify-between items-center mb-3">
-                    <span className="text-xs text-gray-500 font-mono bg-gray-100 px-3 py-1 rounded-lg">
+                    <span className="text-xs text-gray-500 dark:text-gray-400 font-mono bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded-lg">
                       {formatTime(sub.startTime)}
                     </span>
                     {isActive && (
-                      <span className="text-xs text-blue-600 font-bold bg-blue-100 px-3 py-1 rounded-full">
+                      <span className="text-xs text-blue-600 dark:text-blue-400 font-bold bg-blue-100 dark:bg-blue-900/50 px-3 py-1 rounded-full">
                         🔴 در حال پخش
                       </span>
                     )}
                   </div>
                   
-                  <p className={`text-base leading-8 mb-3 ${isActive ? 'font-bold text-gray-900' : 'text-gray-700'}`}>
+                  <p className={`text-base leading-8 mb-3 ${isActive ? 'font-bold text-gray-900 dark:text-white' : 'text-gray-700 dark:text-gray-300'}`}>
                     <ClickableText 
                       text={sub.persianText} 
                       settings={subtitleSettings}
@@ -133,8 +133,8 @@ export default function SubtitleList({
                   </p>
                   
                   {subtitleSettings.mode === 'both' && sub.englishText && (
-                    <div className="pt-3 border-t border-gray-100">
-                      <p dir="ltr" className="text-sm text-gray-500 font-light leading-relaxed">
+                    <div className="pt-3 border-t border-gray-100 dark:border-gray-700">
+                      <p dir="ltr" className="text-sm text-gray-500 dark:text-gray-400 font-light leading-relaxed">
                         <ClickableText 
                           text={sub.englishText} 
                           settings={subtitleSettings}
@@ -149,8 +149,8 @@ export default function SubtitleList({
           </div>
         ) : (
           <div className="text-center py-16">
-            <div className="text-gray-400 text-lg mb-4">📝</div>
-            <div className="text-gray-500 text-sm">در حال بارگذاری زیرنویس...</div>
+            <div className="text-gray-400 dark:text-gray-600 text-lg mb-4">📝</div>
+            <div className="text-gray-500 dark:text-gray-400 text-sm">در حال بارگذاری زیرنویس...</div>
           </div>
         )}
       </div>

@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ArrowRight, BookOpen, Clock, Bookmark, Share2 } from 'lucide-react';
 import DictionaryModal from '@/components/DictionaryModal';
-
+import { toast } from 'sonner';
 
 
 interface Article {
@@ -153,14 +153,16 @@ export default function ArticlePage() {
       });
 
       if (response.ok) {
-        alert("کارت با موفقیت به فلش‌کارت‌ها اضافه شد!");
+        toast.success('کارت با موفقیت به فلش‌کارت‌ها اضافه شد.');
+
         return Promise.resolve();
       } else {
         const errorData = await response.json();
         throw new Error(errorData.error || "خطا در افزودن کارت.");
       }
     } catch (error) {
-      alert("خطا در ارتباط با سرور.");
+      toast.error('خطا در ارتباط با سرور.');
+
       return Promise.reject(error);
     }
   };

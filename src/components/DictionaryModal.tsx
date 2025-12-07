@@ -371,7 +371,7 @@ export default function DictionaryModal({
                         value={customWord}
                         onChange={(e) => setCustomWord(e.target.value)}
                         placeholder="مثال: learn"
-                        className="w-full p-4 pr-12 rounded-xl bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:border-cyan-500 transition-colors text-lg"
+                        className="pl-8 w-full p-4 pr-12 rounded-xl bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:border-cyan-500 transition-colors text-lg"
                         dir="ltr"
                       />
                       {customWord && (

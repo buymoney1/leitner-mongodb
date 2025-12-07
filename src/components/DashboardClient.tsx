@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { BookOpen, Brain, Plus, Play, Home, Video, Settings, Mic, Music } from "lucide-react";
 import { ManageCardsClient } from "./ManageCardsClient";
-import { AdminPanel } from "./video/AdminPanel";
+
 import { VideoList } from "./video/VideoList";
 import { SimpleNotificationPrompt } from "./SimpleNotificationPrompt";
 
@@ -378,11 +378,11 @@ export function DashboardClient({ userName, userRole }: DashboardClientProps) {
         </div>
 
         {/* Admin Panel */}
-        {userRole === 'admin' && (
+        {/* {userRole === 'admin' && (
           <div className="mt-8 px-4 md:px-6">
             <AdminPanel />
           </div>
-        )}
+        )} */}
       </div>
       <SimpleNotificationPrompt />
     </div>

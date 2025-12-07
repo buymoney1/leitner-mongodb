@@ -379,3 +379,4 @@ model PushSubscription {
   @@unique([endpoint])
   @@index([userId])
 }
+

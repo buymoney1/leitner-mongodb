@@ -1,11 +1,14 @@
 "use client";
 import { useState } from "react";
-import { Plus, BookOpen, Clock, Users, Sparkles } from "lucide-react";
+import { Plus, BookOpen, Clock, Users, CheckCircle2 } from "lucide-react";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface TemplateBook {
   id: string;
   title: string;
   description: string;
+  image?: string;
   cards: { front: string; back: string; hint: string }[];
   level?: string;
   category?: string;
@@ -19,26 +22,30 @@ interface TemplateBookCardProps {
 
 export function TemplateBookCard({ book }: TemplateBookCardProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
+  const [isAdded, setIsAdded] = useState(false);
+  const router = useRouter();
 
   const handleAdd = async () => {
+    if (isAdded) return;
+
     setIsLoading(true);
     try {
-      const response = await fetch("/api/books/add-template", {
+      const res = await fetch("/api/books/add-template", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ templateBookId: book.id }),
       });
 
-      const data = await response.json();
+      const data = await res.json();
 
-      if (response.ok) {
-        console.log("کتاب با موفقیت به مجموعه شما اضافه شد!");
+      if (res.ok) {
+        setIsAdded(true);
+        toast.success(`"${book.title}" اضافه شد`, {
+          description: `${book.cards.length} کارت به مجموعه شما افزوده شد`,
+        });
       } else {
-        console.error(data.error || "خطا در افزودن کتاب");
+        toast.error(data.error || "خطایی رخ داد");
       }
-    } catch (error) {
-      console.error("Add failed:", error);
     } finally {
       setIsLoading(false);
     }
@@ -46,138 +53,121 @@ export function TemplateBookCard({ book }: TemplateBookCardProps) {
 
   const getLevelColor = (level?: string) => {
     const colors = {
-      'A1': 'from-green-500 to-emerald-600',
-      'A2': 'from-blue-500 to-cyan-600',
-      'B1': 'from-purple-500 to-violet-600',
-      'B2': 'from-orange-500 to-amber-600',
-      'C1': 'from-red-500 to-pink-600',
-      'C2': 'from-gray-500 to-slate-600'
+      A1: "bg-green-500",
+      A2: "bg-blue-500",
+      B1: "bg-purple-500",
+      B2: "bg-orange-500",
+      C1: "bg-red-500",
+      C2: "bg-slate-500",
     };
-    return colors[level as keyof typeof colors] || 'from-gray-500 to-slate-600';
-  };
-
-  const getCategoryIcon = (category?: string) => {
-    const icons = {
-      'مکالمه': '💬',
-      'گرامر': '📖',
-      'لغات': '📝',
-      'تجاری': '💼',
-      'آکادمیک': '🎓',
-      'سفر': '✈️'
-    };
-    return icons[category as keyof typeof icons] || '📚';
+    return colors[level as keyof typeof colors] || "bg-gray-500";
   };
 
   return (
-    <div 
-      className="group relative flex flex-col rounded-2xl border border-gray-300 dark:border-gray-700/50 bg-white dark:bg-gray-800/50 bg-gradient-to-br from-white to-gray-50/80 dark:from-gray-800/50 dark:to-gray-900/30 backdrop-blur-xl shadow-lg dark:shadow-xl hover:shadow-xl dark:hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 overflow-hidden"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      {/* Animated Gradient Border */}
-      <div className={`absolute inset-0 bg-gradient-to-r ${getLevelColor(book.level)} opacity-0 group-hover:opacity-5 transition-opacity duration-500 rounded-2xl`}></div>
+    <div className="
+      group relative flex flex-col rounded-3xl p-5
+      bg-white dark:bg-neutral-900 
+      border border-neutral-200 dark:border-neutral-700
+      shadow-sm hover:shadow-xl
+      transition-all duration-500 hover:-translate-y-2
+    ">
       
-      {/* Background Glow Effect */}
-      <div className={`absolute -inset-10 bg-gradient-to-r ${getLevelColor(book.level)} rounded-full blur-3xl opacity-0 group-hover:opacity-10 transition-opacity duration-500`}></div>
-
-      <div className="relative z-10 p-6 flex-1 flex flex-col">
-        {/* Header */}
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className={`p-3 rounded-xl bg-gradient-to-br ${getLevelColor(book.level)} shadow-lg`}>
-              <span className="text-2xl">{getCategoryIcon(book.category)}</span>
-            </div>
-            <div>
-              {book.level && (
-                <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${getLevelColor(book.level)} text-white shadow-lg`}>
-                  {book.level}
-                </span>
-              )}
-            </div>
+      {/* Book Image */}
+      {book.image && (
+        <div className="w-full flex justify-center mt-2 mb-4">
+          <div className="
+            w-[80px] h-[110px] rounded-2xl overflow-hidden bg-neutral-200 dark:bg-neutral-700
+            shadow-md group-hover:scale-105 transition-transform duration-500
+          ">
+            <img 
+              src={book.image}
+              alt={book.title}
+              className="w-full h-full object-cover"
+            />
           </div>
-          
-          {/* Popularity Badge */}
-          {book.popularity && book.popularity > 100 && (
-            <div className="flex items-center gap-1 bg-amber-500/20 text-amber-600 dark:text-amber-400 px-2 py-1 rounded-full text-xs border border-amber-500/30">
-              <Sparkles className="h-3 w-3" />
-              پرطرفدار
-            </div>
-          )}
+        </div>
+      )}
+
+      {/* Level Badge */}
+      {book.level && (
+        <div className="absolute top-4 right-4">
+          <span className={`
+            ${getLevelColor(book.level)} text-white 
+            text-xs font-semibold px-3 py-1 rounded-full shadow-md
+          `}>
+            {book.level}
+          </span>
+        </div>
+      )}
+
+      {/* Title */}
+      <h3 className="
+        text-lg font-bold text-neutral-800 dark:text-neutral-200 
+        mb-2 text-center line-clamp-2
+      ">
+        {book.title}
+      </h3>
+
+      {/* Description */}
+      <p className="
+        text-neutral-600 dark:text-neutral-300 
+        text-sm text-center mb-4 line-clamp-3
+      ">
+        {book.description}
+      </p>
+
+      {/* Stats */}
+      <div className="
+        flex items-center justify-center gap-6 mb-5 text-neutral-500 dark:text-neutral-300
+      ">
+        <div className="flex items-center gap-1 text-sm">
+          <BookOpen className="w-4 h-4" />
+          <span>{book.cards.length} کارت</span>
         </div>
 
-        {/* Book Info */}
-        <div className="flex-1">
-          <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-3 line-clamp-2 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors duration-300 leading-tight">
-            {book.title}
-          </h3>
-          <p className="text-gray-600 dark:text-gray-300 text-xs mb-4 line-clamp-3 leading-relaxed">
-            {book.description}
-          </p>
-        </div>
-
-        {/* Stats */}
-        <div className="flex items-center justify-between mb-4 pt-4 border-t border-gray-200 dark:border-gray-700/50">
-          <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
-            <div className="flex items-center gap-1">
-              <BookOpen className="h-4 w-4" />
-              <span>{book.cards.length} کارت</span>
-            </div>
-            {book.estimatedTime && (
-              <div className="flex items-center gap-1">
-                <Clock className="h-4 w-4" />
-                <span>{book.estimatedTime}</span>
-              </div>
-            )}
-            {book.popularity && (
-              <div className="flex items-center gap-1">
-                <Users className="h-4 w-4" />
-                <span>{book.popularity}+</span>
-              </div>
-            )}
+        {book.estimatedTime && (
+          <div className="flex items-center gap-1 text-sm">
+            <Clock className="w-4 h-4" />
+            <span>{book.estimatedTime}</span>
           </div>
-          
-          {book.category && (
-            <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700/50 px-2 py-1 rounded-lg border border-gray-200 dark:border-gray-600/50">
-              {book.category}
-            </span>
-          )}
-        </div>
+        )}
+
+        {book.popularity && (
+          <div className="flex items-center gap-1 text-sm">
+            <Users className="w-4 h-4" />
+            <span>{book.popularity}+</span>
+          </div>
+        )}
       </div>
 
       {/* Action Button */}
-      <div className="relative z-10 p-6 pt-0">
-        <button
-          onClick={handleAdd}
-          disabled={isLoading}
-          className={`group relative w-full overflow-hidden rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 py-3 px-6 text-sm font-semibold text-white shadow-lg transition-all duration-300 hover:from-cyan-600 hover:to-blue-700 hover:shadow-cyan-500/25 hover:scale-105 disabled:opacity-50 disabled:pointer-events-none`}
-        >
-          {/* Animated Background */}
-          <div className="absolute inset-0 bg-gradient-to-r from-cyan-600 to-blue-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-          
-          {/* Loading Animation */}
-          {isLoading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-r from-cyan-600 to-blue-700">
-              <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
-            </div>
-          )}
-          
-          {/* Button Content */}
-          <div className={`relative z-10 flex items-center justify-center gap-2 transition-all duration-300 ${isLoading ? 'opacity-0' : 'opacity-100'}`}>
-            <Plus className="h-4 w-4 transition-transform group-hover:rotate-90 duration-300" />
-            <span>افزودن به مجموعه من</span>
-          </div>
-
-          {/* Ripple Effect */}
-          <div className="absolute inset-0 overflow-hidden rounded-xl">
-            <div className="absolute -inset-10 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 group-hover:animate-pulse"></div>
-          </div>
-        </button>
-      </div>
-
-      {/* Hover Effects */}
-      <div className={`absolute inset-0 rounded-2xl bg-gradient-to-r ${getLevelColor(book.level)} opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10`}>
-        <div className="absolute inset-[1px] rounded-2xl bg-white dark:bg-gray-900"></div>
-      </div>
+      <button
+        onClick={handleAdd}
+        disabled={isLoading || isAdded}
+        className={`
+          w-full py-3 rounded-xl font-semibold text-sm transition-all
+          flex items-center justify-center gap-2
+          ${
+            isAdded
+              ? "bg-green-500 text-white cursor-default"
+              : "bg-neutral-900 text-white hover:bg-neutral-800 dark:bg-neutral-700 dark:hover:bg-neutral-600"
+          }
+        `}
+      >
+        {isLoading ? (
+          <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+        ) : isAdded ? (
+          <>
+            <CheckCircle2 className="w-5 h-5" />
+            <span>اضافه شد</span>
+          </>
+        ) : (
+          <>
+            <Plus className="w-5 h-5" />
+            <span>افزودن به مجموعه</span>
+          </>
+        )}
+      </button>
     </div>
   );
 }

@@ -200,10 +200,10 @@ export default function VideoPlayer() {
   };
 
   return (
-    <div className="w-full max-w-[900px] mx-auto font-sans bg-white" dir="rtl">
+    <div className="w-full max-w-[900px] mx-auto font-sans bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100" dir="rtl">
       
       {/* ویدیو پلیر */}
-      <div className="fixed top-0 left-0 right-0 z-[9999] bg-black shadow-2xl">
+      <div className="fixed top-0 left-0 right-0 z-[9999] bg-black dark:bg-gray-900 shadow-2xl">
         <div className="w-full max-w-[800px] mx-auto">
           <div 
             ref={playerContainerRef}
@@ -259,8 +259,8 @@ export default function VideoPlayer() {
 
             {/* پاپ‌آپ ذخیره لغت - داخل ویدیو پلیر */}
             {showSavePopup && selectedWord && (
-              <div className="fixed absolute inset-0 z-[10000] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-                <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
+              <div className="fixed absolute inset-0 z-[10000] flex items-center justify-center p-4 bg-black/50 dark:bg-gray-900/90 backdrop-blur-sm">
+                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
                   <SaveWordPopup
                     word={selectedWord}
                     onClose={handleClosePopup}
@@ -289,7 +289,7 @@ export default function VideoPlayer() {
       <div style={{ height: `${playerState.videoHeight}px` }}></div>
 
       {/* محتوای پایین */}
-      <div className="px-4 pt-4">
+      <div className="px-4 pt-4 dark:bg-gray-900">
         <TabBar
           activeTab={activeTab}
           vocabularyCount={vocabularies.length}

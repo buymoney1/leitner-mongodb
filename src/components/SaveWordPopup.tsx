@@ -70,11 +70,11 @@ export default function SaveWordPopup({ word, onClose, onSave }: SaveWordPopupPr
   return (
     <div className="flex flex-col max-h-[90vh]">
       {/* Header */}
-      <div className="flex items-center justify-between p-6 border-b border-gray-200">
-        <h3 className="text-lg font-bold text-gray-900">ذخیره لغت در لایتنر</h3>
+      <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+        <h3 className="text-lg font-bold text-gray-900 dark:text-white">ذخیره لغت در لایتنر</h3>
         <button 
           onClick={onClose}
-          className="text-gray-500 hover:text-gray-700 transition-colors"
+          className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
         >
           <CloseIcon />
         </button>
@@ -83,27 +83,27 @@ export default function SaveWordPopup({ word, onClose, onSave }: SaveWordPopupPr
       {/* Scrollable Content */}
       <div className="flex-1 overflow-y-auto p-6 space-y-4">
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700">کلمه انگلیسی:</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">کلمه انگلیسی:</label>
           <input
             type="text"
             value={dictionaryWord}
             onChange={(e) => setDictionaryWord(e.target.value)}
             placeholder="کلمه انگلیسی را وارد کنید..."
-            className="w-full p-3 rounded-xl border border-gray-300 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors"
+            className="w-full p-3 rounded-xl border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white dark:bg-gray-800 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
           />
         </div>
         
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <label className="block text-sm font-medium text-gray-700">معنی فارسی:</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">معنی فارسی:</label>
             <button
               onClick={handleManualTranslate}
               disabled={isTranslating || !dictionaryWord.trim()}
-              className="text-blue-600 hover:text-blue-500 text-xs flex items-center gap-1 disabled:opacity-50"
+              className="text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 text-xs flex items-center gap-1 disabled:opacity-50"
             >
               {isTranslating ? (
                 <>
-                  <div className="w-3 h-3 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-3 h-3 border-2 border-blue-600 dark:border-blue-400 border-t-transparent rounded-full animate-spin"></div>
                   در حال ترجمه...
                 </>
               ) : (
@@ -119,13 +119,13 @@ export default function SaveWordPopup({ word, onClose, onSave }: SaveWordPopupPr
             value={meaning}
             onChange={(e) => setMeaning(e.target.value)}
             placeholder={isTranslating ? "در حال ترجمه..." : "معنی فارسی را وارد کنید..."}
-            className="w-full p-3 rounded-xl border border-gray-300 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors"
+            className="w-full p-3 rounded-xl border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white dark:bg-gray-800 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
             onKeyPress={(e) => e.key === 'Enter' && handleSave()}
             disabled={isTranslating}
           />
           {isTranslating && (
-            <div className="text-blue-600 text-xs flex items-center gap-1">
-              <div className="w-3 h-3 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+            <div className="text-blue-600 dark:text-blue-400 text-xs flex items-center gap-1">
+              <div className="w-3 h-3 border-2 border-blue-600 dark:border-blue-400 border-t-transparent rounded-full animate-spin"></div>
               در حال ترجمه خودکار...
             </div>
           )}
@@ -136,15 +136,15 @@ export default function SaveWordPopup({ word, onClose, onSave }: SaveWordPopupPr
       </div>
 
       {/* Footer */}
-      <div className="p-6 border-t border-gray-200">
+      <div className="p-6 border-t border-gray-200 dark:border-gray-700">
         <div className="flex gap-3">
           <button 
             onClick={handleSave}
             disabled={isSaving || !dictionaryWord.trim() || !meaning.trim()}
             className={`flex-1 py-3 rounded-xl text-white font-medium transition-all duration-300 flex items-center justify-center gap-2 ${
               isSaving || !dictionaryWord.trim() || !meaning.trim()
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700 shadow-lg"
+                ? "bg-gray-400 dark:bg-gray-600 cursor-not-allowed"
+                : "bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-800 shadow-lg"
             }`}
           >
             {isSaving ? (
@@ -162,7 +162,7 @@ export default function SaveWordPopup({ word, onClose, onSave }: SaveWordPopupPr
           
           <button 
             onClick={onClose}
-            className="px-6 py-3 rounded-xl bg-gray-300 text-gray-700 hover:bg-gray-400 transition-colors"
+            className="px-6 py-3 rounded-xl bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-400 dark:hover:bg-gray-600 transition-colors"
           >
             انصراف
           </button>
