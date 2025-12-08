@@ -91,7 +91,7 @@ export default function SubtitleList({
         overflowY: 'auto'
       }}
     >
-      <div className="px-4 pt-4 pb-32 space-y-4">
+      <div className="px-4 pt-1 pb-32 space-y-4">
         {subtitleSettings.mode === "none" && (
           <span className="text-xs text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/30 px-3 py-2 rounded-full border border-orange-200 dark:border-orange-800 font-medium">
             زیرنویس غیرفعال
@@ -113,7 +113,7 @@ export default function SubtitleList({
                       : 'bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-200 dark:hover:border-gray-600 hover:shadow-md'
                   }`}
                 >
-                  <div className="flex justify-between items-center mb-3">
+                  <div className="flex justify-between items-center mb-1">
                     <span className="text-xs text-gray-500 dark:text-gray-400 font-mono bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded-lg">
                       {formatTime(sub.startTime)}
                     </span>
@@ -124,7 +124,7 @@ export default function SubtitleList({
                     )}
                   </div>
                   
-                  <p className={`text-base leading-8 mb-3 ${isActive ? 'font-bold text-gray-900 dark:text-white' : 'text-gray-700 dark:text-gray-300'}`}>
+                  <p className={`text-base leading-8 mb-1 ${isActive ? 'font-bold text-gray-900 dark:text-white' : 'text-gray-700 dark:text-gray-300'}`}>
                     <ClickableText 
                       text={sub.persianText} 
                       settings={subtitleSettings}

@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
 import {prisma} from '@/lib/prisma';
 import { ObjectId } from 'mongodb';
+import { getAuthSession } from '../../../../lib/server-auth';
 
 export async function POST(req: NextRequest) {
   try {
-    const session = await auth();
+    const session = await getAuthSession();
     if (!session?.user?.id) {
       return NextResponse.json(
         { success: false, message: 'لطفاً وارد شوید' },

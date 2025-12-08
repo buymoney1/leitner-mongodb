@@ -1,13 +1,14 @@
 // app/login/layout.tsx
 import { redirect } from 'next/navigation';
-import { auth } from '@/lib/auth';
+import { getAuthSession } from '../../../lib/server-auth';
+
 
 export default async function LoginLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await auth();
+  const session = await getAuthSession();
 
   // اگر کاربر قبلاً لاگین کرده بود، او را به داشبورد بفرست
   if (session) {

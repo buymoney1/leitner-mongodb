@@ -1,9 +1,9 @@
 import React from "react";
-import { auth } from "@/lib/auth";
 import Image from "next/image";
+import { getAuthSession } from "../../../lib/server-auth";
 
 const AboutPage = async () => {
-  const session = await auth();
+  const session = await getAuthSession();
 
   if (!session?.user) {
     return (

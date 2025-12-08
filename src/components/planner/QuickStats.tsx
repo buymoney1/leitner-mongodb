@@ -1,10 +1,19 @@
-// components/planner/QuickStats.tsx
+// components/planner/SimpleQuickStats.tsx
 'use client';
 
-import { TrendingUp, Clock, Target, Award, Loader2, Calendar, BookOpen, Headphones, CheckCircle, XCircle, Zap } from 'lucide-react';
+import { 
+  TrendingUp, 
+  Clock, 
+  Target, 
+  Award, 
+  Loader2, 
+  Calendar, 
+  BookOpen, 
+  Headphones, 
+  CheckCircle, 
+  Zap 
+} from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { format, subDays, startOfWeek, endOfWeek } from 'date-fns';
-import { faIR } from 'date-fns/locale';
 
 interface DailyActivity {
   id: string;
@@ -13,11 +22,7 @@ interface DailyActivity {
   podcastListened: boolean;
   wordsReviewed: boolean;
   articleRead: boolean;
-  videoId?: string;
-  podcastId?: string;
-  articleId?: string;
   progress: number;
-  createdAt: Date;
 }
 
 interface ActivityStats {
@@ -25,19 +30,19 @@ interface ActivityStats {
   podcasts: number;
   articles: number;
   words: number;
-  totalTime: number;
+  totalTime: string;
   streak: number;
   weeklyAverage: number;
   todaysProgress: number;
 }
 
-export default function QuickStats() {
+export default function SimpleQuickStats() {
   const [stats, setStats] = useState<ActivityStats>({
     videos: 0,
     podcasts: 0,
     articles: 0,
     words: 0,
-    totalTime: 0,
+    totalTime: '0 دقیقه',
     streak: 0,
     weeklyAverage: 0,
     todaysProgress: 0
@@ -46,11 +51,36 @@ export default function QuickStats() {
   const [todaysActivity, setTodaysActivity] = useState<DailyActivity | null>(null);
   const [recentActivities, setRecentActivities] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [lastUpdated, setLastUpdated] = useState<string>('');
+  const [currentDate, setCurrentDate] = useState<string>('');
 
   useEffect(() => {
+    // تنظیم تاریخ فقط در کلاینت
+    const today = new Date();
+    const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+    
+    const toPersianDigits = (num: number): string => {
+      return num.toString().replace(/\d/g, (d) => persianDigits[parseInt(d)]);
+    };
+    
+    const gregorianYear = today.getFullYear();
+    const gregorianMonth = today.getMonth() + 1;
+    const gregorianDay = today.getDate();
+    
+    // تبدیل ساده
+    let persianYear = gregorianYear - 621;
+    let persianMonth = gregorianMonth;
+    let persianDay = gregorianDay;
+    
+    // تنظیم ماه
+    if (persianMonth > 6) {
+      persianMonth -= 6;
+    } else {
+      persianMonth += 6;
+    }
+    
+    setCurrentDate(`${toPersianDigits(persianYear)}/${toPersianDigits(persianMonth)}/${toPersianDigits(persianDay)}`);
+    
     fetchStats();
-
   }, []);
 
   const fetchStats = async () => {
@@ -67,11 +97,7 @@ export default function QuickStats() {
       const todayData = await todayRes.json();
       const activitiesData = await activitiesRes.json();
   
-      console.log('📊 داده‌های آمار:', statsData);
-      console.log('📅 داده‌های امروز:', todayData);
-  
       if (statsData.success) {
-        // محاسبه زمان کل از ActivityTracking
         const totalMinutes = Math.floor(statsData.data.totalTime / 60);
         const hours = Math.floor(totalMinutes / 60);
         const minutes = totalMinutes % 60;
@@ -80,34 +106,24 @@ export default function QuickStats() {
           ? `${hours} ساعت و ${minutes} دقیقه`
           : `${minutes} دقیقه`;
   
-        // محاسبه استریک
-        const streak = statsData.data.streak || 0;
-  
         setStats({
           videos: statsData.data.totalActivities?.videos || 0,
           podcasts: statsData.data.totalActivities?.podcasts || 0,
           articles: statsData.data.totalActivities?.articles || 0,
           words: statsData.data.totalActivities?.words || 0,
           totalTime: timeSpent,
-          streak,
+          streak: statsData.data.streak || 0,
           weeklyAverage: statsData.data.weeklyAverage || 0,
           todaysProgress: statsData.data.todaysProgress || 0
         });
   
         if (todayData.success && todayData.data) {
           setTodaysActivity(todayData.data);
-          console.log('✅ فعالیت امروز:', todayData.data);
         }
-  
+
         if (activitiesData.success) {
           setRecentActivities(activitiesData.data);
         }
-  
-        setLastUpdated(new Date().toLocaleTimeString('fa-IR', {
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit'
-        }));
       }
     } catch (error) {
       console.error('Error fetching stats:', error);
@@ -115,40 +131,10 @@ export default function QuickStats() {
       setIsLoading(false);
     }
   };
-  const calculateStreak = (recentDays: any[]): number => {
-    if (!recentDays.length) return 0;
-    
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    let streak = 0;
-    let currentDate = today;
-    
-    // روزهای اخیر را به ترتیب بررسی می‌کنیم
-    const sortedDays = [...recentDays].sort((a, b) => 
-      new Date(b.date).getTime() - new Date(a.date).getTime()
-    );
-    
-    for (const day of sortedDays) {
-      const dayDate = new Date(day.date);
-      dayDate.setHours(0, 0, 0, 0);
-      
-      const diffTime = currentDate.getTime() - dayDate.getTime();
-      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-      
-      if (diffDays === streak && day.progress > 0) {
-        streak++;
-        currentDate = new Date(currentDate.getTime() - 24 * 60 * 60 * 1000);
-      } else {
-        break;
-      }
-    }
-    
-    return streak;
-  };
 
   const formatNumber = (num: number) => {
-    return num.toLocaleString('fa-IR');
+    const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+    return num.toString().replace(/\d/g, (d) => persianDigits[parseInt(d)]);
   };
 
   const getActivityIcon = (activityType: string) => {
@@ -179,6 +165,22 @@ export default function QuickStats() {
       case 'words': return 'لغات';
       default: return 'فعالیت';
     }
+  };
+
+  const formatActivityTime = (dateString: string) => {
+    if (!dateString) return '';
+    
+    const date = new Date(dateString);
+    const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+    
+    const toPersianDigits = (num: number): string => {
+      return num.toString().replace(/\d/g, (d) => persianDigits[parseInt(d)]);
+    };
+    
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    
+    return `${toPersianDigits(hours)}:${toPersianDigits(minutes)}`;
   };
 
   const statsData = [
@@ -350,7 +352,7 @@ export default function QuickStats() {
       {/* وضعیت فعالیت‌های امروز */}
       <div className="mb-6">
         <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-          وضعیت امروز ({new Date().toLocaleDateString('fa-IR')})
+          وضعیت امروز ({currentDate || 'در حال بارگذاری...'})
         </h3>
         <div className="grid grid-cols-4 gap-2">
           {activityStats.map((activity, index) => {
@@ -417,10 +419,7 @@ export default function QuickStats() {
                         {activityLabel}
                       </div>
                       <div className="text-xs text-gray-500 dark:text-gray-500">
-                        {new Date(activity.createdAt).toLocaleTimeString('fa-IR', {
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })}
+                        {formatActivityTime(activity.createdAt)}
                       </div>
                     </div>
                   </div>

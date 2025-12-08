@@ -1,12 +1,12 @@
 // app/api/admin/upload-video/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from "@/lib/auth";
 import { PrismaClient } from '@prisma/client';
+import { getAuthSession } from '../../../../../lib/server-auth';
 
 const prisma = new PrismaClient();
 
 export async function POST(req: NextRequest) {
-  const session = await auth();
+  const session = await getAuthSession();
   const userRole = (session?.user as any)?.role;
 
   if (!session || !session.user || userRole !== 'admin') {

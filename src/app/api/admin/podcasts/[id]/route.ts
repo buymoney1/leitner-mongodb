@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { getAuthSession } from '../../../../../../lib/server-auth';
 
 interface Params {
   params: Promise<{
@@ -11,7 +11,7 @@ interface Params {
 // GET - دریافت جزئیات پادکست برای ویرایش
 export async function GET(request: Request, { params }: Params) {
   try {
-    const session = await auth();
+    const session = await getAuthSession();
     const { id } = await params;
 
     if (!session?.user?.id || session.user.role !== 'admin') {
@@ -51,7 +51,7 @@ export async function GET(request: Request, { params }: Params) {
 // PATCH - ویرایش پادکست
 export async function PATCH(request: Request, { params }: Params) {
   try {
-    const session = await auth();
+    const session = await getAuthSession();
     const { id } = await params;
 
     if (!session?.user?.id || session.user.role !== 'admin') {
@@ -139,7 +139,7 @@ export async function PATCH(request: Request, { params }: Params) {
 // DELETE - حذف پادکست
 export async function DELETE(request: Request, { params }: Params) {
   try {
-    const session = await auth();
+    const session = await getAuthSession();
     const { id } = await params;
 
     if (!session?.user?.id || session.user.role !== 'admin') {

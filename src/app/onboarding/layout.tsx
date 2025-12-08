@@ -1,14 +1,14 @@
 // app/onboarding/layout.tsx
 import { redirect } from 'next/navigation';
-import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { getAuthSession } from '../../../lib/server-auth';
 
 export default async function OnboardingLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await auth();
+  const session = await getAuthSession();
 
   // اگر کاربر لاگین نکرده بود، او را به صفحه لاگین بفرست
   if (!session) {

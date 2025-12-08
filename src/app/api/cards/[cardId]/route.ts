@@ -1,7 +1,7 @@
 // app/api/cards/[cardId]/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getAuthSession } from "../../../../../lib/server-auth";
 
 // تغییر شماره ۱: تایپ params باید Promise باشد
 export async function PATCH(
@@ -9,7 +9,7 @@ export async function PATCH(
   { params }: { params: Promise<{ cardId: string }> }
 ) {
   try {
-    const session = await auth();
+    const session = await getAuthSession();
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

@@ -1,13 +1,14 @@
-import { auth } from "@/lib/auth";
+
 import { redirect } from "next/navigation";
 import { BooksClient } from "@/components/BooksClient";
 import { readFile } from "fs/promises";
 import path from "path";
+import { getAuthSession } from "../../../lib/server-auth";
 
 export const revalidate = 0; // force revalidation
 
 export default async function BooksPage() {
-  const session = await auth();
+  const session = await getAuthSession();
   if (!session?.user) redirect("/login");
 
   // خواندن فایل مستقیم

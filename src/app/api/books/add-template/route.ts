@@ -1,9 +1,9 @@
 // app/api/books/add-template/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { readFile } from "fs/promises";
 import path from "path";
+import { getAuthSession } from "../../../../../lib/server-auth";
 
 // اینترفیس برای تایپ داده‌های کتاب الگو از فایل JSON
 interface TemplateBook {
@@ -15,7 +15,7 @@ interface TemplateBook {
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
+    const session = await getAuthSession();
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

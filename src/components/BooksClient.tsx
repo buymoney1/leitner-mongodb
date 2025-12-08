@@ -105,30 +105,41 @@ export function BooksClient({ initialTemplateBooks }: BooksClientProps) {
           </div>
 
           {filteredBooks.length > 0 ? (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {filteredBooks.map((book) => (
-                <TemplateBookCard key={book.id} book={book} />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-16 bg-gray-50/50 dark:bg-gray-800/30 rounded-2xl border border-gray-200 dark:border-gray-700/50 backdrop-blur-sm">
-              <div className="text-gray-400 text-8xl mb-6">📚</div>
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">کتابی یافت نشد</h3>
-              <p className="text-gray-600 dark:text-gray-400 text-lg mb-6">
-                با تغییر فیلترها یا عبارت جستجو، کتاب‌های بیشتری را کشف کنید
-              </p>
-              <button
-                onClick={() => {
-                  setSearchTerm("");
-                  setSelectedLevel("all");
-                  setSelectedCategory("all");
-                }}
-                className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-8 py-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-purple-500/25 font-semibold"
-              >
-                حذف همه فیلترها
-              </button>
-            </div>
-          )}
+  <div
+    className="
+      grid 
+      gap-5
+      grid-cols-2
+      sm:grid-cols-3
+      md:grid-cols-4
+      lg:grid-cols-5
+      xl:grid-cols-6
+    "
+  >
+    {filteredBooks.map((book) => (
+      <TemplateBookCard key={book.id} book={book} />
+    ))}
+  </div>
+) : (
+  <div className="text-center py-16 bg-gray-50/50 dark:bg-gray-800/30 rounded-2xl border border-gray-200 dark:border-gray-700/50 backdrop-blur-sm">
+    <div className="text-gray-400 text-8xl mb-6">📚</div>
+    <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">کتابی یافت نشد</h3>
+    <p className="text-gray-600 dark:text-gray-400 text-lg mb-6">
+      با تغییر فیلترها یا عبارت جستجو، کتاب‌های بیشتری را کشف کنید
+    </p>
+    <button
+      onClick={() => {
+        setSearchTerm("");
+        setSelectedLevel("all");
+        setSelectedCategory("all");
+      }}
+      className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-8 py-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-purple-500/25 font-semibold"
+    >
+      حذف همه فیلترها
+    </button>
+  </div>
+)}
+
         </section>
 
 

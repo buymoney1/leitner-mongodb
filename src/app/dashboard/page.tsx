@@ -1,13 +1,14 @@
 // app/dashboard/page.tsx
-import { auth } from "@/lib/auth";
+
 import { redirect } from "next/navigation";
 import { DashboardClient } from "@/components/DashboardClient";
 import { PrismaClient } from "@prisma/client";
+import { getAuthSession } from "../../../lib/server-auth";
 
 const prisma = new PrismaClient();
 
 export default async function DashboardPage() {
-  const session = await auth();
+  const session = await getAuthSession();
 
   if (!session || !session.user?.email) {
     redirect("/login");

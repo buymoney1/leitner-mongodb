@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { getAuthSession } from '../../../../../lib/server-auth';
 
 // GET - لیست پادکست‌ها برای ادمین
 export async function GET(request: Request) {
   try {
-    const session = await auth();
+    const session = await getAuthSession();
 
     if (!session?.user?.id || session.user.role !== 'admin') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -48,7 +48,7 @@ export async function GET(request: Request) {
 // POST - ایجاد پادکست جدید
 export async function POST(request: Request) {
   try {
-    const session = await auth();
+    const session = await getAuthSession();
 
     if (!session?.user?.id || session.user.role !== 'admin') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

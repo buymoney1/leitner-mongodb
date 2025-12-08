@@ -1,7 +1,7 @@
 // app/dashboard/layout.tsx
 import { redirect } from 'next/navigation';
-import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { getAuthSession } from '../../../lib/server-auth';
 
 export default async function DashboardLayout({
   children,
@@ -9,7 +9,7 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   // 1. گرفتن اطلاعات جلسه
-  const session = await auth();
+  const session = await getAuthSession();
 
   // 2. اگر کاربر لاگین نکرده بود، او را به صفحه لاگین بفرست
   if (!session?.user?.id) {

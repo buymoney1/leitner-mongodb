@@ -1,7 +1,8 @@
 // app/api/notifications/subscribe/route.ts - نسخه اصلاح شده
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import { auth } from '@/lib/auth';
+import { getAuthSession } from '../../../../../lib/server-auth';
+
 
 const prisma = new PrismaClient();
 
@@ -10,7 +11,7 @@ export async function POST(request: NextRequest) {
   
   try {
     // دریافت session از سرور
-    const session = await auth();
+    const session = await getAuthSession();
 
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -149,7 +150,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET() {
   try {
-    const session = await auth();
+    const session = await getAuthSession();
 
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

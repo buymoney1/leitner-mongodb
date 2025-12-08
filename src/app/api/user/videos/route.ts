@@ -1,14 +1,14 @@
 // app/api/user/videos/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from "@/lib/auth"; // <-- از lib/auth ایمپورت می‌کنیم
 import { PrismaClient } from '@prisma/client';
+import { getAuthSession } from '../../../../../lib/server-auth';
 
 const prisma = new PrismaClient();
 
 // این تابع ویدیوهای اخیر و ویدیوهای سطح A1 را برمی‌گرداند
 export async function GET(req: NextRequest) {
   // استفاده از auth() به جای getServerSession
-  const session = await auth();
+  const session = await getAuthSession();
 
   if (!session) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

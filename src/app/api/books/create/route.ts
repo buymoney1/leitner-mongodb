@@ -1,9 +1,10 @@
-import { auth } from "@/lib/auth";
+
 import { prisma } from "@/lib/prisma";
+import { getAuthSession } from "../../../../../lib/server-auth";
 
 
 export async function POST(req: Request) {
-  const session = await auth();
+  const session = await getAuthSession();
   if (!session?.user || session.user.role !== "admin") {
     return new Response("Unauthorized", { status: 401 });
   }

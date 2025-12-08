@@ -1,12 +1,13 @@
 // src/app/login/page.tsx
-import { auth } from "@/lib/auth";
+
 import { redirect } from "next/navigation";
 import SignIn from "@/components/sign-in";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { getAuthSession } from "../../../lib/server-auth";
 
 export default async function LoginPage() {
-  const session = await auth();
+  const session = await getAuthSession();
 
   // اگر کاربر قبلاً لاگین کرده → بفرستش داشبورد
   if (session) {

@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
 import {prisma} from '@/lib/prisma';
 import { toGregorian } from 'jalaali-js';
+import { getAuthSession } from '../../../../../lib/server-auth';
 
 export async function GET(req: NextRequest) {
   try {
     console.log('📅 درخواست تقویم دریافت شد');
     
-    const session = await auth();
+    const session = await getAuthSession();
     
     if (!session?.user?.id) {
       console.log('❌ کاربر لاگین نیست');

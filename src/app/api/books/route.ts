@@ -1,12 +1,12 @@
 // app/api/books/route.ts
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getAuthSession } from "../../../../lib/server-auth";
 
 // فقط GET برای دریافت کتاب‌ها باقی می‌ماند
 export async function GET() {
   try {
-    const session = await auth();
+    const session = await getAuthSession();
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

@@ -1,9 +1,10 @@
 // components/Navbar.tsx
-import { auth } from "@/lib/auth";
+
+import { getAuthSession } from "../../lib/server-auth";
 import { NavbarClient } from "./NavbarClient";
 
 const Navbar = async () => {
-  const session = await auth();
+  const session = await getAuthSession();
 
   return <NavbarClient session={session} />;
 };

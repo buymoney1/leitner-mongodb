@@ -1,12 +1,13 @@
-import { auth } from '@/lib/auth';
+
 import { NextRequest, NextResponse } from 'next/server';
 import {prisma} from '@/lib/prisma';
+import { getAuthSession } from '../../../../../lib/server-auth';
 
 export async function POST(req: NextRequest) {
   try {
     console.log('🔄 شروع پردازش فعالیت‌ها...');
     
-    const session = await auth();
+    const session = await getAuthSession();
 
     if (!session || !session.user || !session.user.id) {
       console.log('❌ کاربر لاگین نیست');

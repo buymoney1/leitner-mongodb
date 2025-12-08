@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Vazirmatn } from "next/font/google";
 import { SessionProvider } from "next-auth/react";
-import { auth } from "@/lib/auth";
 import "./globals.css";
 import { MobileNavBar } from "@/components/MobileNavBar";
 import { ThemeProvider } from "@/components/ThemeProvider";
@@ -11,6 +10,7 @@ import EnhancedActivityTracker from "@/components/EnhancedActivityTracker";
 import { Toaster } from 'sonner';
 import { NotificationSetup } from "@/components/NotificationSetup";
 import WelcomeVideoModal from "@/components/WelcomeVideoModal";
+import { getAuthSession } from "../../lib/server-auth";
 
 
 const vazir = Vazirmatn({
@@ -50,7 +50,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await auth();
+  const session = await getAuthSession();
 
   return (
     <html lang="fa" dir="rtl" suppressHydrationWarning>

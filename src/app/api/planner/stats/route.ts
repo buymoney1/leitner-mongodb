@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
 import {prisma} from '@/lib/prisma';
+import { getAuthSession } from '../../../../../lib/server-auth';
 
 export async function GET(req: NextRequest) {
   try {
     console.log('📊 درخواست آمار...');
     
-    const session = await auth();
+    const session = await getAuthSession();
     
     if (!session?.user?.id) {
       console.log('❌ کاربر لاگین نیست');

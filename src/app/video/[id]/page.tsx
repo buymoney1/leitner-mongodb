@@ -3,7 +3,7 @@
 import { PrismaClient } from '@prisma/client';
 import VideoPlayer, { Vocabulary } from '@/components/video/VideoPlayer';
 import { notFound, redirect } from 'next/navigation';
-import { auth } from '@/lib/auth';
+import { getAuthSession } from '../../../../lib/server-auth';
 
 const prisma = new PrismaClient();
 
@@ -31,7 +31,7 @@ async function getVideoWithAllData(videoId: string) {
 
 export default async function VideoPage({ params }: { params: Promise<{ id: string }> }) {
  
-  const session = await auth();
+  const session = await getAuthSession();
   if (!session?.user) redirect("/login");
 
   const { id } = await params;

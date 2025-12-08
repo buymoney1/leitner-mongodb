@@ -285,7 +285,7 @@ export default function VocabularyList() {
       </div>
 
       {/* Help Text */}
-      <div className="text-center text-sm text-gray-500 dark:text-gray-400 mt-8 pb-4">
+      <div className="mb-10 text-center text-sm text-gray-500 dark:text-gray-400 mt-8 pb-4">
         <div className="bg-gray-100/50 dark:bg-gray-800/30 rounded-xl p-4 border border-gray-200 dark:border-gray-700/50">
           <div className="flex items-center justify-center gap-2 mb-2">
             <Sparkles className="w-4 h-4" />
