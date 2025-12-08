@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { UserCheck, Clock, BookOpen } from 'lucide-react';
+import { toast } from 'sonner';
+import WelcomeVideoModal from '@/components/WelcomeVideoModal';
 
 const REVIEW_TIME_OPTIONS = [
   { value: 'MORNING', label: 'صبح‌ها ☀️', time: '۸-۱۲' },
@@ -29,11 +31,40 @@ export default function OnboardingPage() {
     reviewTimePreference: '',
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [showWelcomeVideo, setShowWelcomeVideo] = useState(false);
+  const [onboardingCompleted, setOnboardingCompleted] = useState(false);
+  const [shouldRedirect, setShouldRedirect] = useState(false);
 
   useEffect(() => {
-    if (status === 'unauthenticated') router.push('/login');
+    if (status === 'unauthenticated') {
+      toast.error('لطفاً ابتدا وارد حساب کاربری خود شوید');
+      router.push('/login');
+    }
     if (session?.user?.name) setFormData(prev => ({ ...prev, name: session.user.name || '' }));
   }, [session, status, router]);
+
+  // وقتی onboarding کامل شد، state را تغییر بده
+  useEffect(() => {
+    if (onboardingCompleted) {
+      // اول مودال را نشان بده
+      setShowWelcomeVideo(true);
+    }
+  }, [onboardingCompleted]);
+
+  // وقتی کاربر مودال را بست، به داشبورد برو
+  useEffect(() => {
+    if (shouldRedirect) {
+      router.push('/dashboard');
+    }
+  }, [shouldRedirect, router]);
+
+  const handleModalClose = () => {
+    setShowWelcomeVideo(false);
+    // با تاخیر به داشبورد برو
+    setTimeout(() => {
+      setShouldRedirect(true);
+    }, 300);
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -127,14 +158,30 @@ export default function OnboardingPage() {
   const handleNext = () => {
     if (steps[currentStep].isValid) {
       setCurrentStep(step => Math.min(step + 1, steps.length - 1));
+    } else {
+      if (currentStep === 0 && formData.name.trim().length < 2) {
+        toast.warning('لطفاً نام معتبر وارد کنید (حداقل ۲ حرف)');
+      } else if (currentStep === 1 && formData.learningGoal === '') {
+        toast.warning('لطفاً یک هدف یادگیری انتخاب کنید');
+      } else if (currentStep === 2 && formData.reviewTimePreference === '') {
+        toast.warning('لطفاً زمان مورد نظر برای مرور را انتخاب کنید');
+      }
     }
   };
 
   const handlePrev = () => setCurrentStep(step => Math.max(step - 1, 0));
 
   const handleSubmit = async () => {
-    if (!steps[currentStep].isValid) return;
+    if (!steps[currentStep].isValid) {
+      toast.warning('لطفاً همه فیلدها را به درستی پر کنید');
+      return;
+    }
+    
     setIsLoading(true);
+    const toastId = toast.loading('در حال ذخیره اطلاعات...', {
+      duration: Infinity,
+    });
+    
     try {
       const response = await fetch('/api/user/profile', {
         method: 'PATCH',
@@ -142,14 +189,37 @@ export default function OnboardingPage() {
         body: JSON.stringify({
           ...formData,
           suggestedReviewTime: formData.reviewTimePreference,
+          onboardingCompleted: true,
         }),
       });
-      if (response.ok) router.push('/planner');
-      else alert('خطایی در ثبت اطلاعات رخ داد.');
-    } catch {
-      alert('خطا در ارتباط با سرور.');
+      
+      if (response.ok) {
+        toast.success('اطلاعات با موفقیت ذخیره شد!', {
+          id: toastId,
+          duration: 2000,
+        });
+        
+        // علامت گذاری که onboarding کامل شده
+        setOnboardingCompleted(true);
+        
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        toast.error(`خطایی در ثبت اطلاعات رخ داد: ${errorData.message || 'لطفاً دوباره تلاش کنید'}`, {
+          id: toastId,
+          duration: 4000,
+        });
+      }
+    } catch (error) {
+      console.error('Submission error:', error);
+      toast.error('خطا در ارتباط با سرور. لطفاً اتصال اینترنت خود را بررسی کنید', {
+        id: toastId,
+        duration: 4000,
+      });
     } finally {
       setIsLoading(false);
+      setTimeout(() => {
+        toast.dismiss(toastId);
+      }, 100);
     }
   };
 
@@ -243,6 +313,15 @@ export default function OnboardingPage() {
           ))}
         </div>
       </div>
+
+      {/* Welcome Video Modal */}
+      {showWelcomeVideo && (
+        <WelcomeVideoModal
+          isOpen={showWelcomeVideo}
+          onClose={handleModalClose}
+          userName={formData.name}
+        />
+      )}
     </div>
   );
 }
