@@ -33,7 +33,6 @@ export default function OnboardingPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [showWelcomeVideo, setShowWelcomeVideo] = useState(false);
   const [onboardingCompleted, setOnboardingCompleted] = useState(false);
-  const [shouldRedirect, setShouldRedirect] = useState(false);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -43,27 +42,23 @@ export default function OnboardingPage() {
     if (session?.user?.name) setFormData(prev => ({ ...prev, name: session.user.name || '' }));
   }, [session, status, router]);
 
-  // وقتی onboarding کامل شد، state را تغییر بده
+  // وقتی onboarding کامل شد، مستقیماً به داشبورد برو
   useEffect(() => {
     if (onboardingCompleted) {
-      // اول مودال را نشان بده
-      setShowWelcomeVideo(true);
-    }
-  }, [onboardingCompleted]);
-
-  // وقتی کاربر مودال را بست، به داشبورد برو
-  useEffect(() => {
-    if (shouldRedirect) {
+      // به داشبورد منتقل شو
       router.push('/dashboard');
+      
+      // بعد از 5 ثانیه مودال را نمایش بده
+      const timer = setTimeout(() => {
+        setShowWelcomeVideo(true);
+      }, 5000); // 5000 میلی‌ثانیه = 5 ثانیه
+      
+      return () => clearTimeout(timer);
     }
-  }, [shouldRedirect, router]);
+  }, [onboardingCompleted, router]);
 
   const handleModalClose = () => {
     setShowWelcomeVideo(false);
-    // با تاخیر به داشبورد برو
-    setTimeout(() => {
-      setShouldRedirect(true);
-    }, 300);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -196,11 +191,11 @@ export default function OnboardingPage() {
       if (response.ok) {
         toast.success('اطلاعات با موفقیت ذخیره شد!', {
           id: toastId,
-          duration: 2000,
+          duration: 1000,
         });
         
-        // علامت گذاری که onboarding کامل شده
-        setOnboardingCompleted(true);
+        // به داشبورد بروید و flag را در URL قرار دهید
+        router.push(`/dashboard?showWelcome=true&userName=${encodeURIComponent(formData.name)}`);
         
       } else {
         const errorData = await response.json().catch(() => ({}));

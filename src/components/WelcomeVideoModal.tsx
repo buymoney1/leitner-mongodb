@@ -2,43 +2,55 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { Play, CheckCircle, X, Home, RotateCw } from 'lucide-react';
 import { toast } from 'sonner';
 
-interface WelcomeVideoModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  userName: string;
-}
-
-export default function WelcomeVideoModal({
-  isOpen,
-  onClose,
-  userName,
-}: WelcomeVideoModalProps) {
+export default function WelcomeVideoModal() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [isOpen, setIsOpen] = useState(false);
   const [hasPlayed, setHasPlayed] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [progress, setProgress] = useState(0);
   const [videoError, setVideoError] = useState(false);
+  const [userName, setUserName] = useState('');
+  const [timer, setTimer] = useState<NodeJS.Timeout | null>(null);
   
   // مسیر ویدیو از پوشه public
-  // می‌توانید ویدیوهای مختلف داشته باشید:
-  const videoSources = {
-    welcome: '/preview.mp4',
+  const videoUrl = '/preview.mp4';
 
-  };
-  
-  // انتخاب ویدیو مورد نظر
-  const videoUrl = videoSources.welcome; // یا از prop دریافت کنید
+  useEffect(() => {
+    // بررسی پارامترهای URL
+    const showWelcome = searchParams.get('showWelcome');
+    const name = searchParams.get('userName');
+    
+    if (showWelcome === 'true' && name) {
+      setUserName(decodeURIComponent(name));
+      
+      // بعد از 5 ثانیه مودال را نمایش بده
+      const timeout = setTimeout(() => {
+        setIsOpen(true);
+        // حذف پارامترها از URL بدون رفرش صفحه
+        const newUrl = new URL(window.location.href);
+        newUrl.searchParams.delete('showWelcome');
+        newUrl.searchParams.delete('userName');
+        window.history.replaceState({}, '', newUrl.toString());
+      }, 5000);
+      
+      setTimer(timeout);
+      
+      return () => {
+        if (timer) clearTimeout(timer);
+      };
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
-      // ریست کردن وضعیت ویدیو وقتی مودال باز می‌شود
       setVideoLoaded(false);
       setVideoError(false);
       setHasPlayed(false);
@@ -53,6 +65,14 @@ export default function WelcomeVideoModal({
     };
   }, [isOpen]);
 
+  const handleClose = () => {
+    setIsOpen(false);
+    // یک رفرش کوچک برای اطمینان از لود کامل داشبورد
+    setTimeout(() => {
+      router.refresh();
+    }, 100);
+  };
+
   const handleVideoEnd = () => {
     setHasPlayed(true);
     setIsPlaying(false);
@@ -65,7 +85,6 @@ export default function WelcomeVideoModal({
       const currentProgress = (video.currentTime / video.duration) * 100;
       setProgress(currentProgress);
       
-      // اگر بیش از 90% ویدیو دیده شده باشد، آن را کامل شده در نظر بگیر
       if (currentProgress >= 90 && !hasPlayed) {
         setHasPlayed(true);
       }
@@ -88,7 +107,6 @@ export default function WelcomeVideoModal({
 
   const handleLoadedData = () => {
     setVideoLoaded(true);
-    toast.info('ویدیو آماده پخش است');
   };
 
   const handleVideoError = () => {
@@ -105,38 +123,30 @@ export default function WelcomeVideoModal({
     }
   };
 
-  const handleExploreDashboard = () => {
-    onClose();
-    toast.info('در حال انتقال به داشبورد...');
-    // یک رفرش کوچک برای اطمینان از لود کامل داشبورد
-    setTimeout(() => {
-      router.refresh();
-    }, 100);
-  };
-
   const handleCompleteAndGo = () => {
     if (hasPlayed) {
-      onClose();
+      handleClose();
       toast.success('آماده یادگیری هستید! موفق باشید 🚀');
     } else {
       toast.warning('لطفاً ابتدا ویدیو را مشاهده کنید');
     }
   };
 
+  // اگر مودال باز نیست، چیزی رندر نکن
   if (!isOpen) return null;
 
   return (
     <>
       {/* Overlay */}
-      <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[100] animate-in fade-in duration-300" />
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[9999] animate-in fade-in duration-300" />
       
       {/* Modal Container */}
-      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      <div className="fixed  inset-0 z-[10000] flex items-center justify-center p-4">
         <div className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto scrollbar-hide bg-white dark:bg-gray-800/90 rounded-3xl shadow-2xl border border-gray-300 dark:border-gray-700/50 backdrop-blur-xl animate-in slide-in-from-bottom-10 duration-500">
           
           {/* Close Button */}
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="absolute left-4 top-4 z-10 p-2 rounded-full bg-gray-200/80 dark:bg-gray-700/80 hover:bg-gray-300 dark:hover:bg-gray-600/80 transition-all duration-300 border border-gray-300 dark:border-gray-600"
           >
             <X className="h-5 w-5 text-gray-700 dark:text-gray-300" />
@@ -146,7 +156,6 @@ export default function WelcomeVideoModal({
           <div className="p-4 md:p-8">
             {/* Header */}
             <div className="text-center mb-6">
-
               {/* Video Info */}
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/30">
                 <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
@@ -158,8 +167,6 @@ export default function WelcomeVideoModal({
               <h2 className="mt-5 text-sm font-bold text-gray-900 dark:text-white mb-2">
                 {userName} عزیز، به پلتفرم یادگیری انگلیسی خوش آمدید! 🎉
               </h2>
-
-
             </div>
 
             {/* Video Container */}
@@ -194,7 +201,6 @@ export default function WelcomeVideoModal({
                 ) : null}
                 
                 <video
-             
                   ref={videoRef}
                   className="h-60vh w-full aspect-video object-cover cursor-pointer"
                   onClick={handlePlayPause}
@@ -236,10 +242,7 @@ export default function WelcomeVideoModal({
                   </div>
                 )}
               </div>
-
-         
             </div>
-
 
           </div>
         </div>

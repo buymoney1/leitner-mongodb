@@ -2,7 +2,18 @@
 
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import { Headphones, Play, Clock, Filter, Plus, Edit, Trash2, X } from 'lucide-react';
+import Link from 'next/link';
+import { 
+  Headphones, 
+  Play, 
+  Clock, 
+  Filter, 
+  Plus, 
+  Edit, 
+  Trash2, 
+  X,
+  ExternalLink 
+} from 'lucide-react';
 
 interface Podcast {
   id: string;
@@ -12,6 +23,7 @@ interface Podcast {
   coverUrl?: string;
   duration?: number;
   level: string;
+  transcript?: string; // اضافه شده
   isPublished: boolean;
   vocabularies: {
     id: string;
@@ -29,6 +41,7 @@ interface PodcastFormData {
   coverUrl: string;
   duration: string;
   level: string;
+  transcript: string; // اضافه شده
   isPublished: boolean;
   vocabularies: { word: string; meaning: string; timestamp: string }[];
 }
@@ -94,6 +107,7 @@ export default function PodcastsClient() {
         body: JSON.stringify({
           ...formData,
           duration: formData.duration ? parseInt(formData.duration) : null,
+          transcript: formData.transcript || '', // اضافه شده
           vocabularies: formData.vocabularies.filter(v => v.word.trim() && v.meaning.trim())
         }),
       });
@@ -162,7 +176,6 @@ export default function PodcastsClient() {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300 p-8">
       <div className="max-w-6xl mx-auto">
- 
 
         {/* Admin Controls */}
         {isAdmin && (
@@ -218,7 +231,7 @@ export default function PodcastsClient() {
               )}
 
               {/* Content */}
-              <div className="space-y-3 ">
+              <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="px-3 py-1 bg-purple-500/20 text-purple-600 dark:text-purple-400 rounded-full text-sm border border-purple-500/30">
                     {podcast.level}
@@ -231,17 +244,28 @@ export default function PodcastsClient() {
                   )}
                 </div>
 
-                <h3 className="font-semibold text-gray-900 dark:text-white text-lg leading-tight">
-                  {podcast.title}
-                </h3>
+                <Link href={`/podcasts/${podcast.id}`}>
+                  <h3 className="font-semibold text-gray-900 dark:text-white text-lg leading-tight hover:text-purple-600 dark:hover:text-purple-400 transition-colors cursor-pointer">
+                    {podcast.title}
+                  </h3>
+                </Link>
 
                 {podcast.description && (
-                  <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
+                  <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed line-clamp-2">
                     {podcast.description}
                   </p>
                 )}
 
-
+                {/* View Details Button */}
+                <div className="pt-2">
+                  <Link 
+                    href={`/podcasts/${podcast.id}`}
+                    className="inline-flex items-center gap-1 text-sm text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 transition-colors"
+                  >
+                    مشاهده جزئیات
+                    <ExternalLink className="h-3 w-3" />
+                  </Link>
+                </div>
 
                 {/* Admin Actions */}
                 {isAdmin && (
@@ -322,6 +346,7 @@ function PodcastModal({ podcast, onClose, onSave, loading = false }: PodcastModa
     coverUrl: '',
     duration: '',
     level: 'A1',
+    transcript: '', // اضافه شده
     isPublished: false,
     vocabularies: [{ word: '', meaning: '', timestamp: '' }]
   });
@@ -337,6 +362,7 @@ function PodcastModal({ podcast, onClose, onSave, loading = false }: PodcastModa
         coverUrl: podcast.coverUrl || '',
         duration: podcast.duration?.toString() || '',
         level: podcast.level,
+        transcript: podcast.transcript || '', // اضافه شده
         isPublished: podcast.isPublished,
         vocabularies: podcast.vocabularies.length > 0 
           ? podcast.vocabularies.map(v => ({
@@ -450,7 +476,25 @@ function PodcastModal({ podcast, onClose, onSave, loading = false }: PodcastModa
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={3}
               className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
+              placeholder="توضیحات مختصر درباره پادکست..."
             />
+          </div>
+
+          {/* فیلد متن پادکست (Transcript) */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              متن پادکست (Transcript)
+            </label>
+            <textarea
+              value={formData.transcript}
+              onChange={(e) => setFormData({ ...formData, transcript: e.target.value })}
+              rows={6}
+              placeholder="متن کامل پادکست را اینجا وارد کنید..."
+              className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
+            />
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              متن کامل پادکست برای نمایش به کاربران در صفحه جزییات
+            </p>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -519,7 +563,13 @@ function PodcastModal({ podcast, onClose, onSave, loading = false }: PodcastModa
                     onChange={(e) => handleVocabularyChange(index, 'meaning', e.target.value)}
                     className="flex-1 px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
                   />
-    
+                  <input
+                    type="number"
+                    placeholder="زمان (ثانیه)"
+                    value={vocab.timestamp}
+                    onChange={(e) => handleVocabularyChange(index, 'timestamp', e.target.value)}
+                    className="w-24 px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
+                  />
                   {formData.vocabularies.length > 1 && (
                     <button
                       type="button"

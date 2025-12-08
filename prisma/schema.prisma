@@ -195,6 +195,7 @@ model Podcast {
   coverUrl     String?
   duration     Int? // مدت زمان به ثانیه
   level        ContentLevel
+  transcript   String?
   vocabularies PodcastVocabulary[]
   isPublished  Boolean             @default(false)
   createdById  String?             @db.ObjectId

@@ -66,6 +66,7 @@ export async function PATCH(request: Request, { params }: Params) {
       coverUrl,
       duration,
       level,
+      transcript, // اضافه شده
       vocabularies,
       isPublished
     } = body;
@@ -93,6 +94,7 @@ export async function PATCH(request: Request, { params }: Params) {
         ...(coverUrl !== undefined && { coverUrl }),
         ...(duration !== undefined && { duration: duration ? parseInt(duration) : null }),
         ...(level && { level }),
+        ...(transcript !== undefined && { transcript }), // اضافه شده
         ...(isPublished !== undefined && { isPublished }),
         vocabularies: {
           deleteMany: {}, // حذف تمام لغات قبلی

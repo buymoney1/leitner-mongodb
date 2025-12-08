@@ -10,6 +10,7 @@ import { OfflineIndicator } from "@/components/OfflineIndicator";
 import EnhancedActivityTracker from "@/components/EnhancedActivityTracker";
 import { Toaster } from 'sonner';
 import { NotificationSetup } from "@/components/NotificationSetup";
+import WelcomeVideoModal from "@/components/WelcomeVideoModal";
 
 
 const vazir = Vazirmatn({
@@ -94,6 +95,7 @@ export default async function RootLayout({
             <MobileNavBar />
             <PWAInstallPrompt />
             <OfflineIndicator />
+            <WelcomeVideoModal />
           </SessionProvider>
         </ThemeProvider>
       </body>

@@ -1,8 +1,6 @@
 'use client'
 
 import { useState, useEffect } from "react";
-import { auth } from "@/lib/auth";
-import { redirect } from "next/navigation";
 import Link from "next/link";
 
 export default function HomePage() {

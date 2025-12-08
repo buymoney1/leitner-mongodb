@@ -62,6 +62,7 @@ export async function POST(request: Request) {
       coverUrl,
       duration,
       level,
+      transcript, // اضافه شده
       vocabularies,
       isPublished = false
     } = body;
@@ -82,6 +83,7 @@ export async function POST(request: Request) {
         coverUrl,
         duration: duration ? parseInt(duration) : null,
         level,
+        transcript, // اضافه شده
         isPublished,
         createdById: session.user.id,
         vocabularies: {
