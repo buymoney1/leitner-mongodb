@@ -5,6 +5,7 @@ import { useSession, signOut } from 'next-auth/react' // signOut را اضافه
 import { useRouter } from 'next/navigation'
 import { User, Calendar, Award, BookOpen, Mic, FileText, Settings, Save, X, Edit3, Camera, Sun, Moon, Monitor, LogOut } from 'lucide-react'
 import { useTheme } from '../../../hooks/useTheme'
+import { SupportCard } from '@/components/SupportCard'
 
 interface UserProfile {
   id: string
@@ -577,26 +578,11 @@ export default function ProfilePage() {
                   </div>
                 </InfoCard>
 
-                {/* Quick Stats */}
-                <InfoCard title="آمار سریع">
-                  <div className="space-y-3">
-                    {[
-                      { label: 'کتاب‌ها', value: profile._count.books, color: 'bg-blue-500' },
-                      { label: 'کارت‌ها', value: profile._count.cards, color: 'bg-green-500' },
-                      { label: 'پادکست‌ها', value: profile._count.podcasts, color: 'bg-purple-500' },
-                      { label: 'مقالات', value: profile._count.articles, color: 'bg-orange-500' }
-                    ].map((stat, index) => (
-                      <div key={index} className="flex items-center justify-between py-2">
-                        <span className="text-gray-600 dark:text-gray-400 text-sm">{stat.label}</span>
-                        <div className="flex items-center gap-2">
-                          <span className="text-gray-900 dark:text-white font-semibold">{stat.value}</span>
-                          <div className={`w-2 h-2 rounded-full ${stat.color}`}></div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </InfoCard>
+ 
               </div>
+
+              
+              <SupportCard />
 
               {/* Theme Toggle Card */}
               <ThemeToggleCard />
