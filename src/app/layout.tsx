@@ -22,7 +22,7 @@ const vazir = Vazirmatn({
 
 // متادیتا برای PWA
 export const metadata: Metadata = {
-  title: "Leitner System",
+  title: "Zabanion Platform",
   description: "سیستم لایتنر برای یادگیری لغات",
   manifest: "/manifest.json",
   icons: {
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Leitner System",
+    title: "Zabanion Platform",
   },
 };
 
@@ -59,11 +59,11 @@ export default async function RootLayout({
         <link rel="manifest" href="/manifest.json" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="Leitner System" />
+        <meta name="apple-mobile-web-app-title" content="Zabanion Platform" />
         <link rel="apple-touch-icon" href="/icon-192x192.png" />
         
         {/* اضافه کردن متا تگ‌های بیشتر برای PWA */}
-        <meta name="application-name" content="Leitner System" />
+        <meta name="application-name" content="Zabanion Platform" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="msapplication-TileColor" content="#000000" />
         <meta name="msapplication-tap-highlight" content="no" />

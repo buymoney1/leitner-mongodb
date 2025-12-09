@@ -38,7 +38,7 @@ self.addEventListener('push', (event) => {
     console.log('📊 داده‌های Push:', data);
   } catch (error) {
     data = {
-      title: 'Leitner System',
+      title: 'Zabanion Platform',
       body: event.data.text() || 'یادآوری جدید',
     };
   }

@@ -5,7 +5,6 @@ import { readFile } from "fs/promises";
 import path from "path";
 import { getAuthSession } from "../../../../../lib/server-auth";
 
-// اینترفیس برای تایپ داده‌های کتاب الگو از فایل JSON
 interface TemplateBook {
   id: string;
   title: string;
@@ -21,10 +20,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // --- راه حل کلیدی: ذخیره کردن userId در یک متغیر ثابت ---
-    // این کار باعث می‌شود تایپ‌اسکریپت نوع آن را "فراموش" نکند
     const userId = session.user.id;
-
     const { templateBookId } = await request.json();
 
     if (!templateBookId) {
@@ -43,49 +39,96 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Template book not found" }, { status: 404 });
     }
 
-    // ۳. بررسی اینکه آیا کاربر قبلا این کتاب را اضافه نکرده است
+    let message = "";
+    let bookToReturn;
+    let cardsCount = 0;
+
+    // ۳. بررسی اینکه آیا کاربر قبلا این کتاب را اضافه کرده است
     const existingBook = await prisma.book.findFirst({
       where: {
-        userId: userId, // از متغیر ثابت استفاده می‌کنیم
+        userId: userId,
         title: templateBook.title,
       },
+      include: {
+        cards: true
+      }
     });
 
-    if (existingBook) {
-      return NextResponse.json({ error: "شما قبلا این کتاب را به مجموعه خود اضافه کرده‌اید." }, { status: 409 });
-    }
-
-    // ۴. استفاده از تراکنش برای ایجاد کتاب و کارت‌ها
+    // ۴. استفاده از تراکنش
     const result = await prisma.$transaction(async (tx) => {
-      const newUserBook = await tx.book.create({
-        data: {
-          title: templateBook.title,
-          description: templateBook.description,
-          userId: userId, // اینجا دیگر خطا نمی‌دهد
-        },
-      });
-
-      if (templateBook.cards && templateBook.cards.length > 0) {
-        await tx.card.createMany({
-          data: templateBook.cards.map((card) => ({
-            front: card.front,
-            back: card.back,
-            hint: card.hint,
-            userId: userId, // اینجا هم از متغیر ثابت استفاده می‌کنیم
-            bookId: newUserBook.id,
-          })),
+      if (existingBook) {
+        // اگر کتاب از قبل وجود دارد، فقط کارت‌های جدید اضافه می‌شوند
+        message = "این کتاب قبلاً در مجموعه شما موجود بود. لغات جدید به آن اضافه شد.";
+        
+        if (templateBook.cards && templateBook.cards.length > 0) {
+          // فقط کارت‌هایی که قبلاً وجود ندارند را اضافه می‌کنیم
+          const existingCardFronts = new Set(existingBook.cards.map(card => card.front));
+          const newCards = templateBook.cards.filter(card => !existingCardFronts.has(card.front));
+          
+          if (newCards.length > 0) {
+            await tx.card.createMany({
+              data: newCards.map((card) => ({
+                front: card.front,
+                back: card.back,
+                hint: card.hint,
+                userId: userId,
+                bookId: existingBook.id,
+              })),
+            });
+            cardsCount = newCards.length;
+          } else {
+            message = "تمام لغات این کتاب قبلاً در مجموعه شما موجود هستند.";
+          }
+        }
+        
+        // کتاب موجود را با کارت‌های به‌روز شده برمی‌گردانیم
+        bookToReturn = await tx.book.findUnique({
+          where: { id: existingBook.id },
+          include: { cards: true }
         });
+        
+      } else {
+        // اگر کتاب وجود ندارد، کتاب جدید و تمام کارت‌هایش را ایجاد می‌کنیم
+        const newUserBook = await tx.book.create({
+          data: {
+            title: templateBook.title,
+            description: templateBook.description,
+            userId: userId,
+          },
+        });
+
+        if (templateBook.cards && templateBook.cards.length > 0) {
+          await tx.card.createMany({
+            data: templateBook.cards.map((card) => ({
+              front: card.front,
+              back: card.back,
+              hint: card.hint,
+              userId: userId,
+              bookId: newUserBook.id,
+            })),
+          });
+          cardsCount = templateBook.cards.length;
+        }
+
+        message = "کتاب جدید با موفقیت به مجموعه شما اضافه شد.";
+        bookToReturn = newUserBook;
       }
 
-      return newUserBook;
+      return { book: bookToReturn, message, cardsCount };
     });
 
-    return NextResponse.json(result, { status: 201 });
+    return NextResponse.json({
+      success: true,
+      message: result.message,
+      book: result.book,
+      cardsAdded: result.cardsCount,
+      alreadyExists: !!existingBook
+    }, { status: 200 });
 
   } catch (error) {
     console.error("Error adding template book:", error);
     return NextResponse.json(
-      { error: "Internal Server Error" },
+      { error: "خطای سرور داخلی" },
       { status: 500 }
     );
   }

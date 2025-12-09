@@ -12,9 +12,7 @@ import {
   Volume2, 
   ChevronLeft, 
   ChevronRight,
-  Star,
-  Zap,
-  Target
+  Book, 
 } from "lucide-react";
 
 interface Card {
@@ -143,45 +141,70 @@ export default function ReviewPage() {
 
   if (cards.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900 p-4 transition-colors duration-300">
-        <div className="text-center bg-white dark:bg-gray-800/80 bg-gradient-to-br from-gray-50/80 to-white/60 dark:from-gray-800/80 dark:to-gray-900/80 backdrop-blur-xl p-8 sm:p-12 rounded-3xl shadow-xl dark:shadow-2xl max-w-md border border-gray-300 dark:border-gray-700/50 relative overflow-hidden transition-all duration-300">
-          {/* Background Effects */}
-          <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-blue-500/5 dark:from-green-500/5 dark:to-blue-500/5"></div>
-          <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/10 dark:bg-green-500/10 rounded-full blur-3xl"></div>
-          
-          <div className="relative z-10">
-            <div className="mx-auto flex items-center justify-center h-16 w-16 sm:h-20 sm:w-20 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 mb-4 sm:mb-6 shadow-lg shadow-green-500/30">
-              <Sparkles className="h-8 w-8 sm:h-10 sm:w-10 text-white" strokeWidth={2.5} />
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-3">
-              آفرین! 🎉
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400 text-base sm:text-lg mb-2">همه کارت‌های امروز رو مرور کردی</p>
-            <p className="text-gray-500 dark:text-gray-500 text-sm">کارت‌های جدید فردا برای مرور آماده می‌شن</p>
-            
-            <div className="mt-6 sm:mt-8 grid grid-cols-2 gap-3 sm:gap-4 text-center">
-              <div className="bg-gray-100 dark:bg-gray-700/30 rounded-xl p-3 sm:p-4 border border-gray-200 dark:border-gray-600/30">
-                <div className="text-xl sm:text-2xl font-bold text-green-600 dark:text-green-400">{sessionStats.correct}</div>
-                <div className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm">پاسخ صحیح</div>
-              </div>
-              <div className="bg-gray-100 dark:bg-gray-700/30 rounded-xl p-3 sm:p-4 border border-gray-200 dark:border-gray-600/30">
-                <div className="text-xl sm:text-2xl font-bold text-amber-600 dark:text-amber-400">{sessionStats.incorrect}</div>
-                <div className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm">نیاز به تمرین</div>
-              </div>
-            </div>
-
-            <button
-              onClick={() => router.push("/dashboard")}
-              className="cursor-pointer mt-6 sm:mt-8 px-6 py-3 sm:px-8 sm:py-4 bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-xl hover:from-cyan-500 hover:to-blue-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900 w-full font-semibold shadow-lg shadow-cyan-500/30 transition-all duration-200 hover:scale-[1.02] group"
-            >
-              <span className="flex items-center justify-center gap-2 text-sm sm:text-base">
-                بازگشت به داشبورد
-                <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5 group-hover:-translate-x-1 transition-transform" />
-              </span>
-            </button>
+<div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-4 transition-colors duration-500">
+  <div className="text-center relative w-full max-w-md">
+    {/* Animated background glow */}
+    <div className="absolute -inset-4 bg-gradient-to-r from-green-500/5 via-cyan-500/5 to-blue-500/5 dark:from-green-500/10 dark:via-cyan-500/10 dark:to-blue-500/10 rounded-3xl blur-2xl animate-pulse"></div>
+    
+    <div className="relative bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl p-10 sm:p-12 rounded-3xl shadow-2xl dark:shadow-2xl border border-gray-200/60 dark:border-gray-700/40 overflow-hidden">
+      {/* Gradient border effect */}
+      <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-green-500/5 via-cyan-500/5 to-blue-500/5 dark:from-green-500/10 dark:via-cyan-500/10 dark:to-blue-500/10"></div>
+      
+      {/* Floating orbs */}
+      <div className="absolute -top-10 -right-10 w-40 h-40 bg-gradient-to-br from-green-500/20 to-cyan-500/20 rounded-full blur-2xl"></div>
+      <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-gradient-to-tr from-blue-500/20 to-cyan-500/20 rounded-full blur-2xl"></div>
+      
+      <div className="relative z-10">
+        {/* Icon/Emoji container */}
+        <div className="mb-8">
+          <div className="inline-flex p-4 rounded-2xl bg-gradient-to-br from-green-500/10 to-cyan-500/10 dark:from-green-500/15 dark:to-cyan-500/15 border border-green-500/20 dark:border-cyan-500/20">
+            <div className="text-4xl">🎯</div>
           </div>
         </div>
+        
+        {/* Message */}
+        <p className="text-gray-700 dark:text-gray-300 text-lg sm:text-xl font-medium mb-2">
+          هیچ کارتی برای مرور نیست!
+        </p>
+        <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base mb-10">
+          کارت‌های امروز را به پایان رساندید
+        </p>
+
+        <div className="flex flex-col sm:flex-row gap-4 mt-10">
+  {/* کتابخانه Button */}
+  <button
+    onClick={() => router.push("/books")}
+    className="relative w-full overflow-hidden rounded-xl group"
+  >
+    <div className="absolute inset-0 bg-gradient-to-r from-purple-500 via-indigo-500 to-purple-500 opacity-0 group-hover:opacity-20 blur-lg transition-all duration-500"></div>
+    
+    <div className="relative bg-gradient-to-r from-purple-600 to-indigo-600 dark:from-purple-700 dark:to-indigo-700 text-white py-4 px-6 rounded-xl font-semibold text-base shadow-xl shadow-purple-500/25 dark:shadow-purple-500/15 transition-all duration-300 group-hover:shadow-2xl group-hover:shadow-purple-500/35 dark:group-hover:shadow-purple-500/25 group-hover:scale-[1.02] group-active:scale-[0.98]">
+      <span className="flex items-center justify-center gap-3">
+        کتابخانه
+        <Book className="h-5 w-5 transition-transform group-hover:rotate-12" />
+      </span>
+    </div>
+  </button>
+
+  {/* داشبورد Button */}
+  <button
+    onClick={() => router.push("/dashboard")}
+    className="relative w-full overflow-hidden rounded-xl group"
+  >
+    <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 via-blue-500 to-cyan-500 opacity-0 group-hover:opacity-20 blur-lg transition-all duration-500"></div>
+    
+    <div className="relative bg-gradient-to-r from-cyan-600 to-blue-600 dark:from-cyan-700 dark:to-blue-700 text-white py-4 px-6 rounded-xl font-semibold text-base shadow-xl shadow-cyan-500/25 dark:shadow-cyan-500/15 transition-all duration-300 group-hover:shadow-2xl group-hover:shadow-cyan-500/35 dark:group-hover:shadow-cyan-500/25 group-hover:scale-[1.02] group-active:scale-[0.98]">
+      <span className="flex items-center justify-center gap-3">
+        داشبورد
+        <ChevronLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
+      </span>
+    </div>
+  </button>
+</div>
       </div>
+    </div>
+  </div>
+</div>
     );
   }
 
