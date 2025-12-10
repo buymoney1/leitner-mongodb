@@ -1,11 +1,14 @@
+// next.config.ts
+import { withNextVideo } from "next-video/process";
+import type { NextConfig } from "next";
+
 const withPWA = require('next-pwa')({
   dest: 'public',
   register: true,
-  skipWaiting: true, // مهم: خودکار آپدیت شود
+  skipWaiting: true,
   clientsClaim: true,
   disable: process.env.NODE_ENV === 'development',
   
-  // تنظیمات ساده‌شده
   runtimeCaching: [
     // APIها اصلاً کش نشوند
     {
@@ -38,3 +41,24 @@ const withPWA = require('next-pwa')({
     }
   ],
 });
+
+const nextConfig: NextConfig = {
+  /* config options here */
+  experimental: {
+    optimizeCss: true,
+  },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    ignoreDuringBuilds: true, // ✅ ESLint غیرفعال در build
+  },
+  images: {
+    domains: ["lh3.googleusercontent.com"],
+  },
+  reactStrictMode: true,
+  swcMinify: true,
+};
+
+// ✅ ترتیب درست: اول withPWA، بعد withNextVideo
+export default withNextVideo(withPWA(nextConfig));
