@@ -1,4 +1,5 @@
 
+//src/app/books/page.tsx
 import { redirect } from "next/navigation";
 import { BooksClient } from "@/components/BooksClient";
 import { readFile } from "fs/promises";

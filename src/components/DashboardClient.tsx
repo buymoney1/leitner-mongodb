@@ -4,7 +4,8 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { BookOpen, Brain, Plus, Play, Home, Video, Settings, Mic, Music, User, Map, FileText, Trash2 } from "lucide-react";
-import { SimpleNotificationPrompt } from "./SimpleNotificationPrompt";
+
+
 
 interface Stats {
   totalCards: number;
@@ -317,7 +318,7 @@ export function DashboardClient({ userName, userRole }: DashboardClientProps) {
 
       </div>
      
-      <SimpleNotificationPrompt />
+
     </div>
   );
 }

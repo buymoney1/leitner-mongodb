@@ -1,34 +1,40 @@
-import { withNextVideo } from "next-video/process";
-import type { NextConfig } from "next";
-
-
-
 const withPWA = require('next-pwa')({
   dest: 'public',
   register: true,
-  skipWaiting: true,
-  disable: process.env.NODE_ENV === 'development'
-})
-
-const nextConfig: NextConfig = {
-  /* config options here */
-  experimental: {
-    optimizeCss: true, // غیرفعال کردن lightningcss
-  },
-  typescript: {
-    ignoreBuildErrors: true, // موقتاً برای جلوگیری از خطای build
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  images: {
-    domains: ["lh3.googleusercontent.com"],
-  },
-
-  reactStrictMode: true,
-  swcMinify: true,
-
-
-};
-
-export default withNextVideo(nextConfig);
+  skipWaiting: true, // مهم: خودکار آپدیت شود
+  clientsClaim: true,
+  disable: process.env.NODE_ENV === 'development',
+  
+  // تنظیمات ساده‌شده
+  runtimeCaching: [
+    // APIها اصلاً کش نشوند
+    {
+      urlPattern: /\/api\/.*/,
+      handler: 'NetworkOnly',
+      options: {
+        cacheName: 'api-cache',
+      }
+    },
+    // صفحات داینامیک با اولویت شبکه
+    {
+      urlPattern: /\/articles\/.*/,
+      handler: 'NetworkFirst',
+      options: {
+        cacheName: 'articles-cache',
+        networkTimeoutSeconds: 3
+      }
+    },
+    // استاتیک assets کش شوند
+    {
+      urlPattern: /\.(?:png|jpg|jpeg|svg|css|js)$/,
+      handler: 'CacheFirst',
+      options: {
+        cacheName: 'static-assets',
+        expiration: {
+          maxEntries: 100,
+          maxAgeSeconds: 30 * 24 * 60 * 60 // 30 روز
+        }
+      }
+    }
+  ],
+});

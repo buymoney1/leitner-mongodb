@@ -1,3 +1,5 @@
+//src/app/layout.tsx
+
 import type { Metadata, Viewport } from "next";
 import { Vazirmatn } from "next/font/google";
 import { SessionProvider } from "next-auth/react";
@@ -8,9 +10,10 @@ import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
 import EnhancedActivityTracker from "@/components/EnhancedActivityTracker";
 import { Toaster } from 'sonner';
-import { NotificationSetup } from "@/components/NotificationSetup";
 import WelcomeVideoModal from "@/components/WelcomeVideoModal";
 import { getAuthSession } from "../../lib/server-auth";
+import AutoUpdatePWA from "@/components/AutoUpdatePWA";
+
 
 
 const vazir = Vazirmatn({
@@ -71,9 +74,9 @@ export default async function RootLayout({
       <body className={`${vazir.variable} font-sans antialiased bg-white dark:bg-black text-gray-900 dark:text-white transition-colors duration-300`}>
         <ThemeProvider>
           <SessionProvider session={session}>
-          {session?.user?.id && (
-              <NotificationSetup userId={session.user.id} />
-            )}
+          <AutoUpdatePWA /> 
+    
+
           <EnhancedActivityTracker />
             {children}
             <Toaster
