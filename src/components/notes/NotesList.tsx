@@ -42,7 +42,7 @@ export default function NotesList({
   const handleEdit = (note: Note) => {
     setEditingNote(note);
     setIsFormOpen(true);
-    setShowActions(null); // بستن منو هنگام ویرایش
+    setShowActions(null);
   };
 
   const handleFormSubmit = async (data: { title: string; content: string }) => {
@@ -61,7 +61,7 @@ export default function NotesList({
         await onNoteDelete(noteId);
       } finally {
         setDeletingNoteId(null);
-        setShowActions(null); // بستن منو پس از حذف
+        setShowActions(null);
       }
     }
   };
@@ -95,7 +95,7 @@ export default function NotesList({
         </div>
         <button
           onClick={() => setIsFormOpen(true)}
-          className="flex items-center gap-2 px-3 md:px-4 py-2 bg-gray-800 dark:bg-gray-700 hover:bg-gray-900 dark:hover:bg-gray-600 text-white rounded-lg transition-colors text-xs md:text-sm shadow-sm"
+          className="flex items-center gap-2 px-3 md:px-4 py-2 bg-gray-800 dark:bg-gray-700 hover:bg-gray-900 dark:hover:bg-gray-600 text-white rounded-lg transition-colors text-xs md:text-sm shadow-sm flex-shrink-0"
         >
           <Plus size={14} className="md:size-4" />
           <span className="hidden md:inline">یادداشت جدید</span>
@@ -124,19 +124,19 @@ export default function NotesList({
           {notes.map((note) => (
             <div
               key={note.id}
-              className="group bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:border-gray-300 dark:hover:border-gray-600 transition-colors duration-200 shadow-sm"
+              className="group bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:border-gray-300 dark:hover:border-gray-600 transition-colors duration-200 shadow-sm overflow-hidden"
             >
               {/* هدر یادداشت برای موبایل */}
-              <div className="md:hidden flex justify-between items-start mb-3">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
-                  <h3 className="text-gray-800 dark:text-gray-200 text-sm font-medium truncate flex-1">
+              <div className="md:hidden flex justify-between items-start gap-2 mb-3">
+                <div className="flex items-start gap-2 min-w-0 flex-1">
+                  <div className="w-2 h-2 bg-gray-300 dark:bg-gray-600 rounded-full mt-1.5 flex-shrink-0"></div>
+                  <h3 className="text-gray-800 dark:text-gray-200 text-sm font-medium break-words line-clamp-2">
                     {note.title}
                   </h3>
                 </div>
                 
                 {/* منو عملیات موبایل */}
-                <div className="relative">
+                <div className="relative flex-shrink-0">
                   <button
                     onClick={() => setShowActions(showActions === note.id ? null : note.id)}
                     className="p-1 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
@@ -191,25 +191,24 @@ export default function NotesList({
               <div className="md:flex justify-between items-start">
                 <div className="flex-1 min-w-0">
                   {/* عنوان برای دسکتاپ */}
-                  <h3 className="hidden md:block text-gray-800 dark:text-gray-200 text-sm font-medium truncate mb-2">
+                  <h3 className="hidden md:block text-gray-800 dark:text-gray-200 text-sm font-medium break-words line-clamp-2 mb-2">
                     {note.title}
                   </h3>
                   
                   {/* محتوا */}
-                  <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-2 mb-3 md:mb-2">
-                    {note.content.substring(0, 100)}
-                    {note.content.length > 100 && '...'}
+                  <p className="text-gray-600 dark:text-gray-400 text-sm break-words line-clamp-2 mb-3 md:mb-2">
+                    {note.content}
                   </p>
                   
                   {/* فوتر اطلاعات */}
                   <div className="flex flex-wrap items-center gap-3 md:gap-4 text-xs text-gray-500 dark:text-gray-500">
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-1.5 flex-shrink-0">
                       <Calendar size={12} />
                       <span className="hidden md:inline">{formatDate(note.createdAt)}</span>
                       <span className="md:hidden">{formatDateShort(note.createdAt)}</span>
                     </div>
                     {note.highlights && note.highlights.length > 0 && (
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex items-center gap-1.5 flex-shrink-0">
                         <div className="w-2 h-2 rounded-full bg-yellow-400"></div>
                         <span>{note.highlights.length} هایلایت</span>
                       </div>
