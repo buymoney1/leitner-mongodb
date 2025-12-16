@@ -26,27 +26,21 @@ export async function GET(
 
     const userId = session.user.id;
 
-    // 1. دریافت فعالیت‌های تکمیل شده کاربر
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const completedActivities = await prisma.dailyActivity.count({
+    // دریافت تمام perfectDays کاربر (روزهای با progress = 100)
+    const perfectDays = await prisma.dailyActivity.count({
       where: {
         userId,
-        progress: { gte: 100 } // فعالیت‌های 100% تکمیل شده
+        progress: 100 // فقط روزهای کامل
       }
     });
 
-    // 2. محاسبه سطح فعلی (هر 10 فعالیت = 1 لول)
-    const baseLevel = Math.floor(completedActivities / 10) + 1;
-    const currentLevel = Math.min(baseLevel, 15); // حداکثر 15 لول
+    // محاسبه سطح فعلی: هر perfectDay = 1 لول
+    const currentLevel = perfectDays + 1; // لول از 1 شروع می‌شود
 
-    // 3. محاسبه فعالیت‌های باقی‌مانده برای لول فعلی
-    const activitiesForCurrentLevel = completedActivities % 10;
-    const tasksCompleted = activitiesForCurrentLevel;
-    const tasksRequired = 10; // هر لول 10 فعالیت نیاز دارد
+    // دریافت فعالیت‌های امروز برای محاسبه پیشرفت روز جاری
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-    // 4. دریافت فعالیت‌های امروز
     const todaysActivity = await prisma.dailyActivity.findFirst({
       where: {
         userId,
@@ -57,20 +51,28 @@ export async function GET(
       }
     });
 
+    // محاسبه تعداد فعالیت‌های امروز (از 4 فعالیت)
+    const todaysCompletedActivities = todaysActivity ? 
+      [
+        todaysActivity.videoWatched,
+        todaysActivity.podcastListened,
+        todaysActivity.wordsReviewed,
+        todaysActivity.articleRead
+      ].filter(Boolean).length : 0;
+
     return NextResponse.json({
       success: true,
       data: {
         currentLevel,
-        tasksCompleted,
-        tasksRequired,
-        completedActivities,
+        perfectDays,
+        tasksCompleted: todaysCompletedActivities, // فعالیت‌های امروز
+        tasksRequired: 4, // 4 فعالیت روزانه
         todaysProgress: todaysActivity?.progress || 0,
         todaysActivity: todaysActivity ? {
           videoWatched: todaysActivity.videoWatched,
           podcastListened: todaysActivity.podcastListened,
           wordsReviewed: todaysActivity.wordsReviewed,
-          articleRead: todaysActivity.articleRead,
-          songListened: todaysActivity.songListened
+          articleRead: todaysActivity.articleRead
         } : null
       }
     });

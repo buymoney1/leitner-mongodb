@@ -172,7 +172,7 @@ class SafePrisma {
     if (!options.skipValidation) {
       const validation = this.validateData(model as string, data, 'create')
       if (!validation.isValid) {
-        throw new Error(`Validation failed for ${model}: ${validation.errors.join(', ')}`)
+        throw new Error(`Validation failed for ${String(model)}: ${validation.errors.join(', ')}`)
       }
     }
     
@@ -200,7 +200,7 @@ class SafePrisma {
     if (!options.skipValidation) {
       const validation = this.validateData(model as string, data, 'update')
       if (!validation.isValid) {
-        throw new Error(`Validation failed for ${model}: ${validation.errors.join(', ')}`)
+        throw new Error(`Validation failed for ${String(model)}: ${validation.errors.join(', ')}`)
       }
     }
     
