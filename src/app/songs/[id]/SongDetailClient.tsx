@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Music, User, Clock, ArrowLeft, Play, Pause, Calendar, Disc } from 'lucide-react';
+import { Music, User, Clock, ArrowLeft, Play, Pause, Calendar, Disc, Share2 } from 'lucide-react';
 import AudioPlayer from '@/components/songs/AudioPlayer';
 import { AudioPlayerHandle } from '@/components/songs/AudioPlayer';
 import DictionaryModal from '@/components/DictionaryModal';
@@ -406,9 +406,9 @@ export default function SongDetailClient() {
 
                     <button
                       onClick={handleShare}
-                      className="flex items-center gap-2 px-4 py-2 md:px-5 md:py-2.5 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-md shadow-blue-500/25"
+                      className="flex items-center gap-2 px-3 py-2 md:px-5 md:py-2.5 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-md shadow-blue-500/25"
                     >
-                      <span className="text-sm font-medium">اشتراک‌گذاری</span>
+                       <Share2 className="h-5 w-5" />
                     </button>
 
                     {/* Metadata Badges */}

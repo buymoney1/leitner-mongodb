@@ -1,13 +1,11 @@
 const withPWA = require('next-pwa')({
   dest: 'public',
   register: true,
-  skipWaiting: true, // مهم: خودکار آپدیت شود
+  skipWaiting: true,
   clientsClaim: true,
   disable: process.env.NODE_ENV === 'development',
   
-  // تنظیمات ساده‌شده
   runtimeCaching: [
-    // APIها اصلاً کش نشوند
     {
       urlPattern: /\/api\/.*/,
       handler: 'NetworkOnly',
@@ -15,7 +13,6 @@ const withPWA = require('next-pwa')({
         cacheName: 'api-cache',
       }
     },
-    // صفحات داینامیک با اولویت شبکه
     {
       urlPattern: /\/articles\/.*/,
       handler: 'NetworkFirst',
@@ -24,7 +21,6 @@ const withPWA = require('next-pwa')({
         networkTimeoutSeconds: 3
       }
     },
-    // استاتیک assets کش شوند
     {
       urlPattern: /\.(?:png|jpg|jpeg|svg|css|js)$/,
       handler: 'CacheFirst',
@@ -32,9 +28,32 @@ const withPWA = require('next-pwa')({
         cacheName: 'static-assets',
         expiration: {
           maxEntries: 100,
-          maxAgeSeconds: 30 * 24 * 60 * 60 // 30 روز
+          maxAgeSeconds: 30 * 24 * 60 * 60
         }
       }
     }
   ],
 });
+
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  // اضافه کردن این بخش
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'cdn.britannica.com',
+        port: '',
+        pathname: '/**',
+      },
+  
+      // {
+      //   protocol: 'https',
+      //   hostname: 'images.unsplash.com',
+      // },
+
+    ],
+  },
+};
+
+module.exports = withPWA(nextConfig);

@@ -1,18 +1,20 @@
-//api/podcasts/[id]/route.ts
+// api/podcasts/[id]/route.ts
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-interface Params {
-  params: {
-    id: string;
-  };
+// پارامترها به صورت Promise تعریف می‌شوند
+interface RouteParams {
+  params: Promise<{ id: string }>;
 }
 
-export async function GET(request: Request, { params }: Params) {
+export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
+    // await کردن params قبل از استفاده
+    const { id } = await params;
+    
     const podcast = await prisma.podcast.findUnique({
-      where: { id: params.id },
+      where: { id }, // استفاده از id بعد از await
       include: {
         vocabularies: {
           orderBy: { timestamp: 'asc' }
