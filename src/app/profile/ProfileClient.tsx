@@ -420,47 +420,32 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Desktop Tabs */}
-        <div className="hidden md:flex space-x-1 border-b border-gray-300 dark:border-gray-800 mx-6 mb-6">
-          {[
-            { id: 'overview', label: 'نمای کلی', icon: User },
-            { id: 'stats', label: 'آمار یادگیری', icon: Award },
-            { id: 'settings', label: 'تنظیمات', icon: Settings }
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
-              className={`flex items-center gap-2 pb-4 px-4 text-sm font-medium transition-all duration-300 ${
-                activeTab === tab.id
-                  ? 'text-cyan-600 dark:text-cyan-400 border-b-2 border-cyan-600 dark:border-cyan-400'
-                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200/50 dark:hover:bg-gray-800/50 rounded-t-lg'
-              }`}
-            >
-              <tab.icon className="h-4 w-4" />
-              {tab.label}
-            </button>
-          ))}
-        </div>
+
 
         {/* Tab Content */}
         <div className="px-4 md:px-6 space-y-6">
           {activeTab === 'overview' && (
             <>
               {/* Profile Overview */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 gap-6">
                 {/* Avatar and Basic Info */}
                 <InfoCard 
                   title="اطلاعات شخصی"
-                  action={!isEditing && <EditButton onClick={() => setIsEditing(true)} />}
+                  // action={!isEditing && <EditButton onClick={() => setIsEditing(true)} />}
                 >
                   <div className="flex items-center gap-4 mb-4">
                     <div className="relative group">
                       {profile.image ? (
-                        <img
-                          src={profile.image}
-                          alt={profile.name || 'Profile'}
-                          className="w-16 h-16 rounded-full border-2 border-cyan-500/30"
-                        />
+                                                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-cyan-500/20 to-purple-500/20 flex items-center justify-center border-2 border-cyan-500/30">
+                                                <span className="text-lg font-light text-white">
+                                                  {(profile.name || profile.email).charAt(0).toUpperCase()}
+                                                </span>
+                                              </div>
+                        // <img
+                        //   src={profile.image}
+                        //   alt={profile.name || 'Profile'}
+                        //   className="w-16 h-16 rounded-full border-2 border-cyan-500/30"
+                        // />
                       ) : (
                         <div className="w-16 h-16 rounded-full bg-gradient-to-br from-cyan-500/20 to-purple-500/20 flex items-center justify-center border-2 border-cyan-500/30">
                           <span className="text-lg font-light text-white">
@@ -511,78 +496,11 @@ export default function ProfilePage() {
                   </div>
                 </InfoCard>
 
-                {/* Learning Goals */}
-                <InfoCard 
-                  title="اهداف یادگیری"
-                  action={isEditing ? <SaveCancelButtons /> : <EditButton onClick={() => setIsEditing(true)} />}
-                >
-                  <div className="space-y-4">
-                    <div>
-                      <label className="text-gray-600 dark:text-gray-400 text-sm">هدف اصلی</label>
-                      {isEditing ? (
-                        <textarea
-                          value={editForm.learningGoal}
-                          onChange={(e) => handleInputChange('learningGoal', e.target.value)}
-                          rows={3}
-                          className="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-gray-900 dark:text-white focus:outline-none focus:border-cyan-500 resize-none mt-1"
-                          placeholder="اهداف یادگیری خود را بنویسید..."
-                        />
-                      ) : (
-                        <p className="text-gray-900 dark:text-white mt-1">
-                          {profile.learningGoal || 'هنوز تعیین نشده'}
-                        </p>
-                      )}
-                    </div>
-                    <div>
-                      <label className="text-gray-600 dark:text-gray-400 text-sm">نمره هدف</label>
-                      {isEditing ? (
-                        <input
-                          type="number"
-                          value={editForm.targetScore}
-                          onChange={(e) => handleInputChange('targetScore', e.target.value)}
-                          min="0"
-                          step="0.1"
-                          className="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-gray-900 dark:text-white focus:outline-none focus:border-cyan-500 mt-1"
-                          placeholder="نمره هدف"
-                        />
-                      ) : (
-                        <p className="text-gray-900 dark:text-white mt-1">
-                          {profile.targetScore ? `${profile.targetScore}` : 'تعیین نشده'}
-                        </p>
-                      )}
-                    </div>
-                    <div>
-                      <label className="text-gray-600 dark:text-gray-400 text-sm">زمان مرور پیشنهادی</label>
-                      {isEditing ? (
-                        <select
-                          value={editForm.suggestedReviewTime}
-                          onChange={(e) => handleInputChange('suggestedReviewTime', e.target.value)}
-                          className="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-gray-900 dark:text-white focus:outline-none focus:border-cyan-500 mt-1"
-                        >
-                          <option value="">انتخاب زمان</option>
-                          <option value="MORNING">صبح</option>
-                          <option value="AFTERNOON">ظهر</option>
-                          <option value="EVENING">عصر</option>
-                          <option value="NIGHT">شب</option>
-                        </select>
-                      ) : (
-                        <p className="text-gray-900 dark:text-white mt-1 capitalize">
-                          {profile.suggestedReviewTime === 'MORNING' && 'صبح'}
-                          {profile.suggestedReviewTime === 'AFTERNOON' && 'ظهر'}
-                          {profile.suggestedReviewTime === 'EVENING' && 'عصر'}
-                          {profile.suggestedReviewTime === 'NIGHT' && 'شب'}
-                          {!profile.suggestedReviewTime && 'تعیین نشده'}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </InfoCard>
-
- 
+      
               </div>
 
               
-              <SupportCard />
+       
 
               {/* Theme Toggle Card */}
               <ThemeToggleCard />
@@ -609,29 +527,7 @@ export default function ProfilePage() {
             </>
           )}
 
-          {activeTab === 'settings' && (
-            <div className="space-y-6">
-              {/* Logout Card in Settings Tab */}
-              <div className="bg-gradient-to-br from-red-500/10 to-pink-500/5 rounded-2xl p-6 border border-red-500/20 backdrop-blur-sm">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-red-500/20 flex items-center justify-center">
-                      <LogOut className="h-6 w-6 text-red-600 dark:text-red-400" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-gray-900 dark:text-white">خروج از حساب</h4>
-                      <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">
-                        پس از خروج، برای دسترسی مجدد باید وارد شوید
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div className="mt-4">
-                  <LogoutButton />
-                </div>
-              </div>
-            </div>
-          )}
+        <SupportCard />
         </div>
       </div>
 

@@ -164,8 +164,8 @@ class SafePrisma {
     model: T, 
     data: any,
     options: {
-      userId?: string // برای اضافه کردن userId از session
-      skipValidation?: boolean // فقط برای موارد خاص
+      userId?: string
+      skipValidation?: boolean
     } = {}
   ) {
     // اعتبارسنجی
@@ -179,12 +179,19 @@ class SafePrisma {
     // پاکسازی داده‌ها
     const sanitizedData = this.sanitizeData(model as string, data, 'create', options.userId)
     
+    // استفاده از type assertion برای حل مشکل TypeScript
+    const modelDelegate = this.prisma[model] as any
+    
+    // بررسی اینکه مدل وجود دارد
+    if (!modelDelegate || typeof modelDelegate.create !== 'function') {
+      throw new Error(`Model ${String(model)} does not exist or does not have create method`)
+    }
+    
     // ایجاد رکورد
-    return await this.prisma[model].create({
+    return await modelDelegate.create({
       data: sanitizedData
     })
   }
-  
   /**
    * آپدیت رکورد با اعتبارسنجی کامل
    */
@@ -207,13 +214,20 @@ class SafePrisma {
     // پاکسازی داده‌ها
     const sanitizedData = this.sanitizeData(model as string, data, 'update')
     
+    // استفاده از type assertion
+    const modelDelegate = this.prisma[model] as any
+    
+    // بررسی اینکه مدل وجود دارد
+    if (!modelDelegate || typeof modelDelegate.update !== 'function') {
+      throw new Error(`Model ${String(model)} does not exist or does not have update method`)
+    }
+    
     // آپدیت رکورد
-    return await this.prisma[model].update({
+    return await modelDelegate.update({
       where,
       data: sanitizedData
     })
   }
-  
   /**
    * اعتبارسنجی داده‌ها
    */
@@ -405,21 +419,25 @@ export const prisma = SafePrisma.getInstance()
 
 // Type-safe wrapper برای استفاده آسان
 export const db = {
-  // برای عملیات create
-  create: prisma.create.bind(prisma),
+  // برای عملیات read
+  findMany: (model: keyof PrismaClient, args?: any) => 
+    (prisma.client[model] as any).findMany(args),
   
-  // برای عملیات update
-  update: prisma.update.bind(prisma),
+  findFirst: (model: keyof PrismaClient, args?: any) => 
+    (prisma.client[model] as any).findFirst(args),
   
-  // برای عملیات read (از client اصلی استفاده کن)
-  findMany: (model: string, args?: any) => prisma.client[model].findMany(args),
-  findFirst: (model: string, args?: any) => prisma.client[model].findFirst(args),
-  findUnique: (model: string, args?: any) => prisma.client[model].findUnique(args),
-  count: (model: string, args?: any) => prisma.client[model].count(args),
+  findUnique: (model: keyof PrismaClient, args?: any) => 
+    (prisma.client[model] as any).findUnique(args),
+  
+  count: (model: keyof PrismaClient, args?: any) => 
+    (prisma.client[model] as any).count(args),
   
   // برای عملیات delete
-  delete: (model: string, args?: any) => prisma.client[model].delete(args),
-  deleteMany: (model: string, args?: any) => prisma.client[model].deleteMany(args),
+  delete: (model: keyof PrismaClient, args?: any) => 
+    (prisma.client[model] as any).delete(args),
+  
+  deleteMany: (model: keyof PrismaClient, args?: any) => 
+    (prisma.client[model] as any).deleteMany(args),
   
   // تعریف مدل جدید
   defineModel: prisma.defineModelRules.bind(prisma)

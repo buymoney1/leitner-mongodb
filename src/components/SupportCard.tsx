@@ -27,7 +27,7 @@ export function SupportCard() {
   };
 
   return (
-    <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl">
+    <div className="mb-2 bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl">
       {/* Card Header */}
       <div 
         className="p-5 cursor-pointer"
