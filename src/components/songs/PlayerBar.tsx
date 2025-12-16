@@ -1,4 +1,4 @@
-import { X } from 'lucide-react';
+
 import AudioPlayer from './AudioPlayer';
 
 interface Song {
@@ -29,7 +29,7 @@ export default function PlayerBar({
       artist={song.artist}
       coverUrl={song.coverUrl}
       onClose={onClose}
-      formatDuration={formatDuration}
+      
     />
   );
 }

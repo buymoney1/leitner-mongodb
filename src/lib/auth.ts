@@ -3,6 +3,7 @@ import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
+import type { User } from "next-auth";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
@@ -15,14 +16,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   secret: process.env.AUTH_SECRET,
   
   callbacks: {
-    async session({ session, user, token }) {
-      console.log('🔐 Session Callback - User ID:', user?.id);
-      console.log('🔐 Session Callback - Token:', token);
+    async session({ session, user }) {
+      console.log('🔐 Session Callback - User ID:', user.id);
       
       if (session.user) {
+        // اضافه کردن id به session
         session.user.id = user.id;
         
         try {
+          // دریافت role از دیتابیس
           const userData = await prisma.user.findUnique({
             where: { id: user.id },
             select: { 
@@ -32,12 +34,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             }
           });
           
-          console.log('🔐 User data from DB:');
+          console.log('🔐 User data from DB:', userData);
           
-        (session.user as any).role = userData?.role || 'user';
+          // اضافه کردن role به session.user
+          // Type assertion به درستی
+          const userWithRole = session.user as User & { role?: string };
+          userWithRole.role = userData?.role || 'user';
+          
         } catch (error) {
           console.error('❌ Error fetching user role:', error);
-          (session.user as any).role = 'user';
+          const userWithRole = session.user as User & { role?: string };
+          userWithRole.role = 'user';
         }
       }
       
@@ -45,11 +52,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return session;
     },
     
-    async jwt({ token, user, account, profile }) {
+    async jwt({ token, user }) {
       console.log('🔐 JWT Callback - User:', user);
       if (user) {
         token.id = user.id;
-      token.role = (user as any).role || 'user';
+        // اضافه کردن role به token
+        const userWithRole = user as User & { role?: string };
+        token.role = userWithRole.role || 'user';
       }
       return token;
     },

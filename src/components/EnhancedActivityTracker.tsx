@@ -18,7 +18,7 @@ export default function SimpleActivityTracker() {
     if (path.startsWith('/video/') || path.includes('/video/')) return 'video';
     if (path === '/dashboard/review' || path.includes('/review')) return 'words';
     if (path.startsWith('/articles/') || path.includes('/article/')) return 'article';
-    if (path.includes('/song/')) return 'song';
+
     return null;
   };
 

@@ -1,4 +1,5 @@
-import { Subtitle, SubtitleSettings } from '../types';
+import { Subtitle, SubtitleSettings } from "../../types";
+
 
 interface VideoSubtitlesProps {
   activeSubtitle: Subtitle | null;

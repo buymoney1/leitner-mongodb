@@ -236,7 +236,7 @@ export default function SongsClient() {
             songs={filteredSongs}
             isAdmin={isAdmin}
             onPlay={handlePlaySong}
-            onEdit={setEditingSong}
+            onEdit={(song) => setEditingSong(song)}
             onDelete={handleDeleteSong}
             formatDuration={formatDuration}
           />
@@ -260,8 +260,8 @@ export default function SongsClient() {
       {currentSong && (
         <PlayerBar
           song={currentSong}
-          isPlaying={isPlaying}
-          onPlayPause={() => setIsPlaying(!isPlaying)}
+         
+       
           onClose={() => setCurrentSong(null)}
           formatDuration={formatDuration}
         />

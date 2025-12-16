@@ -1,16 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useState, FormEvent } from "react";
 
 export default function NewBookPage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     await fetch("/api/books/create", {
       method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({ title, description }),
     });
 
@@ -37,7 +40,10 @@ export default function NewBookPage() {
           onChange={(e) => setDescription(e.target.value)}
         />
 
-        <button className="w-full bg-blue-600 hover:bg-blue-700 p-3 rounded">
+        <button 
+          type="submit"
+          className="w-full bg-blue-600 hover:bg-blue-700 p-3 rounded"
+        >
           ذخیره
         </button>
       </form>

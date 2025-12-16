@@ -308,9 +308,7 @@ export default function VideoPlayer() {
             />
           ) : (
             <VocabularyList
-              vocabularies={vocabularies}
-              onWordClick={handleWordClick}
-              onRemoveWord={handleRemoveWord}
+
             />
           )}
         </div>

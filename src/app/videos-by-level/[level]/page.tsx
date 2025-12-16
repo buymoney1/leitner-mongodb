@@ -102,13 +102,7 @@ export default async function LevelVideosPage({ params }: { params: Promise<{ le
                       </div>
                     </div>
 
-                    {/* Duration */}
-                    {video.duration && (
-                      <div className="absolute bottom-3 left-3 bg-black/80 text-white px-2 py-1 rounded-lg text-xs backdrop-blur-sm">
-                        {Math.floor(video.duration / 60)}:{String(video.duration % 60).padStart(2, '0')}
-                      </div>
-                    )}
-
+          
                     {/* Level Badge */}
                     <div className={`absolute top-3 right-3 bg-gradient-to-r ${levelInfo.color} text-white px-2 py-1 rounded-lg text-xs font-semibold backdrop-blur-sm`}>
                       {video.level}
@@ -121,9 +115,6 @@ export default async function LevelVideosPage({ params }: { params: Promise<{ le
                       {video.title}
                     </h3>
                     
-                    <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-2 leading-relaxed">
-                      {video.description || 'توضیحات ویدیو'}
-                    </p>
 
                     {/* Stats */}
                     <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
@@ -137,12 +128,7 @@ export default async function LevelVideosPage({ params }: { params: Promise<{ le
                           <span>۴.۸</span>
                         </div>
                       </div>
-                      {video.duration && (
-                        <div className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          <span>{video.duration} دقیقه</span>
-                        </div>
-                      )}
+
                     </div>
                   </div>
 

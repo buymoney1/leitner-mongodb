@@ -312,9 +312,6 @@ export default function OnboardingPage() {
       {/* Welcome Video Modal */}
       {showWelcomeVideo && (
         <WelcomeVideoModal
-          isOpen={showWelcomeVideo}
-          onClose={handleModalClose}
-          userName={formData.name}
         />
       )}
     </div>

@@ -40,6 +40,12 @@ export async function processAllPendingActivities() {
     return { processed: usersWithActivities.length };
   } catch (error) {
     console.error('Error processing all activities:', error);
-    return { processed: 0, error: error.message };
+    
+    // بررسی نوع error
+    if (error instanceof Error) {
+      return { processed: 0, error: error.message };
+    } else {
+      return { processed: 0, error: 'Unknown error occurred' };
+    }
   }
 }

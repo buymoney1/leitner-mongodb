@@ -1,4 +1,5 @@
-import { Subtitle } from '../types';
+import { Subtitle } from "../../types";
+
 
 export const QUALITY_OPTIONS = [
   { value: "auto", label: "Auto" },

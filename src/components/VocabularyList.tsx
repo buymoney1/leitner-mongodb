@@ -1,4 +1,5 @@
-import { Vocabulary } from '../types';
+
+import { Vocabulary } from '../../types';
 import { DictionaryIcon } from './icons';
 
 interface VocabularyListProps {

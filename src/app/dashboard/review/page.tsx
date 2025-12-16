@@ -14,6 +14,7 @@ import {
   ChevronRight,
   Book, 
 } from "lucide-react";
+import { toast } from "sonner"; // Import toast from sonner
 
 interface Card {
   id: string;
@@ -49,9 +50,21 @@ export default function ReviewPage() {
       if (response.ok) {
         const data = await response.json();
         setCards(data);
+        // اگر کارتی برای مرور نبود، toast نمایش داده شود
+        if (data.length === 0) {
+          toast.success("✅ مرور امروزت تمام شد!", {
+            description: "کارت‌های امروز را به پایان رساندید.",
+            duration: 5000,
+            position: "top-center",
+          });
+        }
       }
     } catch (error) {
       console.error("Failed to fetch cards:", error);
+      toast.error("خطا در دریافت کارت‌ها", {
+        description: "لطفاً دوباره تلاش کنید.",
+        duration: 3000,
+      });
     } finally {
       setIsLoading(false);
     }
@@ -77,6 +90,13 @@ export default function ReviewPage() {
         }));
 
         if (currentCardIndex === cards.length - 1) {
+          // وقتی آخرین کارت مرور شد
+          toast.success("🎉 تبریک! مرور امروزت تکمیل شد.", {
+            description: `امروز ${sessionStats.correct + (isCorrect ? 1 : 0)} از ${cards.length} کارت را صحیح پاسخ دادی.`,
+            duration: 6000,
+            position: "top-center",
+          });
+          
           setShowConfetti(true);
           setTimeout(() => {
             router.push("/dashboard");
@@ -86,10 +106,17 @@ export default function ReviewPage() {
         }
       } else {
         const data = await response.json();
-        console.error(data.error || "خطا در ثبت پاسخ.");
+        toast.error("خطا در ثبت پاسخ", {
+          description: data.error || "لطفاً دوباره تلاش کنید.",
+          duration: 3000,
+        });
       }
     } catch (error) {
       console.error("Failed to submit review:", error);
+      toast.error("خطا در ارتباط با سرور", {
+        description: "لطفاً اتصال اینترنت خود را بررسی کنید.",
+        duration: 3000,
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -141,70 +168,70 @@ export default function ReviewPage() {
 
   if (cards.length === 0) {
     return (
-<div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-4 transition-colors duration-500">
-  <div className="text-center relative w-full max-w-md">
-    {/* Animated background glow */}
-    <div className="absolute -inset-4 bg-gradient-to-r from-green-500/5 via-cyan-500/5 to-blue-500/5 dark:from-green-500/10 dark:via-cyan-500/10 dark:to-blue-500/10 rounded-3xl blur-2xl animate-pulse"></div>
-    
-    <div className="relative bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl p-10 sm:p-12 rounded-3xl shadow-2xl dark:shadow-2xl border border-gray-200/60 dark:border-gray-700/40 overflow-hidden">
-      {/* Gradient border effect */}
-      <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-green-500/5 via-cyan-500/5 to-blue-500/5 dark:from-green-500/10 dark:via-cyan-500/10 dark:to-blue-500/10"></div>
-      
-      {/* Floating orbs */}
-      <div className="absolute -top-10 -right-10 w-40 h-40 bg-gradient-to-br from-green-500/20 to-cyan-500/20 rounded-full blur-2xl"></div>
-      <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-gradient-to-tr from-blue-500/20 to-cyan-500/20 rounded-full blur-2xl"></div>
-      
-      <div className="relative z-10">
-        {/* Icon/Emoji container */}
-        <div className="mb-8">
-          <div className="inline-flex p-4 rounded-2xl bg-gradient-to-br from-green-500/10 to-cyan-500/10 dark:from-green-500/15 dark:to-cyan-500/15 border border-green-500/20 dark:border-cyan-500/20">
-            <div className="text-4xl">🎯</div>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-4 transition-colors duration-500">
+        <div className="text-center relative w-full max-w-md">
+          {/* Animated background glow */}
+          <div className="absolute -inset-4 bg-gradient-to-r from-green-500/5 via-cyan-500/5 to-blue-500/5 dark:from-green-500/10 dark:via-cyan-500/10 dark:to-blue-500/10 rounded-3xl blur-2xl animate-pulse"></div>
+          
+          <div className="relative bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl p-10 sm:p-12 rounded-3xl shadow-2xl dark:shadow-2xl border border-gray-200/60 dark:border-gray-700/40 overflow-hidden">
+            {/* Gradient border effect */}
+            <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-green-500/5 via-cyan-500/5 to-blue-500/5 dark:from-green-500/10 dark:via-cyan-500/10 dark:to-blue-500/10"></div>
+            
+            {/* Floating orbs */}
+            <div className="absolute -top-10 -right-10 w-40 h-40 bg-gradient-to-br from-green-500/20 to-cyan-500/20 rounded-full blur-2xl"></div>
+            <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-gradient-to-tr from-blue-500/20 to-cyan-500/20 rounded-full blur-2xl"></div>
+            
+            <div className="relative z-10">
+              {/* Icon/Emoji container */}
+              <div className="mb-8">
+                <div className="inline-flex p-4 rounded-2xl bg-gradient-to-br from-green-500/10 to-cyan-500/10 dark:from-green-500/15 dark:to-cyan-500/15 border border-green-500/20 dark:border-cyan-500/20">
+                  <div className="text-4xl">🎯</div>
+                </div>
+              </div>
+              
+              {/* Message */}
+              <p className="text-gray-700 dark:text-gray-300 text-lg sm:text-xl font-medium mb-2">
+                همه کارت‌های امروز رو تموم کردی!
+              </p>
+              <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base mb-10">
+                فردا با کارت‌های جدید برگرد
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-4 mt-10">
+                {/* کتابخانه Button */}
+                <button
+                  onClick={() => router.push("/books")}
+                  className="relative w-full overflow-hidden rounded-xl group"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-500 via-indigo-500 to-purple-500 opacity-0 group-hover:opacity-20 blur-lg transition-all duration-500"></div>
+                  
+                  <div className="relative bg-gradient-to-r from-purple-600 to-indigo-600 dark:from-purple-700 dark:to-indigo-700 text-white py-4 px-6 rounded-xl font-semibold text-base shadow-xl shadow-purple-500/25 dark:shadow-purple-500/15 transition-all duration-300 group-hover:shadow-2xl group-hover:shadow-purple-500/35 dark:group-hover:shadow-purple-500/25 group-hover:scale-[1.02] group-active:scale-[0.98]">
+                    <span className="flex items-center justify-center gap-3">
+                      کتابخانه
+                      <Book className="h-5 w-5 transition-transform group-hover:rotate-12" />
+                    </span>
+                  </div>
+                </button>
+
+                {/* داشبورد Button */}
+                <button
+                  onClick={() => router.push("/dashboard")}
+                  className="relative w-full overflow-hidden rounded-xl group"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 via-blue-500 to-cyan-500 opacity-0 group-hover:opacity-20 blur-lg transition-all duration-500"></div>
+                  
+                  <div className="relative bg-gradient-to-r from-cyan-600 to-blue-600 dark:from-cyan-700 dark:to-blue-700 text-white py-4 px-6 rounded-xl font-semibold text-base shadow-xl shadow-cyan-500/25 dark:shadow-cyan-500/15 transition-all duration-300 group-hover:shadow-2xl group-hover:shadow-cyan-500/35 dark:group-hover:shadow-cyan-500/25 group-hover:scale-[1.02] group-active:scale-[0.98]">
+                    <span className="flex items-center justify-center gap-3">
+                      داشبورد
+                      <ChevronLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
+                    </span>
+                  </div>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
-        
-        {/* Message */}
-        <p className="text-gray-700 dark:text-gray-300 text-lg sm:text-xl font-medium mb-2">
-          هیچ کارتی برای مرور نیست!
-        </p>
-        <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base mb-10">
-          کارت‌های امروز را به پایان رساندید
-        </p>
-
-        <div className="flex flex-col sm:flex-row gap-4 mt-10">
-  {/* کتابخانه Button */}
-  <button
-    onClick={() => router.push("/books")}
-    className="relative w-full overflow-hidden rounded-xl group"
-  >
-    <div className="absolute inset-0 bg-gradient-to-r from-purple-500 via-indigo-500 to-purple-500 opacity-0 group-hover:opacity-20 blur-lg transition-all duration-500"></div>
-    
-    <div className="relative bg-gradient-to-r from-purple-600 to-indigo-600 dark:from-purple-700 dark:to-indigo-700 text-white py-4 px-6 rounded-xl font-semibold text-base shadow-xl shadow-purple-500/25 dark:shadow-purple-500/15 transition-all duration-300 group-hover:shadow-2xl group-hover:shadow-purple-500/35 dark:group-hover:shadow-purple-500/25 group-hover:scale-[1.02] group-active:scale-[0.98]">
-      <span className="flex items-center justify-center gap-3">
-        کتابخانه
-        <Book className="h-5 w-5 transition-transform group-hover:rotate-12" />
-      </span>
-    </div>
-  </button>
-
-  {/* داشبورد Button */}
-  <button
-    onClick={() => router.push("/dashboard")}
-    className="relative w-full overflow-hidden rounded-xl group"
-  >
-    <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 via-blue-500 to-cyan-500 opacity-0 group-hover:opacity-20 blur-lg transition-all duration-500"></div>
-    
-    <div className="relative bg-gradient-to-r from-cyan-600 to-blue-600 dark:from-cyan-700 dark:to-blue-700 text-white py-4 px-6 rounded-xl font-semibold text-base shadow-xl shadow-cyan-500/25 dark:shadow-cyan-500/15 transition-all duration-300 group-hover:shadow-2xl group-hover:shadow-cyan-500/35 dark:group-hover:shadow-cyan-500/25 group-hover:scale-[1.02] group-active:scale-[0.98]">
-      <span className="flex items-center justify-center gap-3">
-        داشبورد
-        <ChevronLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
-      </span>
-    </div>
-  </button>
-</div>
       </div>
-    </div>
-  </div>
-</div>
     );
   }
 
@@ -220,21 +247,7 @@ export default function ReviewPage() {
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-500/5 dark:bg-blue-500/5 rounded-full blur-3xl"></div>
       </div>
 
-      {/* Confetti Effect */}
-      {showConfetti && (
-        <div className="fixed inset-0 pointer-events-none z-50 flex items-center justify-center">
-          <div className="text-center">
-            <div className="relative">
-              <Sparkles className="h-32 w-32 text-yellow-400 animate-bounce mx-auto mb-6" />
-              <div className="absolute inset-0 bg-yellow-400/20 rounded-full blur-xl"></div>
-            </div>
-            <h2 className="text-5xl font-bold bg-gradient-to-r from-yellow-400 to-amber-400 bg-clip-text text-transparent mb-4">
-              تبریک! 🎊
-            </h2>
-            <p className="text-2xl text-gray-900 dark:text-white/80">مرور امروزت تموم شد!</p>
-          </div>
-        </div>
-      )}
+
 
       <div className="max-w-4xl mx-auto w-full relative z-10">
 

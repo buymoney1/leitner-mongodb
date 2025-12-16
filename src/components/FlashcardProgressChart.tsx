@@ -1,4 +1,3 @@
-// src/components/FlashcardProgressChartDark.tsx
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -16,13 +15,31 @@ import {
 } from 'recharts';
 import { useSession } from 'next-auth/react';
 
+// تعریف انواع TypeScript
+interface ChartDataItem {
+  box: string;
+  boxNumber: number;
+  count: number;
+  progress: number;
+}
+
+// نوع برای tooltip - ساده و مستقیم
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: Array<{
+    value: number;
+    payload: ChartDataItem;
+  }>;
+  label?: string;
+}
+
 const FlashcardProgressChartDark = () => {
   const { data: session } = useSession();
-  const [chartData, setChartData] = useState([]);
+  const [chartData, setChartData] = useState<ChartDataItem[]>([]);
   const [overallProgress, setOverallProgress] = useState(0);
   const [totalCards, setTotalCards] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchFlashcardData = async () => {
@@ -32,19 +49,33 @@ const FlashcardProgressChartDark = () => {
         const res = await fetch('/api/flashcards/progress');
         if (!res.ok) throw new Error('خطا در دریافت داده‌ها');
         const data = await res.json();
-        setChartData(data.data);
-        setOverallProgress(data.overallProgress);
-        setTotalCards(data.totalCards);
+        setChartData(data.data || []);
+        setOverallProgress(data.overallProgress || 0);
+        setTotalCards(data.totalCards || 0);
         setError(null);
       } catch (err) {
         console.error(err);
-        setError(err.message);
+        setError(err instanceof Error ? err.message : 'خطای ناشناخته');
       } finally {
         setLoading(false);
       }
     };
     fetchFlashcardData();
   }, [session]);
+
+  // CustomTooltip با نوع ساده‌تر
+  const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
+    if (active && payload && payload.length > 0 && payload[0]) {
+      return (
+        <div className="bg-gray-900 text-white p-3 rounded-lg shadow-lg border border-gray-700">
+          <p className="font-semibold text-cyan-400">{label}</p>
+          <p className="text-blue-400">{`تعداد کارت‌ها: ${payload[0].value}`}</p>
+          <p className="text-green-400">{`درصد پیشرفت: ${payload[0].payload.progress}%`}</p>
+        </div>
+      );
+    }
+    return null;
+  };
 
   if (loading)
     return (
@@ -60,19 +91,6 @@ const FlashcardProgressChartDark = () => {
         <p>{error}</p>
       </div>
     );
-
-  const CustomTooltip = ({ active, payload, label }) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-gray-900 text-white p-3 rounded-lg shadow-lg border border-gray-700">
-          <p className="font-semibold text-cyan-400">{label}</p>
-          <p className="text-blue-400">{`تعداد کارت‌ها: ${payload[0].value}`}</p>
-          <p className="text-green-400">{`درصد پیشرفت: ${payload[0].payload.progress}%`}</p>
-        </div>
-      );
-    }
-    return null;
-  };
 
   return (
     <div className="bg-gray-900 text-white rounded-2xl shadow-2xl border border-gray-700">

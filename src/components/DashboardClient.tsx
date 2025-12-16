@@ -111,7 +111,7 @@ export function DashboardClient({ userName, userRole }: DashboardClientProps) {
           </div>
           
           <div className="flex-1">
-            <h3 className="whitespace-nowrap font-semibold text-gray-900 dark:text-white mb-1 text-[13px] line-clamp-1">
+            <h3 className="whitespace-nowrap font-semibold text-gray-900 dark:text-white mb-1 text-[12px] line-clamp-1">
               {label}
             </h3>
 
@@ -127,11 +127,12 @@ export function DashboardClient({ userName, userRole }: DashboardClientProps) {
 
  
   const quickActions = [
+
     {
-      href: "/profile",
-      icon: User,
-      label: "پروفایل",
-      description: "پروفایل کاربری",
+      href: "/journey",
+      icon: Map, 
+      label: "سفر یادگیری",
+      description: "مشاهده مسیر پیشرفت و لول‌ها",
       color: {
         border: "border-rose-500/20",
         bg: "from-rose-500/10 to-pink-600/5",
@@ -144,7 +145,7 @@ export function DashboardClient({ userName, userRole }: DashboardClientProps) {
     {
       href: "/planner",
       icon: Map,
-      label: "نقشه راه",
+      label: "آمار یادگیری",
       description: "من تو این راه دستیار شما هستم",
       color: {
         border: "border-amber-500/20",
@@ -200,7 +201,7 @@ export function DashboardClient({ userName, userRole }: DashboardClientProps) {
     {
       href: "/articles",
       icon: FileText,
-      label: "مقالات",
+      label: "مقاله‌ها",
       description: "مطالعه عمیق و دقیق",
       color: {
         border: "border-indigo-500/20",
@@ -214,7 +215,7 @@ export function DashboardClient({ userName, userRole }: DashboardClientProps) {
     {
       href: "/dashboard/review",
       icon: Brain,
-      label: "شروع مرور",
+      label: "مرور لغات",
       description: `${stats.dueCards} کارت برای مرور`,
       color: {
         border: "border-orange-500/20",
@@ -239,20 +240,7 @@ export function DashboardClient({ userName, userRole }: DashboardClientProps) {
         glow: "bg-fuchsia-500"
       }
     },
-    {
-      href: "/journey",
-      icon: Map, 
-      label: "سفر یادگیری",
-      description: "مشاهده مسیر پیشرفت و لول‌ها",
-      color: {
-        border: "border-amber-500/20",
-        bg: "from-amber-500/10 to-orange-600/5",
-        iconBg: "bg-amber-500/20",
-        icon: "text-amber-600 dark:text-amber-400",
-        dot: "bg-amber-500",
-        glow: "bg-amber-500"
-      }
-    },
+  
     {
       href: "/add-card",
       icon: Plus,
@@ -315,6 +303,7 @@ export function DashboardClient({ userName, userRole }: DashboardClientProps) {
                 <div className=" grid grid-cols-3 gap-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
                   {quickActions.map((action, index) => (
                     <QuickActionButton
+                   
                       key={index}
                       href={action.href}
                       icon={action.icon}

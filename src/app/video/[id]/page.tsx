@@ -1,9 +1,10 @@
 // app/videos/[id]/page.tsx
 
 import { PrismaClient } from '@prisma/client';
-import VideoPlayer, { Vocabulary } from '@/components/video/VideoPlayer';
+import VideoPlayer from '@/components/video/VideoPlayer';
 import { notFound, redirect } from 'next/navigation';
 import { getAuthSession } from '../../../../lib/server-auth';
+import { Vocabulary } from '../../../../types';
 
 const prisma = new PrismaClient();
 
@@ -51,8 +52,8 @@ export default async function VideoPage({ params }: { params: Promise<{ id: stri
   // کامپوننت VideoPlayer را با داده‌های جدید رندر کن
   return (
     <VideoPlayer
-      videoUrl="/test-video.mp4"
-      subtitleUrl="/text.vtt"
+      // videoUrl="/test-video.mp4"
+      // subtitleUrl="/text.vtt"
       
     />
   );

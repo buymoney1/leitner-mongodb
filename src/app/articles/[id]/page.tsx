@@ -6,7 +6,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { ArrowRight, BookOpen, Clock, Bookmark, Share2 } from 'lucide-react';
 import DictionaryModal from '@/components/DictionaryModal';
 import { toast } from 'sonner';
-
+import React from 'react';
 
 interface Article {
   id: string;
@@ -50,7 +50,7 @@ const ClickableText = ({ text, onWordClick }: { text: string; onWordClick: (word
   }
 
   let lastIndex = 0;
-  const elements: JSX.Element[] = [];
+  const elements: React.ReactNode[] = [];
 
   words.forEach((word, index) => {
     const wordStart = text.indexOf(word, lastIndex);

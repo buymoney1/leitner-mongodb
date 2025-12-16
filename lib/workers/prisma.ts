@@ -6,30 +6,39 @@ const prismaClientSingleton = () => {
     log: ['query', 'error', 'warn'],
   })
   
-  // Middleware برای اعتبارسنجی تاریخ‌ها
-  prisma.$use(async (params, next) => {
-    // قبل از هر عملیات، بررسی کن
-    if (params.action === 'create' || params.action === 'update') {
-      const now = new Date()
-      
-      // اگر updatedAt وجود دارد، اعتبارسنجی کن
-      if (params.args.data.updatedAt !== undefined) {
-        if (!(params.args.data.updatedAt instanceof Date)) {
-          console.warn('⚠️ updatedAt معتبر نیست، اصلاح به تاریخ فعلی')
-          params.args.data.updatedAt = now
+  // استفاده از $extends برای اضافه کردن middleware
+  const prismaWithMiddleware = prisma.$extends({
+    query: {
+      async $allOperations({ operation, model, args, query }) {
+        const now = new Date()
+        
+        // فقط برای عملیات create و update
+        if (operation === 'create' || operation === 'update') {
+          // برای create، createdAt را تنظیم کن
+          if (operation === 'create' && !args.data.createdAt) {
+            args.data.createdAt = now
+          }
+          
+          // برای update، updatedAt را تنظیم کن
+          if (operation === 'update') {
+            args.data.updatedAt = now
+          }
+          
+          // اگر updatedAt وجود دارد اما معتبر نیست، اصلاح کن
+          if (args.data.updatedAt !== undefined) {
+            if (!(args.data.updatedAt instanceof Date)) {
+              console.warn('⚠️ updatedAt معتبر نیست، اصلاح به تاریخ فعلی')
+              args.data.updatedAt = now
+            }
+          }
         }
-      }
-      
-      // برای create، createdAt را تنظیم کن
-      if (params.action === 'create' && !params.args.data.createdAt) {
-        params.args.data.createdAt = now
+        
+        return query(args)
       }
     }
-    
-    return next(params)
   })
   
-  return prisma
+  return prismaWithMiddleware
 }
 
 declare global {

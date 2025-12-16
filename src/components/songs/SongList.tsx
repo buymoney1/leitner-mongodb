@@ -8,6 +8,11 @@ interface Song {
   album?: string;
   duration: number;
   coverUrl?: string;
+  audioUrl: string;     
+  lyrics: string;       
+  isPublished: boolean;  
+  createdById?: string;  
+  createdAt: string;    
 }
 
 interface SongListProps {

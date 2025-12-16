@@ -1,6 +1,7 @@
 import { useRef, useEffect } from 'react';
-import { Subtitle, SubtitleSettings } from '../types';
+
 import { formatTime } from '../utils';
+import { Subtitle, SubtitleSettings } from '../../types';
 
 interface SubtitleListProps {
   subtitles: Subtitle[];

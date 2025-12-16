@@ -1,7 +1,8 @@
 // components/HLSPlayer.tsx
 import React, { useState, useRef, useEffect } from 'react';
 import ReactPlayer, { ReactPlayerProps } from 'react-player';
-import { VideoPlayerProps, PlayerState } from '../types/video';
+import { VideoPlayerProps } from '../../types/video';
+
 
 const HLSPlayer: React.FC<VideoPlayerProps> = ({
   url,

@@ -10,7 +10,6 @@ export async function GET(req: NextRequest) {
     const session = await getAuthSession();
     
     if (!session?.user?.id) {
-      console.log('❌ کاربر لاگین نیست');
       return NextResponse.json(
         { success: false, message: 'لطفاً وارد شوید' },
         { status: 401 }
@@ -85,13 +84,7 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    console.log('📈 وضعیت نهایی:', {
-      progress: dailyActivity.progress,
-      video: dailyActivity.videoWatched,
-      podcast: dailyActivity.podcastListened,
-      words: dailyActivity.wordsReviewed,
-      article: dailyActivity.articleRead
-    });
+
 
     return NextResponse.json({
       success: true,

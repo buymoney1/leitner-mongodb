@@ -1,7 +1,7 @@
 // app/songs/[id]/SongDetailClient.tsx
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, JSX } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Music, User, Clock, ArrowLeft, Play, Pause, Calendar, Disc, Share2 } from 'lucide-react';
 import AudioPlayer from '@/components/songs/AudioPlayer';
