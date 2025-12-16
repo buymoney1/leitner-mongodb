@@ -71,7 +71,7 @@ export default async function RootLayout({
         <meta name="msapplication-TileColor" content="#000000" />
         <meta name="msapplication-tap-highlight" content="no" />
       </head>
-      <body className={`${vazir.variable} font-sans antialiased bg-white dark:bg-black text-gray-900 dark:text-white transition-colors duration-300`}>
+      <body className={`${vazir.variable} font-sans antialiased bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors duration-300`}>
         <ThemeProvider>
           <SessionProvider session={session}>
           <AutoUpdatePWA /> 
