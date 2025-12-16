@@ -2,7 +2,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Edit, Eye, Calendar, Trash2, Plus } from 'lucide-react';
+import { Edit, Eye, Calendar, Trash2, Plus, MoreVertical } from 'lucide-react';
 import NoteForm from './NoteForm';
 
 interface Note {
@@ -37,10 +37,12 @@ export default function NotesList({
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingNote, setEditingNote] = useState<Note | null>(null);
   const [deletingNoteId, setDeletingNoteId] = useState<string | null>(null);
+  const [showActions, setShowActions] = useState<string | null>(null);
 
   const handleEdit = (note: Note) => {
     setEditingNote(note);
     setIsFormOpen(true);
+    setShowActions(null); // بستن منو هنگام ویرایش
   };
 
   const handleFormSubmit = async (data: { title: string; content: string }) => {
@@ -59,6 +61,7 @@ export default function NotesList({
         await onNoteDelete(noteId);
       } finally {
         setDeletingNoteId(null);
+        setShowActions(null); // بستن منو پس از حذف
       }
     }
   };
@@ -71,30 +74,44 @@ export default function NotesList({
     });
   };
 
+  const formatDateShort = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('fa-IR', {
+      month: 'numeric',
+      day: 'numeric'
+    });
+  };
+
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="space-y-6 pb-4">
+      {/* هدر */}
+      <div className="flex justify-between items-center px-4 pt-4 md:px-0">
         <div>
-          <h2 className="text-xl font-medium text-gray-800 dark:text-gray-200">یادداشت‌های من</h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          <h2 className="text-lg md:text-xl font-medium text-gray-800 dark:text-gray-200">
+            یادداشت‌های من
+          </h2>
+          <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mt-0.5">
             تعداد: {notes.length}
           </p>
         </div>
         <button
           onClick={() => setIsFormOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-gray-800 dark:bg-gray-700 hover:bg-gray-900 dark:hover:bg-gray-600 text-white rounded-lg transition-colors text-sm"
+          className="flex items-center gap-2 px-3 md:px-4 py-2 bg-gray-800 dark:bg-gray-700 hover:bg-gray-900 dark:hover:bg-gray-600 text-white rounded-lg transition-colors text-xs md:text-sm shadow-sm"
         >
-          <Plus size={16} />
-          یادداشت جدید
+          <Plus size={14} className="md:size-4" />
+          <span className="hidden md:inline">یادداشت جدید</span>
+          <span className="md:hidden">جدید</span>
         </button>
       </div>
 
+      {/* لیست یادداشت‌ها */}
       {notes.length === 0 ? (
-        <div className="text-center py-12 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700">
-          <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
-            <Edit className="h-8 w-8 text-gray-400 dark:text-gray-600" />
+        <div className="mx-4 md:mx-0 text-center py-12 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700">
+          <div className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-4 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
+            <Edit className="h-6 w-6 md:h-8 md:w-8 text-gray-400 dark:text-gray-600" />
           </div>
-          <p className="text-gray-500 dark:text-gray-400 mb-4">هنوز یادداشتی ثبت نکرده‌اید.</p>
+          <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 mb-4">
+            هنوز یادداشتی ثبت نکرده‌اید.
+          </p>
           <button
             onClick={() => setIsFormOpen(true)}
             className="px-4 py-2 bg-gray-800 dark:bg-gray-700 hover:bg-gray-900 dark:hover:bg-gray-600 text-white rounded-lg transition-colors text-sm"
@@ -103,31 +120,93 @@ export default function NotesList({
           </button>
         </div>
       ) : (
-        <div className="grid gap-3">
+        <div className="space-y-3 px-4 md:px-0">
           {notes.map((note) => (
             <div
               key={note.id}
-              className="group bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:border-gray-300 dark:hover:border-gray-600 transition-colors duration-200"
+              className="group bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:border-gray-300 dark:hover:border-gray-600 transition-colors duration-200 shadow-sm"
             >
-              <div className="flex justify-between items-start">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start gap-3 mb-2">
-                    <div className="flex-shrink-0 w-2 h-2 mt-2 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-gray-800 dark:text-gray-200 text-sm font-medium truncate mb-1">
-                        {note.title}
-                      </h3>
-                      <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-2 mb-3">
-                        {note.content.substring(0, 120)}
-                        {note.content.length > 120 && '...'}
-                      </p>
-                    </div>
-                  </div>
+              {/* هدر یادداشت برای موبایل */}
+              <div className="md:hidden flex justify-between items-start mb-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
+                  <h3 className="text-gray-800 dark:text-gray-200 text-sm font-medium truncate flex-1">
+                    {note.title}
+                  </h3>
+                </div>
+                
+                {/* منو عملیات موبایل */}
+                <div className="relative">
+                  <button
+                    onClick={() => setShowActions(showActions === note.id ? null : note.id)}
+                    className="p-1 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                  >
+                    <MoreVertical size={18} />
+                  </button>
                   
-                  <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-500">
+                  {showActions === note.id && (
+                    <>
+                      <div 
+                        className="fixed inset-0 z-10"
+                        onClick={() => setShowActions(null)}
+                      />
+                      <div className="absolute left-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-20">
+                        {onNoteClick && (
+                          <button
+                            onClick={() => {
+                              onNoteClick(note);
+                              setShowActions(null);
+                            }}
+                            className="flex items-center gap-2 w-full px-4 py-3 text-right text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                          >
+                            <Eye size={16} />
+                            مشاهده جزییات
+                          </button>
+                        )}
+                        <button
+                          onClick={() => handleEdit(note)}
+                          className="flex items-center gap-2 w-full px-4 py-3 text-right text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                        >
+                          <Edit size={16} />
+                          ویرایش
+                        </button>
+                        <button
+                          onClick={() => {
+                            setShowActions(null);
+                            handleDelete(note.id);
+                          }}
+                          disabled={deletingNoteId === note.id}
+                          className="flex items-center gap-2 w-full px-4 py-3 text-right text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 disabled:opacity-50"
+                        >
+                          <Trash2 size={16} />
+                          حذف
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* محتوای یادداشت */}
+              <div className="md:flex justify-between items-start">
+                <div className="flex-1 min-w-0">
+                  {/* عنوان برای دسکتاپ */}
+                  <h3 className="hidden md:block text-gray-800 dark:text-gray-200 text-sm font-medium truncate mb-2">
+                    {note.title}
+                  </h3>
+                  
+                  {/* محتوا */}
+                  <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-2 mb-3 md:mb-2">
+                    {note.content.substring(0, 100)}
+                    {note.content.length > 100 && '...'}
+                  </p>
+                  
+                  {/* فوتر اطلاعات */}
+                  <div className="flex flex-wrap items-center gap-3 md:gap-4 text-xs text-gray-500 dark:text-gray-500">
                     <div className="flex items-center gap-1.5">
                       <Calendar size={12} />
-                      <span>{formatDate(note.createdAt)}</span>
+                      <span className="hidden md:inline">{formatDate(note.createdAt)}</span>
+                      <span className="md:hidden">{formatDateShort(note.createdAt)}</span>
                     </div>
                     {note.highlights && note.highlights.length > 0 && (
                       <div className="flex items-center gap-1.5">
@@ -138,7 +217,8 @@ export default function NotesList({
                   </div>
                 </div>
 
-                <div className="flex gap-1 flex-shrink-0">
+                {/* دکمه‌های عملیات برای دسکتاپ */}
+                <div className="hidden md:flex gap-1 flex-shrink-0 mt-1">
                   {onNoteClick && (
                     <button
                       onClick={() => onNoteClick(note)}
@@ -170,6 +250,7 @@ export default function NotesList({
         </div>
       )}
 
+      {/* فرم ایجاد/ویرایش */}
       <NoteForm
         isOpen={isFormOpen}
         onClose={() => {
