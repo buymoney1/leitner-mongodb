@@ -87,9 +87,9 @@ export default function SettingsPanel({
                 <span className="text-xs text-gray-700 font-semibold block">حالت نمایش زیرنویس</span>
                 <div className="grid grid-cols-2 gap-2 text-[10px] sm:grid-cols-4 sm:gap-1">
                   {[
-                    { val: 'both', label: 'فارسی + انگلیسی' },
+                    { val: 'both', label: 'هردو زبان' },
                     { val: 'persian', label: 'فقط فارسی' },
-                    { val: 'english', label: 'فقط انگلیسی' },
+                    { val: 'english', label: 'زبان اصلی' },
                     { val: 'none', label: 'غیرفعال' }
                   ].map(opt => (
                     <button 

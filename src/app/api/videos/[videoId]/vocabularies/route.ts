@@ -2,13 +2,18 @@
 import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 
+// تعریف نوع برای params در Next.js 15 (Promise)
+interface RouteParams {
+  params: Promise<{ videoId: string }>;
+}
+
 export async function GET(
   request: NextRequest,
-  { params }: { params: { videoId: string } }
+  { params }: RouteParams
 ) {
   try {
-
-    const { videoId } = params;
+    // await کردن params برای دسترسی به videoId
+    const { videoId } = await params;
 
     console.log('Fetching vocabularies for videoId:', videoId);
 
@@ -34,7 +39,6 @@ export async function GET(
         id: true,
         word: true,
         meaning: true,
-   
       },
       orderBy: {
         word: 'asc'

@@ -1,6 +1,10 @@
 // app/video-levels/page.tsx
+'use client';
+
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Play, Star, Target, TrendingUp, Users, Clock } from 'lucide-react';
+import { Play, Star, Target, TrendingUp, Users, Clock, Upload } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 
 const videoLevels = [
   {
@@ -78,6 +82,31 @@ const videoLevels = [
 ];
 
 export default function VideoLevelsPage() {
+  const { data: session, status } = useSession();
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (status === 'loading') return;
+    
+    // بررسی اینکه آیا کاربر ادمین است
+    if (session?.user?.role === 'admin') {
+      setIsAdmin(true);
+    }
+    setIsLoading(false);
+  }, [session, status]);
+
+  if (status === 'loading' || isLoading) {
+    return (
+      <div className="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">در حال بارگذاری...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="overflow-x-hidden"> 
       <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300 py-8 px-4 sm:px-6 lg:px-8 relative">
@@ -92,6 +121,20 @@ export default function VideoLevelsPage() {
         <div className="absolute bottom-1/4 right-0 translate-x-1/2 w-72 h-72 bg-purple-500/10 dark:bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
         <div className="relative z-10 max-w-7xl mx-auto">
+          
+          {/* دکمه آپلود فقط برای ادمین */}
+          {isAdmin && (
+            <div className="mb-8">
+              <Link 
+                href="/admin/upload-video"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
+              >
+                <Upload className="w-5 h-5" />
+                آپلود ویدیو جدید
+              </Link>
+
+            </div>
+          )}
 
 
           {/* Stats */}
