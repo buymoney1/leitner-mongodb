@@ -1,16 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
-
-import {prisma} from '@/lib/prisma';
+import { prisma } from '@/lib/prisma';
 import { getAuthSession } from '../../../../../lib/server-auth';
 
+// تعریف نوع برای params در Next.js 15 (Promise)
+interface RouteParams {
+  params: Promise<{ id: string }>;
+}
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
+    // await کردن params برای دسترسی به id
+    const { id } = await params;
+    
     const song = await prisma.song.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         createdBy: {
           select: {
@@ -38,11 +41,11 @@ export async function GET(
   }
 }
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(request: NextRequest, { params }: RouteParams) {
   try {
+    // await کردن params
+    const { id } = await params;
+    
     const session = await getAuthSession();
 
     if (!session) {
@@ -60,7 +63,7 @@ export async function PATCH(
     const body = await request.json();
     
     const song = await prisma.song.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         title: body.title,
         artist: body.artist,
@@ -83,11 +86,11 @@ export async function PATCH(
   }
 }
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
+    // await کردن params
+    const { id } = await params;
+    
     const session = await getAuthSession();
 
     if (!session) {
@@ -103,7 +106,7 @@ export async function DELETE(
     }
 
     await prisma.song.delete({
-      where: { id: params.id }
+      where: { id }
     });
 
     return NextResponse.json({ message: 'آهنگ با موفقیت حذف شد' });

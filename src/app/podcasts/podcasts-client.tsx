@@ -221,12 +221,7 @@ export default function PodcastsClient() {
                     alt={podcast.title}
                     className="w-full h-48 object-cover rounded-xl"
                   />
-                  <button
-                    onClick={() => setCurrentPlaying(currentPlaying === podcast.id ? null : podcast.id)}
-                    className="absolute bottom-4 left-4 p-3 bg-purple-500 hover:bg-purple-600 rounded-full shadow-lg transition-all duration-300"
-                  >
-                    <Play className="h-5 w-5 text-white fill-current" />
-                  </button>
+
                 </div>
               )}
 
@@ -245,13 +240,13 @@ export default function PodcastsClient() {
                 </div>
 
                 <Link href={`/podcasts/${podcast.id}`}>
-                  <h3 className="font-semibold text-gray-900 dark:text-white text-lg leading-tight hover:text-purple-600 dark:hover:text-purple-400 transition-colors cursor-pointer">
+                  <h3 dir='ltr' className="font-semibold text-gray-900 dark:text-white text-lg leading-tight hover:text-purple-600 dark:hover:text-purple-400 transition-colors cursor-pointer">
                     {podcast.title}
                   </h3>
                 </Link>
 
                 {podcast.description && (
-                  <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed line-clamp-2">
+                  <p dir='ltr' className="mt-3 text-gray-600 dark:text-gray-400 text-sm leading-relaxed line-clamp-2">
                     {podcast.description}
                   </p>
                 )}

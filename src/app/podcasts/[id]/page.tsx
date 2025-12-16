@@ -85,7 +85,7 @@ const ClickableText = ({ text, onWordClick }: { text: string; onWordClick: (word
           e.stopPropagation();
           onWordClick(word);
         }}
-        className="cursor-pointer hover:text-cyan-600 dark:hover:text-cyan-300 hover:bg-cyan-500/20 px-1 rounded transition-all duration-200 border-b border-dashed border-cyan-500/50"
+        className="cursor-pointer hover:text-cyan-600 dark:hover:text-cyan-300 hover:bg-cyan-500/20 rounded transition-all duration-200"
         title="کلیک برای افزودن به فلش‌کارت"
       >
         {word}
@@ -316,7 +316,7 @@ export default function PodcastDetailPage() {
               e.stopPropagation();
               handleWordClick(cleanWord);
             }}
-            className="cursor-pointer hover:text-cyan-600 dark:hover:text-cyan-300 hover:bg-cyan-500/20 px-1 rounded transition-all duration-200 border-b border-dashed border-cyan-500/50"
+            className="cursor-pointer hover:text-cyan-600 dark:hover:text-cyan-300 hover:bg-cyan-500/20 rounded transition-all duration-200"
             title="کلیک برای افزودن به فلش‌کارت"
           >
             {word}{' '}
@@ -508,7 +508,7 @@ export default function PodcastDetailPage() {
                 <div className="px-6 pb-6">
                   <div className="prose prose-lg dark:prose-invert max-w-none">
                     <div className="bg-gray-50 dark:bg-gray-800/70 rounded-xl p-6 border border-gray-300 dark:border-gray-700/50">
-                      <p className="text-left text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line text-base md:text-lg">
+                      <p dir='ltr' className="text-left text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line text-base md:text-lg">
                         {renderWordsInText(podcast.transcript)}
                       </p>
                     </div>

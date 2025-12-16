@@ -70,7 +70,7 @@ const ClickableText = ({ text, onWordClick }: { text: string; onWordClick: (word
           e.stopPropagation();
           onWordClick(word);
         }}
-        className="cursor-pointer hover:text-cyan-600 dark:hover:text-cyan-300 hover:bg-cyan-500/20 px-1 rounded transition-all duration-200 border-b border-dashed border-cyan-500/50"
+        className="cursor-pointer hover:text-cyan-600 dark:hover:text-cyan-300 hover:bg-cyan-500/20 rounded transition-all duration-200"
         title="کلیک برای افزودن به فلش‌کارت"
       >
         {word}
@@ -185,7 +185,7 @@ export default function ArticlePage() {
               e.stopPropagation();
               handleWordClick(vocab.word);
             }}
-            className="cursor-pointer text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 border-b-2 border-dashed border-green-500/50 mx-0.5 font-medium transition-colors duration-200"
+            className="cursor-pointer text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300  font-medium transition-colors duration-200"
             title={`${vocab.word}: ${vocab.meaning}`}
           >
             {word}{' '}
@@ -201,7 +201,7 @@ export default function ArticlePage() {
               e.stopPropagation();
               handleWordClick(cleanWord);
             }}
-            className="cursor-pointer hover:text-cyan-600 dark:hover:text-cyan-300 hover:bg-cyan-500/20 px-1 rounded transition-all duration-200 border-b border-dashed border-cyan-500/50"
+            className="cursor-pointer hover:text-cyan-600 dark:hover:text-cyan-300 hover:bg-cyan-500/20 rounded transition-all duration-200 "
             title="کلیک برای افزودن به فلش‌کارت"
           >
             {word}{' '}
@@ -368,13 +368,13 @@ export default function ArticlePage() {
               {new Date(article.createdAt).toLocaleDateString('fa-IR')}
             </div>
           </div>
-          
-          <h1 className="text-2xl md:text-4xl font-bold text-gray-900 dark:text-white mb-6 leading-tight px-4">
+          absolute bottom-4 left-4 p-3 bg-purple-500 hover:bg-purple-600 rounded-full shadow-lg transition-all duration-300
+          <h1 dir='ltr' className="text-2xl md:text-4xl font-bold text-gray-900 dark:text-white mb-6 leading-tight px-4">
             {article.title}
           </h1>
           
           {article.excerpt && (
-            <p className="text-base md:text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed px-4">
+            <p dir='ltr' className="text-base md:text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed px-4">
               <ClickableText text={article.excerpt} onWordClick={handleWordClick} />
             </p>
           )}
@@ -388,6 +388,7 @@ export default function ArticlePage() {
               <div className="prose prose-lg dark:prose-invert max-w-none">
                 {paragraphs.map((paragraph, index) => (
                   <div
+                  dir='ltr'
                     key={index}
                     className={`p-4 md:p-6 rounded-xl transition-all duration-300 ${
                       index === currentParagraph
