@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { BookOpen, Brain, Plus, Play, Home, Video, Settings, Mic, Music, User, Map, FileText, Trash2 } from "lucide-react";
+import { BookOpen,Notebook, Brain, Plus, Play, Home, Video, Settings, Mic, Music, User, Map, FileText, Trash2 } from "lucide-react";
 
 
 
@@ -224,6 +224,20 @@ export function DashboardClient({ userName, userRole }: DashboardClientProps) {
         icon: "text-orange-600 dark:text-orange-400",
         dot: "bg-orange-500",
         glow: "bg-orange-500"
+      }
+    },
+    {
+      href: "/notes",
+      icon: Notebook,
+      label: "یادداشت‌ها",
+      description: "گوش کنید و یاد بگیرید",
+      color: {
+        border: "border-emerald-500/20",
+        bg: "from-emerald-500/10 to-green-600/5",
+        iconBg: "bg-emerald-500/20",
+        icon: "text-emerald-600 dark:text-emerald-400",
+        dot: "bg-emerald-500",
+        glow: "bg-emerald-500"
       }
     },
     {

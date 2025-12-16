@@ -368,8 +368,7 @@ export default function ArticlePage() {
               {new Date(article.createdAt).toLocaleDateString('fa-IR')}
             </div>
           </div>
-          absolute bottom-4 left-4 p-3 bg-purple-500 hover:bg-purple-600 rounded-full shadow-lg transition-all duration-300
-          <h1 dir='ltr' className="text-2xl md:text-4xl font-bold text-gray-900 dark:text-white mb-6 leading-tight px-4">
+        <h1 dir='ltr' className="text-2xl md:text-4xl font-bold text-gray-900 dark:text-white mb-6 leading-tight px-4">
             {article.title}
           </h1>
           

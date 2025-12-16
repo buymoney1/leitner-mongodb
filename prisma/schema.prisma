@@ -68,10 +68,13 @@ model User {
   articles Article[]
   songs    Song[] // اضافه کردن رابطه با Song
 
+
   activityTrackings ActivityTracking[]
 
   // اضافه کردن رابطه با DailyActivity
   dailyActivities DailyActivity[]
+
+  notes Note[]
 
   // === اضافه کردن Notification Settings ===
   notificationToken   String? // توکن push notification
@@ -381,3 +384,21 @@ model PushSubscription {
   @@index([userId])
 }
 
+// اضافه کردن مدل Note به انتهای فایل Prisma schema (قبل از آخرین } نیست)
+
+model Note {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  content   String
+  userId    String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // هایلایت‌ها به صورت JSON ذخیره می‌شوند
+  highlights Json?   @db.Json // آرایه‌ای از { text: string, start: number, end: number, color: string }
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([createdAt])
+}
