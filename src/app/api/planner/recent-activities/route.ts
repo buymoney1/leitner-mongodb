@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const limit = parseInt(searchParams.get('limit') || '10');
 
-    // دریافت فعالیت‌ها
+    // دریافت فعالیت‌ها - استفاده از حروف کوچک
     const activities = await prisma.activityTracking.findMany({
       where: {
         userId: session.user.id
@@ -90,7 +90,6 @@ export async function GET(req: NextRequest) {
                 break;
               
               case 'words':
-                // برای کلمات، می‌توانید اطلاعات مربوطه را برگردانید
                 content = {
                   type: 'words_review',
                   title: 'مرور کلمات'

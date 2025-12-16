@@ -240,6 +240,20 @@ export function DashboardClient({ userName, userRole }: DashboardClientProps) {
       }
     },
     {
+      href: "/journey",
+      icon: Map, 
+      label: "سفر یادگیری",
+      description: "مشاهده مسیر پیشرفت و لول‌ها",
+      color: {
+        border: "border-amber-500/20",
+        bg: "from-amber-500/10 to-orange-600/5",
+        iconBg: "bg-amber-500/20",
+        icon: "text-amber-600 dark:text-amber-400",
+        dot: "bg-amber-500",
+        glow: "bg-amber-500"
+      }
+    },
+    {
       href: "/add-card",
       icon: Plus,
       label: "افزودن کارت",

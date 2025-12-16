@@ -32,7 +32,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             }
           });
           
-          console.log('🔐 User data from DB:', userData);
+          console.log('🔐 User data from DB:');
           
         (session.user as any).role = userData?.role || 'user';
         } catch (error) {
