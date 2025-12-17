@@ -150,24 +150,23 @@ export default function NotesList({
                         className="fixed inset-0 z-10"
                         onClick={() => setShowActions(null)}
                       />
-                      <div className="absolute left-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-20">
+                      <div className=" absolute left-0  w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-20">
                         {onNoteClick && (
                           <button
                             onClick={() => {
                               onNoteClick(note);
                               setShowActions(null);
                             }}
-                            className="flex items-center gap-2 w-full px-4 py-3 text-right text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                            className="flex items-center gap-2 w-full px-4 py-2 text-right text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                           >
-                            <Eye size={16} />
-                            مشاهده جزییات
-                          </button>
+                            <Eye size={14} />
+                            مشاهده                          </button>
                         )}
                         <button
                           onClick={() => handleEdit(note)}
-                          className="flex items-center gap-2 w-full px-4 py-3 text-right text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                          className="flex items-center gap-2 w-full px-4 py-2 text-right text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                         >
-                          <Edit size={16} />
+                          <Edit size={14} />
                           ویرایش
                         </button>
                         <button
@@ -176,9 +175,9 @@ export default function NotesList({
                             handleDelete(note.id);
                           }}
                           disabled={deletingNoteId === note.id}
-                          className="flex items-center gap-2 w-full px-4 py-3 text-right text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 disabled:opacity-50"
+                          className="flex items-center gap-2 w-full px-4 py-2 text-right text-xs text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 disabled:opacity-50"
                         >
-                          <Trash2 size={16} />
+                          <Trash2 size={14} />
                           حذف
                         </button>
                       </div>

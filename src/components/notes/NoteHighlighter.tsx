@@ -43,9 +43,11 @@ export default function NoteHighlighter({
   const [showActionMenu, setShowActionMenu] = useState(false);
   const [isDictionaryModalOpen, setIsDictionaryModalOpen] = useState(false);
   const [dictionaryWord, setDictionaryWord] = useState('');
+  const [touchStartPos, setTouchStartPos] = useState({ x: 0, y: 0 });
   
   const contentRef = useRef<HTMLDivElement>(null);
   const selectionRef = useRef<Selection | null>(null);
+  const touchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   if (!content) {
     return (
@@ -57,49 +59,79 @@ export default function NoteHighlighter({
     );
   }
 
-  // Detect text selection
+  const handleTextSelection = () => {
+    if (readOnly) return;
+    
+    const selection = window.getSelection();
+    if (!selection || selection.isCollapsed) {
+      return;
+    }
+
+    const text = selection.toString().trim();
+    if (!text || text.length < 2) {
+      return;
+    }
+
+    if (contentRef.current && !contentRef.current.contains(selection.anchorNode)) {
+      return;
+    }
+
+    const isNearHighlight = highlights?.some(highlight => {
+      return text.includes(highlight.text) || highlight.text.includes(text);
+    });
+
+    if (isNearHighlight) {
+      selection.removeAllRanges();
+      return;
+    }
+
+    selectionRef.current = selection;
+    setSelectedText(text);
+    setShowActionMenu(true);
+  };
+
+  // Detect text selection for both desktop and mobile
   useEffect(() => {
-    const handleSelection = () => {
-      if (readOnly) return;
-      
-      const selection = window.getSelection();
-      if (!selection || selection.isCollapsed) {
-        return;
-      }
-
-      const text = selection.toString().trim();
-      if (!text || text.length < 2) {
-        return;
-      }
-
-      if (contentRef.current && !contentRef.current.contains(selection.anchorNode)) {
-        return;
-      }
-
-      const isNearHighlight = highlights?.some(highlight => {
-        return text.includes(highlight.text) || highlight.text.includes(text);
-      });
-
-      if (isNearHighlight) {
-        selection.removeAllRanges();
-        return;
-      }
-
-      selectionRef.current = selection;
-      setSelectedText(text);
-      setShowActionMenu(true);
+    const handleMouseUp = () => {
+      handleTextSelection();
     };
 
-    document.addEventListener('mouseup', handleSelection);
+    const handleTouchEnd = (e: TouchEvent) => {
+      // فقط اگر حرکت انگشت خیلی کم بوده (انتخاب متن) نه کشیدن
+      const touchEnd = e.changedTouches[0];
+      const deltaX = Math.abs(touchEnd.clientX - touchStartPos.x);
+      const deltaY = Math.abs(touchEnd.clientY - touchStartPos.y);
+      
+      // اگر حرکت کمتر از 10 پیکسل باشد، احتمالاً انتخاب متن است
+      if (deltaX < 10 && deltaY < 10) {
+        // کمی تاخیر برای اینکه مرورگر فرصت انتخاب متن را داشته باشد
+        setTimeout(handleTextSelection, 100);
+      }
+    };
+
+    const handleTouchStart = (e: TouchEvent) => {
+      const touchStart = e.touches[0];
+      setTouchStartPos({ x: touchStart.clientX, y: touchStart.clientY });
+    };
+
+    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener('touchend', handleTouchEnd);
+    document.addEventListener('touchstart', handleTouchStart);
     
     return () => {
-      document.removeEventListener('mouseup', handleSelection);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('touchend', handleTouchEnd);
+      document.removeEventListener('touchstart', handleTouchStart);
+      
+      if (touchTimeoutRef.current) {
+        clearTimeout(touchTimeoutRef.current);
+      }
     };
-  }, [readOnly, highlights]);
+  }, [readOnly, highlights, touchStartPos]);
 
   // Close menu when clicking outside
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
+    const handleClickOutside = (e: MouseEvent | TouchEvent) => {
       const target = e.target as HTMLElement;
       const isClickInsideContent = contentRef.current?.contains(target);
       const isClickInsideMenu = target.closest('.action-menu-modal');
@@ -109,13 +141,26 @@ export default function NoteHighlighter({
       }
     };
 
+    const handleTouchOutside = (e: TouchEvent) => {
+      handleClickOutside(e);
+    };
+
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleTouchOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleTouchOutside);
+    };
   }, [showActionMenu]);
 
   const handleWordClick = (word: string) => {
-    setDictionaryWord(word);
-    setIsDictionaryModalOpen(true);
+    // برای موبایل، از کلیک مستقیم روی کلمات جلوگیری می‌کنیم
+    // و فقط از طریق انتخاب متن عمل می‌کنیم
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    if (!isMobile) {
+      setDictionaryWord(word);
+      setIsDictionaryModalOpen(true);
+    }
   };
 
   const handleAddToFlashcards = async () => {
@@ -178,7 +223,7 @@ export default function NoteHighlighter({
     window.getSelection()?.removeAllRanges();
   };
 
-  // Render text with clickable words
+  // رندر متن با کلمات قابل کلیک
   const renderText = () => {
     if (!highlights || highlights.length === 0) {
       return renderPlainText();
@@ -241,12 +286,14 @@ export default function NoteHighlighter({
       const cleanWord = segment.replace(/[^\w]/g, '');
       
       if (cleanWord.length > 1 && /^[a-zA-Z]+$/.test(cleanWord)) {
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        
         return (
           <span
             key={`word-${index}`}
             onClick={() => handleWordClick(cleanWord)}
-            className="cursor-pointer text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 px-0.5 rounded transition-colors duration-200"
-            title="کلیک برای جستجو در دیکشنری"
+            className={`${isMobile ? '' : 'cursor-pointer hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700'} text-gray-700 dark:text-gray-300 px-0.5 rounded transition-colors duration-200`}
+            title={isMobile ? "انتخاب کنید تا عملیات نمایش داده شود" : "کلیک برای جستجو در دیکشنری"}
           >
             {segment}
           </span>
@@ -256,6 +303,9 @@ export default function NoteHighlighter({
       return <span key={`text-${index}`}>{segment}</span>;
     });
   };
+
+  // استایل مخصوص موبایل برای منو
+  const isMobile = typeof window !== 'undefined' && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
   return (
     <>
@@ -269,6 +319,12 @@ export default function NoteHighlighter({
       <div
         ref={contentRef}
         className="whitespace-pre-wrap leading-relaxed text-sm text-gray-700 dark:text-gray-300 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 min-h-[200px] select-text cursor-text"
+        // جلوگیری از زوم روی دبل تاپ در موبایل
+        style={{ 
+          touchAction: 'manipulation',
+          WebkitUserSelect: 'text',
+          userSelect: 'text'
+        }}
       >
         {renderText()}
       </div>
@@ -279,10 +335,17 @@ export default function NoteHighlighter({
           <div 
             className="fixed inset-0 bg-black/20 dark:bg-black/40 backdrop-blur-sm z-[9998]"
             onClick={closeMenu}
+            onTouchStart={closeMenu}
           />
           
           <div className="action-menu-modal fixed inset-0 z-[9999] flex items-center justify-center p-4">
-            <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md overflow-hidden border border-gray-200 dark:border-gray-700">
+            <div 
+              className="relative bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md overflow-hidden border border-gray-200 dark:border-gray-700"
+              style={{
+                maxHeight: isMobile ? '80vh' : 'auto',
+                overflowY: isMobile ? 'auto' : 'visible'
+              }}
+            >
               {/* Header */}
               <div className="p-4 border-b border-gray-100 dark:border-gray-700">
                 <div className="flex items-center justify-between">
@@ -290,8 +353,8 @@ export default function NoteHighlighter({
                     <div className="p-1.5 bg-gray-100 dark:bg-gray-700 rounded">
                       <Sparkles className="h-4 w-4 text-gray-600 dark:text-gray-400" />
                     </div>
-                    <div>
-                      <span className="text-sm text-gray-600 dark:text-gray-400">عملیات روی متن</span>
+                    <div className=''>
+                      <span className=" text-sm text-gray-600 dark:text-gray-400">عملیات روی متن</span>
                       <p className="text-xs text-gray-500 dark:text-gray-500 mt-0.5">
                         متن انتخاب شده شما
                       </p>
@@ -299,7 +362,8 @@ export default function NoteHighlighter({
                   </div>
                   <button
                     onClick={closeMenu}
-                    className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                    onTouchEnd={closeMenu}
+                    className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors touch-manipulation"
                   >
                     <X className="h-4 w-4 text-gray-500 dark:text-gray-400" />
                   </button>
@@ -318,13 +382,14 @@ export default function NoteHighlighter({
                 <div className="space-y-3">
                   <button
                     onClick={handleAddToFlashcards}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gray-800 dark:bg-gray-700 hover:bg-gray-900 dark:hover:bg-gray-600 text-white rounded-lg text-sm transition-colors duration-200"
+                    onTouchEnd={handleAddToFlashcards}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gray-800 dark:bg-gray-700 hover:bg-gray-900 dark:hover:bg-gray-600 text-white rounded-lg text-sm transition-colors duration-200 touch-manipulation active:scale-95"
                   >
                     <PlusCircle className="h-4 w-4" />
                     افزودن به فلش‌کارت
                   </button>
 
-                  <div className="text-center">
+                  <div className="text-center mt-8">
                     <span className="text-xs text-gray-500 dark:text-gray-400">
                       یا هایلایت با رنگ:
                     </span>
@@ -336,7 +401,8 @@ export default function NoteHighlighter({
                       <button
                         key={name}
                         onClick={() => handleHighlight(color)}
-                        className="flex flex-col items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200 group"
+                        onTouchEnd={() => handleHighlight(color)}
+                        className="flex flex-col items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200 group touch-manipulation active:scale-95"
                       >
                         <div 
                           className="h-8 w-8 rounded-md mb-1 shadow-sm group-hover:scale-105 transition-transform duration-200"
@@ -351,7 +417,8 @@ export default function NoteHighlighter({
 
                   <button
                     onClick={closeMenu}
-                    className="w-full px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors text-sm"
+                    onTouchEnd={closeMenu}
+                    className="w-full px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors text-sm touch-manipulation active:scale-95"
                   >
                     انصراف
                   </button>

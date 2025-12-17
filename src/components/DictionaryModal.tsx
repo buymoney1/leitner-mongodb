@@ -64,7 +64,7 @@ const DictionarySection = ({ word, onWordSelect }: { word: string; onWordSelect:
           </svg>
         </div>
         <div>
-          <h3 className="text-gray-900 dark:text-white font-bold text-xl">اطلاعات دیکشنری</h3>
+          <h3 className="text-gray-900 dark:text-white font-bold text-lg">اطلاعات دیکشنری</h3>
           <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">اطلاعات کامل کلمه از دیکشنری آنلاین</p>
         </div>
       </div>
@@ -342,7 +342,7 @@ export default function DictionaryModal({
                 <span className="hidden sm:inline">بستن</span>
               </button>
               
-              <h2 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white text-center">
+              <h2 className="text-sm md:text-lg font-bold text-gray-900 dark:text-white text-center">
                 دیکشنری و افزودن فلش‌کارت
               </h2>
               
@@ -355,12 +355,8 @@ export default function DictionaryModal({
             <div className="max-w-4xl mx-auto">
               {/* فرم افزودن کارت */}
               <div className="bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-6 mb-6 border border-cyan-100 dark:border-cyan-900/30">
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-3">
-                  <Plus className="h-6 w-6 text-cyan-600 dark:text-cyan-400" />
-                  افزودن به فلش‌کارت
-                </h3>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+         
+                <div className="text-right grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                   <div className="space-y-3">
                     <label className="block text-gray-900 dark:text-white text-sm font-medium">
                       کلمه انگلیسی
@@ -387,9 +383,7 @@ export default function DictionaryModal({
                   
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <label className="block text-gray-900 dark:text-white text-sm font-medium">
-                        معنی فارسی
-                      </label>
+              
                       <button
                         onClick={handleManualTranslate}
                         disabled={isTranslating || !customWord.trim()}
@@ -407,6 +401,9 @@ export default function DictionaryModal({
                           </>
                         )}
                       </button>
+                      <label className="block text-gray-900 dark:text-white text-sm font-medium">
+                        معنی فارسی
+                      </label>
                     </div>
                     <div className="relative">
                       <input
@@ -414,9 +411,10 @@ export default function DictionaryModal({
                         value={customMeaning}
                         onChange={(e) => setCustomMeaning(e.target.value)}
                         placeholder={isTranslating ? "در حال ترجمه..." : "مثال: یاد گرفتن"}
-                        className="w-full p-4 pr-12 rounded-xl bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:border-cyan-500 transition-colors text-lg"
+                        className=" w-full p-4 pr-12 rounded-xl bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:border-cyan-500 transition-colors text-lg"
                         onKeyPress={(e) => e.key === 'Enter' && handleAddToFlashcards()}
                         disabled={isTranslating}
+                        dir="rtl"
                       />
                       {customMeaning && (
                         <button
@@ -453,7 +451,7 @@ export default function DictionaryModal({
                   ) : (
                     <>
                       <Plus className="h-5 w-5" />
-                      افزودن به فلش‌کارت‌ها
+                      <span className='text-sm'>افزودن به فلش‌کارت‌ها</span>
                     </>
                   )}
                 </button>
