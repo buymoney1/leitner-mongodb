@@ -316,41 +316,14 @@ export default function NoteDetail({
                 </div>
                 
                 {/* Tips */}
-                <div className="p-2 mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
-  <div className="flex items-center gap-3 mb-4">
-    <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
-      <Sparkles className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-    </div>
-    <h3 className="font-semibold text-gray-800 dark:text-gray-200">راهنمای استفاده</h3>
-  </div>
-  
-  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-    <div className="py-5 flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-100 dark:border-gray-700">
-      <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center bg-gray-200 dark:bg-gray-700 rounded-full">
-        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">۱</span>
-      </div>
-      <p className=" text-sm text-gray-700 dark:text-gray-300">
-        متن را انتخاب کنید تا گزینه‌های هایلایت و افزودن به فلش‌کارت ظاهر شود
-      </p>
-    </div>
-    
-    <div className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-100 dark:border-gray-700">
-      <div className=" flex-shrink-0 w-6 h-6 flex items-center justify-center bg-gray-200 dark:bg-gray-700 rounded-full">
-        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">۲</span>
-      </div>
-      <p className="text-sm text-gray-700 dark:text-gray-300">
-        روی کلمات انگلیسی کلیک کنید تا معنی آن‌ها را جستجو کنید
-      </p>
-    </div>
-  </div>
-</div>
+
               </div>
             </div>
           </div>
 
           {/* Highlights Sidebar */}
           {showHighlights && (
-            <div className="mb-12 lg:w-1/3">
+            <div className="mb-2 lg:w-1/3">
               <div className="sticky top-28 bg-gradient-to-b from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-lg p-6">
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-3">
@@ -441,20 +414,40 @@ export default function NoteDetail({
               </div>
             </div>
           )}
-        </div>
 
-        {/* Floating Action Button */}
-        <div className="fixed bottom-8 right-8 z-20">
-          <div className="flex flex-col items-center gap-3">
-            <button
-              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              className="p-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-              title="برو به بالا"
-            >
-              <ArrowLeft className="h-6 w-6 rotate-90" />
-            </button>
-          </div>
+
+
         </div>
+        <div className="p-2 mb-15 mt-6">
+  <div className="flex items-center gap-3 mb-4">
+    <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
+      <Sparkles className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+    </div>
+    <h3 className="font-semibold text-gray-800 dark:text-gray-200">راهنمای استفاده</h3>
+  </div>
+  
+  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+    <div className="py-5 flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-100 dark:border-gray-700">
+      <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center bg-gray-200 dark:bg-gray-700 rounded-full">
+        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">۱</span>
+      </div>
+      <p className=" text-sm text-gray-700 dark:text-gray-300">
+        متن را انتخاب کنید تا گزینه‌های هایلایت و افزودن به فلش‌کارت ظاهر شود
+      </p>
+    </div>
+    
+    <div className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-100 dark:border-gray-700">
+      <div className=" flex-shrink-0 w-6 h-6 flex items-center justify-center bg-gray-200 dark:bg-gray-700 rounded-full">
+        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">۲</span>
+      </div>
+      <p className="text-sm text-gray-700 dark:text-gray-300">
+        روی کلمات انگلیسی کلیک کنید تا معنی آن‌ها را جستجو کنید
+      </p>
+    </div>
+  </div>
+</div>
+        
+
       </div>
     </div>
   );

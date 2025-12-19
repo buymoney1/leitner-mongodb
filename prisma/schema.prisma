@@ -402,3 +402,7 @@ model Note {
   @@index([userId])
   @@index([createdAt])
 }
+
+
+
+
