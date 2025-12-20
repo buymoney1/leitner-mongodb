@@ -283,19 +283,19 @@ export default function NoteDetail({
       {/* Content */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Title Section */}
-        <div className="text-center mb-12">
-          <div className="">
+        <div className="text-center mb-6">
+   
             <div className="inline-flex items-center gap-3 px-4 py-2 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 dark:from-blue-500/20 dark:to-cyan-500/20 rounded-full border border-blue-200 dark:border-blue-800 mb-6">
               <BookOpen className="h-5 w-5 text-blue-600 dark:text-blue-400" />
               <span className="text-sm font-medium text-blue-700 dark:text-blue-300">یادداشت شخصی</span>
             </div>
             
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 dark:text-white  leading-tight tracking-tight">
+            <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white  leading-tight tracking-tight">
               {note.title}
             </h1>
             
         
-          </div>
+  
         </div>
 
         {/* Main Content Area */}
@@ -388,29 +388,7 @@ export default function NoteDetail({
                   </div>
                 )}
                 
-                {/* Statistics */}
-                {highlights.length > 0 && (
-                  <div className="mt-6 pt-6 border-t border-gray-100 dark:border-gray-700">
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="text-center p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
-                        <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                          {highlights.length}
-                        </div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                          هایلایت
-                        </div>
-                      </div>
-                      <div className="text-center p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
-                        <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                          {new Set(highlights.map(h => h.color)).size}
-                        </div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                          رنگ مختلف
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
+               
               </div>
             </div>
           )}
@@ -432,7 +410,7 @@ export default function NoteDetail({
         <span className="text-sm font-medium text-gray-700 dark:text-gray-300">۱</span>
       </div>
       <p className=" text-sm text-gray-700 dark:text-gray-300">
-        متن را انتخاب کنید تا گزینه‌های هایلایت و افزودن به فلش‌کارت ظاهر شود
+        متن مورد نظر را انتخاب کنید و از گزینه های سمت راست صفحه، برای افزودن به لایتنر و هایلایت کردن استفاده کنید.
       </p>
     </div>
     

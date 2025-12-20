@@ -350,16 +350,16 @@ export default function NoteHighlighter({
         onAddToFlashcards={handleDictionaryAdd}
       />
 
-      {showToolbar && selectedText && !readOnly && (
+      {!readOnly && (
         <div className="toolbar-container">
           <Toolbar
-            selectedText={selectedText}
+            selectedText={selectedText || ''}
             onHighlight={handleToolbarHighlight}
             onAddToFlashcards={handleToolbarAddToFlashcards}
-            onClose={closeToolbar}
           />
         </div>
       )}
+
 
       <div
         ref={contentRef}

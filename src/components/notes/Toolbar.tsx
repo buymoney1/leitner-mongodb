@@ -2,68 +2,35 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { 
-  Highlighter, 
-  PlusCircle, 
-  ChevronRight, 
-  ChevronLeft,
-  Sparkles,
-  BookOpen,
-  X,
-  Palette,
-  BookmarkPlus
-} from 'lucide-react';
+import { Highlighter, PlusCircle } from 'lucide-react';
 
 interface ToolbarProps {
   selectedText: string;
   onHighlight: (color: string) => void;
   onAddToFlashcards: (text: string) => void;
-  onClose?: () => void;
 }
 
 const HIGHLIGHT_COLORS = [
-  { name: 'زرد', color: '#FFEB3B', icon: '🟡' },
-  { name: 'سبز', color: '#81C784', icon: '🟢' },
-  { name: 'آبی', color: '#a1d5ff', icon: '🔵' },
-  { name: 'نارنجی', color: '#FFB74D', icon: '🟠' },
+  { name: 'yellow', color: '#FFEB3B' },
+  { name: 'green', color: '#81C784' },
+  { name: 'blue', color: '#A1D5FF' },
+  { name: 'orange', color: '#FFB74D' },
 ];
 
 export default function Toolbar({
   selectedText,
   onHighlight,
   onAddToFlashcards,
-  onClose
 }: ToolbarProps) {
-  const [isOpen, setIsOpen] = useState(true);
   const [showColors, setShowColors] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
   const toolbarRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    setIsMobile(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
-  }, []);
-
-  const handleHighlight = (color: string) => {
-    onHighlight(color);
-    setShowColors(false);
-    if (onClose) onClose();
-  };
-
-  const handleAddToFlashcards = () => {
-    onAddToFlashcards(selectedText);
-    if (onClose) onClose();
-  };
-
-  const toggleToolbar = () => {
-    setIsOpen(!isOpen);
-  };
-
-  // بستن منو رنگ‌ها با کلیک خارج
+  /* ---------------- Close color picker on outside click ---------------- */
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
-        showColors && 
-        toolbarRef.current && 
+        showColors &&
+        toolbarRef.current &&
         !toolbarRef.current.contains(event.target as Node)
       ) {
         setShowColors(false);
@@ -74,85 +41,109 @@ export default function Toolbar({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showColors]);
 
+  /* ---------------- Handlers ---------------- */
+  const handleHighlight = (color: string) => {
+    if (!selectedText) return;
+    onHighlight(color);
+    setShowColors(false);
+  };
+
+  const handleAddToFlashcards = () => {
+    if (!selectedText) return;
+    onAddToFlashcards(selectedText);
+  };
+
   return (
-    <div 
+    <div
       ref={toolbarRef}
-      className="fixed right-4 top-1/2 transform -translate-y-1/2 z-50"
+      className="
+        fixed right-3 top-2/3 -translate-y-1/2 z-50
+        opacity-60 hover:opacity-100
+        transition-opacity duration-300
+      "
     >
-      {/* Main Toolbar */}
-      <div className={`
-        flex flex-col items-center gap-2
-        bg-white dark:bg-gray-800
-        rounded-2xl shadow-2xl border
-        border-gray-200 dark:border-gray-700
-        transition-all duration-300 ease-out
-        ${isOpen ? 'w-14 p-2' : 'w-0 p-0 overflow-hidden'}
-      `}>
-        {/* Close Button */}
-        {isOpen && (
+      <div
+        className="
+          flex flex-col items-center gap-2
+          bg-white dark:bg-gray-800
+          border border-gray-200 dark:border-gray-700
+          rounded-2xl shadow-xl
+          w-12 py-2
+          hover:w-14
+          transition-all duration-300
+        "
+      >
+        {/* Highlight */}
+        <div className="relative">
           <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors"
+            onClick={() => setShowColors(prev => !prev)}
+            disabled={!selectedText}
+            title="هایلایت متن"
+            className="
+              p-2 rounded-xl
+              transition-colors
+              hover:bg-gray-100 dark:hover:bg-gray-700
+              disabled:opacity-40 disabled:cursor-not-allowed
+            "
           >
-            <X className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+            <Highlighter
+              className="
+                h-5 w-5
+                text-gray-500
+                hover:text-yellow-500
+              "
+            />
           </button>
-        )}
 
-        {/* Divider */}
-        {isOpen && <div className="w-8 h-px bg-gray-200 dark:bg-gray-700 my-1" />}
-
-        {/* Highlight Button with Color Picker */}
-        {isOpen && (
-          <div className="relative">
-            <button
-              onClick={() => setShowColors(!showColors)}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors group"
-              title="هایلایت"
+          {/* Color Picker */}
+          {showColors && (
+            <div
+              className="
+                absolute right-14 top-1/2 -translate-y-1/2
+                bg-white dark:bg-gray-800
+                border border-gray-200 dark:border-gray-700
+                rounded-xl shadow-xl
+                p-2 flex flex-col gap-2
+              "
             >
-              <Highlighter className="h-5 w-5 text-gray-600 dark:text-gray-400 group-hover:text-yellow-500" />
-            </button>
+              {HIGHLIGHT_COLORS.map(({ name, color }) => (
+                <button
+                  key={name}
+                  onClick={() => handleHighlight(color)}
+                  className="
+                    w-6 h-6 rounded-md
+                    ring-1 ring-black/10
+                    hover:scale-110
+                    transition-transform
+                  "
+                  style={{ backgroundColor: color }}
+                />
+              ))}
+            </div>
+          )}
+        </div>
 
-            {/* Color Picker */}
-            {showColors && (
-              <div className="mt-16 absolute right-12 top-1/2 transform -translate-y-1/2 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 p-3 w-[40px]">
-                <div className="flex flex-col gap-2">
-                  {HIGHLIGHT_COLORS.map(({ name, color, icon }) => (
-                    <button
-                      key={name}
-                      onClick={() => handleHighlight(color)}
-                      className="flex items-center gap-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                    >
-                      <div 
-                        className="w-6 h-6 rounded-md shadow-sm"
-                        style={{ backgroundColor: color }}
-                      />
-         
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Add to Flashcards Button */}
-        {isOpen && (
-          <button
-            onClick={handleAddToFlashcards}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors group"
-            title="افزودن به فلش‌کارت"
-          >
-            <PlusCircle className="h-5 w-5 text-gray-600 dark:text-gray-400 group-hover:text-green-500" />
-          </button>
-        )}
-
-        {/* Divider */}
-        {isOpen && <div className="w-8 h-px bg-gray-200 dark:bg-gray-700 my-1" />}
-
-
+        {/* Add to Flashcards */}
+        <button
+          onClick={handleAddToFlashcards}
+          disabled={!selectedText}
+          title="افزودن به فلش‌کارت"
+          className="
+            p-2 rounded-xl
+            transition-colors
+            hover:bg-gray-100 dark:hover:bg-gray-700
+            disabled:opacity-40 disabled:cursor-not-allowed
+          "
+        >
+          <PlusCircle
+            className="
+              h-5 w-5
+              text-gray-500
+              hover:text-green-500
+            "
+          />
+        </button>
       </div>
-
-
     </div>
   );
 }
