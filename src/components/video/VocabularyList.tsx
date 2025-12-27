@@ -1,12 +1,11 @@
 // components/video/VocabularyList.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
-import { Search, BookOpen, Sparkles, Plus } from 'lucide-react';
+import { useState } from 'react';
+import { Search, BookOpen, Sparkles, Plus, Trash2 } from 'lucide-react';
 import DictionaryModal from '../DictionaryModal';
 
-// Type برای لغات ویدیو - مطابق با مدل Prisma
+// Type برای لغات ویدیو
 interface VideoVocabulary {
   id: string;
   word: string;
@@ -14,59 +13,20 @@ interface VideoVocabulary {
   timestamp?: number;
 }
 
-export default function VocabularyList() {
-  const params = useParams();
-  const videoId = params.id as string;
-  
-  const [vocabularies, setVocabularies] = useState<VideoVocabulary[]>([]);
-  const [loading, setLoading] = useState(true);
+interface VocabularyListProps {
+  vocabularies: VideoVocabulary[];
+  onRemoveWord?: (id: string) => void;
+}
+
+export default function VocabularyList({ 
+  vocabularies = [], 
+  onRemoveWord 
+}: VocabularyListProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedWord, setSelectedWord] = useState<VideoVocabulary | null>(null);
   const [isDictionaryModalOpen, setIsDictionaryModalOpen] = useState(false);
   const [selectedWordForModal, setSelectedWordForModal] = useState("");
   const [selectedWordMeaning, setSelectedWordMeaning] = useState("");
-
-  // Fetch vocabularies from API
-  useEffect(() => {
-    if (!videoId) {
-      console.error('videoId is empty from params:', params);
-      setLoading(false);
-      return;
-    }
-
-    const fetchVocabularies = async () => {
-      try {
-        setLoading(true);
-        console.log('Fetching vocabularies for video:', videoId);
-        const response = await fetch(`/api/videos/${videoId}/vocabularies`);
-        
-        console.log('Response status:', response.status);
-        
-        if (!response.ok) {
-          throw new Error(`خطا در دریافت لغات: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        console.log('Fetched data:', data);
-        
-        // اطمینان از ساختار داده
-        if (data && data.vocabularies && Array.isArray(data.vocabularies)) {
-          setVocabularies(data.vocabularies);
-          console.log('Vocabularies set:', data.vocabularies.length, 'items');
-        } else {
-          console.warn('Invalid data structure:', data);
-          setVocabularies([]);
-        }
-      } catch (error) {
-        console.error('Error fetching vocabularies:', error);
-        alert('خطا در بارگذاری لغات. لطفاً صفحه را رفرش کنید.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchVocabularies();
-  }, [videoId, params]);
 
   // تابع برای افزودن کارت به فلش‌کارت
   const handleAddToFlashcards = async (word: string, meaning: string) => {
@@ -118,25 +78,16 @@ export default function VocabularyList() {
     setIsDictionaryModalOpen(true);
   };
 
-  // نمایش loading state
-  if (!videoId) {
-    return (
-      <div className="min-h-full bg-white dark:bg-gray-900 flex items-center justify-center p-4">
-        <div className="text-center">
-          <BookOpen className="w-12 h-12 text-red-500 dark:text-red-400 mx-auto mb-4" />
-          <p className="text-red-600 dark:text-red-400 font-medium">خطا: شناسه ویدیو نامعتبر است</p>
-          <p className="text-gray-500 dark:text-gray-400 text-sm mt-2">
-            لطفاً از صفحه ویدیو دوباره وارد شوید
-          </p>
-          <p className="text-gray-400 dark:text-gray-600 text-xs mt-1">
-            Params: {JSON.stringify(params)}
-          </p>
-        </div>
-      </div>
-    );
-  }
+  // حذف لغت
+  const handleRemoveClick = (e: React.MouseEvent, vocabId: string) => {
+    e.stopPropagation();
+    if (onRemoveWord && confirm('آیا از حذف این لغت مطمئن هستید؟')) {
+      onRemoveWord(vocabId);
+    }
+  };
 
-  if (loading) {
+  // نمایش loading state اگر vocabularies undefined باشد
+  if (!vocabularies) {
     return (
       <div className="min-h-full bg-white dark:bg-gray-900 flex items-center justify-center p-4">
         <div className="text-center">
@@ -146,9 +97,6 @@ export default function VocabularyList() {
       </div>
     );
   }
-
-  console.log('Rendering with vocabularies:', vocabularies.length);
-  console.log('Filtered vocabularies:', filteredVocabularies.length);
 
   return (
     <div className="min-h-full bg-white dark:bg-gray-900 transition-colors duration-300 p-4">
@@ -168,9 +116,12 @@ export default function VocabularyList() {
 
       {/* هدر و اطلاعات */}
       <div className="mb-6">
-      <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
-      <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">لغات ویدیو</h2>
-        
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">لغات ویدیو</h2>
+        <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
+          <div className="flex items-center gap-2">
+            <BookOpen className="w-4 h-4" />
+            <span>لغات آموزشی ویدیو</span>
+          </div>
           <span className="bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400 px-2 py-1 rounded-full">
             {vocabularies.length} لغت
           </span>
@@ -247,20 +198,22 @@ export default function VocabularyList() {
                         }`}>
                           {vocab.word}
                         </p>
-                     
                       </div>
-                      <button 
-                        onClick={(e) => handleAddButtonClick(e, vocab)}
-                        className="p-1.5 rounded-lg bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400 hover:bg-cyan-200 dark:hover:bg-cyan-800/50 transition-colors"
-                        title="افزودن به فلش‌کارت"
-                      >
-                        <Plus className="w-4 h-4" />
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button 
+                          onClick={(e) => handleAddButtonClick(e, vocab)}
+                          className="p-1.5 rounded-lg bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400 hover:bg-cyan-200 dark:hover:bg-cyan-800/50 transition-colors"
+                          title="افزودن به فلش‌کارت"
+                        >
+                          <Plus className="w-4 h-4" />
+                        </button>
+
+                      </div>
                     </div>
                     
                     {/* Word Meaning */}
                     <div className="mt-2">
-                    <p className={`text-base leading-relaxed ${
+                      <p className={`text-base leading-relaxed ${
                         selectedWord?.id === vocab.id 
                           ? 'text-gray-800 dark:text-gray-100 font-medium' 
                           : 'text-gray-700 dark:text-gray-300'
@@ -294,12 +247,10 @@ export default function VocabularyList() {
           <p className="text-xs leading-relaxed">
             ۱. روی هر لغت کلیک کنید تا اطلاعات کامل آن را ببینید<br />
             ۲. از دکمه <span className="text-cyan-600 dark:text-cyan-400">+</span> برای افزودن به فلش‌کارت استفاده کنید<br />
-            ۳. در قسمت جستجو، هم کلمه انگلیسی و هم معنی فارسی قابل جستجو است
+          ۴. در قسمت جستجو، هم کلمه انگلیسی و هم معنی فارسی قابل جستجو است
           </p>
         </div>
       </div>
-
-
     </div>
   );
 }

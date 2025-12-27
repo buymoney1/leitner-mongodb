@@ -15,20 +15,30 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { title, videoUrl, thumbnailUrl, level, subtitles, vocabularies } = body;
+    const { 
+      title, 
+      videoUrl, 
+      thumbnailUrl, 
+      description,
+      level, 
+      subtitles, 
+      vocabularies 
+    } = body;
 
     if (!title || !videoUrl || !level) {
-      return NextResponse.json({ error: 'Missing required fields: title, videoUrl, level' }, { status: 400 });
+      return NextResponse.json({ 
+        error: 'Missing required fields: title, videoUrl, level' 
+      }, { status: 400 });
     }
 
-    // ایجاد ویدیو با ذخیره مستقیم محتوای VTT
+    // ایجاد ویدیو با فیلدهای جدید
     const newVideo = await prisma.video.create({
       data: {
         title,
         videoUrl,
-        thumbnailUrl,
+        thumbnailUrl: thumbnailUrl || null,
         level,
-        subtitlesVtt: subtitles, // <-- محتوای VTT خام مستقیماً ذخیره می‌شود
+        subtitlesVtt: subtitles,
       },
     });
 
@@ -42,9 +52,23 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    return NextResponse.json({ success: true, videoId: newVideo.id });
+    return NextResponse.json({ 
+      success: true, 
+      videoId: newVideo.id,
+      message: 'ویدیو با موفقیت آپلود شد',
+      video: {
+        id: newVideo.id,
+        title: newVideo.title,
+        level: newVideo.level,
+        thumbnailUrl: newVideo.thumbnailUrl,
+        createdAt: newVideo.createdAt
+      }
+    });
   } catch (error) {
     console.error('Upload Error:', error);
-    return NextResponse.json({ error: 'Failed to upload video' }, { status: 500 });
+    return NextResponse.json({ 
+      error: 'Failed to upload video',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, { status: 500 });
   }
 }

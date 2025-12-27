@@ -3,34 +3,48 @@
 
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
+import { Upload, Image, FileText, Video, Globe } from 'lucide-react';
 
 // لیست سطوح را از enum می‌گیریم تا در منو نمایش دهیم
 const videoLevels = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
 
 export default function AdminVideoUploadForm() {
-  // 1. status را هم از useSession بگیرید
   const { data: session, status } = useSession(); 
   const [title, setTitle] = useState('');
   const [videoUrl, setVideoUrl] = useState('');
+  const [thumbnailUrl, setThumbnailUrl] = useState('');
+  const [description, setDescription] = useState('');
   const [level, setLevel] = useState('A1');
   const [subtitlesText, setSubtitlesText] = useState('');
   const [message, setMessage] = useState('');
   const [vocabularyText, setVocabularyText] = useState(''); 
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // 2. اگر در حال بارگذاری است، یک پیام یا اسپینر نمایش دهید
   if (status === 'loading') {
-    return <div className="text-center p-4">Loading...</div>; // می‌توانید یک کامپوننت اسپینر هم قرار دهید
+    return (
+      <div className="text-center p-8">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-500 border-t-transparent mx-auto"></div>
+        <p className="mt-4 text-gray-600">در حال بارگذاری...</p>
+      </div>
+    );
   }
 
-  // 3. اگر کاربر وارد نشده یا نقشش ادمین نیست، دسترسی را رد کنید
   if (status === 'unauthenticated' || session?.user?.role !== 'admin') {
-    return <p className="text-center p-4 text-red-600">Access Denied. Admins only.</p>;
+    return (
+      <div className="text-center p-8 max-w-md mx-auto">
+        <div className="bg-red-100 dark:bg-red-900/30 rounded-full p-4 w-16 h-16 flex items-center justify-center mx-auto mb-4">
+          <span className="text-2xl">🔒</span>
+        </div>
+        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">دسترسی محدود</h3>
+        <p className="text-gray-600 dark:text-gray-400">فقط مدیران سیستم می‌توانند ویدیو آپلود کنند.</p>
+      </div>
+    );
   }
   
-  // 4. اگر از مراحل بالا عبور کرد، یعنی کاربر ادمین است و فرم را نمایش بده
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setMessage('');
+    setIsSubmitting(true);
 
     const vocabularies = vocabularyText.split('\n').map(line => {
       const parts = line.split('|');
@@ -42,93 +56,265 @@ export default function AdminVideoUploadForm() {
       };
     }).filter(vocab => vocab !== null);
 
-    // ارسال زیرنویس به صورت خام (VTT) بدون پردازش
-    const response = await fetch('/api/admin/upload-video', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        title, 
-        videoUrl, 
-        level, 
-        subtitles: subtitlesText, // ارسال زیرنویس به صورت متن VTT خام
-        vocabularies 
-      }),
-    });
+    try {
+      const response = await fetch('/api/admin/upload-video', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          title, 
+          videoUrl, 
+          thumbnailUrl: thumbnailUrl || null,
+          description: description || null,
+          level, 
+          subtitles: subtitlesText,
+          vocabularies 
+        }),
+      });
 
-    const data = await response.json();
+      const data = await response.json();
 
-    if (response.ok) {
-      setMessage('Video uploaded successfully!');
-      setTitle('');
-      setVideoUrl('');
-      setLevel('A1'); 
-      setSubtitlesText('');
-      setVocabularyText('');
-    } else {
-      setMessage(`Error: ${data.error}`);
+      if (response.ok) {
+        setMessage('✅ ویدیو با موفقیت آپلود شد!');
+        // ریست فرم
+        setTitle('');
+        setVideoUrl('');
+        setThumbnailUrl('');
+        setDescription('');
+        setLevel('A1'); 
+        setSubtitlesText('');
+        setVocabularyText('');
+      } else {
+        setMessage(`❌ خطا: ${data.error || 'خطا در آپلود ویدیو'}`);
+      }
+    } catch (error) {
+      setMessage('❌ خطا در ارتباط با سرور');
+      console.error('Upload error:', error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-2xl mx-auto p-4 border rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-4">Upload New Video</h2>
-      {/* ... بقیه کد فرم بدون تغییر ... */}
-      <div className="mb-4">
-        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="title">Title</label>
-        <input id="title" type="text" value={title} onChange={(e) => setTitle(e.target.value)} className="w-full p-2 border rounded" required />
-      </div>
-      <div className="mb-4">
-        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="videoUrl">Video URL</label>
-        <input id="videoUrl" type="text" value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} className="w-full p-2 border rounded" required />
-      </div>
-      
-      <div className="mb-4">
-        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="level">
-          Level
-        </label>
-        <select
-          id="level"
-          value={level}
-          onChange={(e) => setLevel(e.target.value)}
-          className="w-full p-2 border rounded"
-          required
-        >
-          {videoLevels.map((lvl) => (
-            <option key={lvl} value={lvl}>
-              {lvl}
-            </option>
-          ))}
-        </select>
-      </div>
+    <div className="max-w-4xl mx-auto p-4 md:p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-6 md:p-8">
+        <div className="flex items-center gap-3 mb-8">
+          <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600">
+            <Upload className="h-6 w-6 text-white" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">آپلود ویدیو جدید</h2>
+            <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">ویدیوهای آموزشی را برای زبان‌آموزان آپلود کنید</p>
+          </div>
+        </div>
 
-      <div className="mb-4">
-        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="vocabulary">
-          لغت‌ها و عبارت‌های مهم (هر خط یک مورد: لغت|معنی)
-        </label>
-        <textarea
-          id="vocabulary"
-          value={vocabularyText}
-          onChange={(e) => setVocabularyText(e.target.value)}
-          className="w-full p-2 border rounded h-32 font-mono text-sm"
-          placeholder="Hello|سلام&#10;World|جهان&#10;How are you?|حالت چطوره؟"
-        />
-      </div>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          
+          {/* عنوان ویدیو */}
+          <div className="space-y-2">
+            <label className="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white">
+              <Video className="h-4 w-4 text-blue-500" />
+              عنوان ویدیو
+            </label>
+            <input 
+              id="title" 
+              type="text" 
+              value={title} 
+              onChange={(e) => setTitle(e.target.value)} 
+              className="w-full p-4 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              placeholder="عنوان ویدیو (مثال: آموزش مقدماتی انگلیسی - سلام و احوالپرسی)"
+              required 
+            />
+          </div>
 
-      <div className="mb-4">
-        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="subtitles">Subtitles (VTT format)</label>
-        <textarea 
-          id="subtitles" 
-          value={subtitlesText} 
-          onChange={(e) => setSubtitlesText(e.target.value)} 
-          className="w-full p-2 border rounded h-48 font-mono text-sm" 
-          required 
-          placeholder="WEBVTT&#10;&#10;00:00:00.000 --> 00:00:03.500&#10;Hello, how are you?&#10;سلام، حال شما چطور است؟&#10;&#10;00:00:03.500 --> 00:00:06.000&#10;I am fine, thank you.&#10;من خوبم، ممنون." 
-        />
+          {/* لینک ویدیو */}
+          <div className="space-y-2">
+            <label className="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white">
+              <Globe className="h-4 w-4 text-green-500" />
+              لینک ویدیو
+            </label>
+            <input 
+              id="videoUrl" 
+              type="text" 
+              value={videoUrl} 
+              onChange={(e) => setVideoUrl(e.target.value)} 
+              className="w-full p-4 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+              placeholder="لینک ویدیو (مثال: https://example.com/video.mp4)"
+              required 
+            />
+            <p className="text-xs text-gray-500 dark:text-gray-400">لینک مستقیم ویدیو را وارد کنید (MP4, WebM, etc.)</p>
+          </div>
+
+          {/* لینک تامبنیل */}
+          <div className="space-y-2">
+            <label className="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white">
+              <Image className="h-4 w-4 text-purple-500" />
+              لینک تصویر تامبنیل (اختیاری)
+            </label>
+            <input 
+              id="thumbnailUrl" 
+              type="text" 
+              value={thumbnailUrl} 
+              onChange={(e) => setThumbnailUrl(e.target.value)} 
+              className="w-full p-4 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+              placeholder="لینک تصویر تامبنیل (مثال: https://example.com/thumbnail.jpg)"
+            />
+            <p className="text-xs text-gray-500 dark:text-gray-400">اگر خالی بگذارید، تامبنیل پیش‌فرض استفاده می‌شود</p>
+            
+            {/* Preview thumbnail */}
+            {thumbnailUrl && (
+              <div className="mt-2">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">پیش‌نمایش:</p>
+                <div className="relative w-32 h-20 rounded-lg overflow-hidden border border-gray-300 dark:border-gray-600">
+                  <img 
+                    src={thumbnailUrl} 
+                    alt="Thumbnail preview" 
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23f3f4f6"/><text x="50" y="50" font-family="Arial" font-size="10" text-anchor="middle" dy=".3em" fill="%239ca3af">Invalid URL</text></svg>';
+                    }}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* توضیحات */}
+          <div className="space-y-2">
+            <label className="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white">
+              <FileText className="h-4 w-4 text-amber-500" />
+              توضیحات ویدیو (اختیاری)
+            </label>
+            <textarea 
+              id="description" 
+              value={description} 
+              onChange={(e) => setDescription(e.target.value)} 
+              className="w-full p-4 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all min-h-[100px]"
+              placeholder="توضیحات مختصر درباره محتوای ویدیو..."
+              rows={3}
+            />
+          </div>
+
+          {/* سطح ویدیو */}
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-900 dark:text-white">
+              سطح ویدیو
+            </label>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
+              {videoLevels.map((lvl) => (
+                <button
+                  key={lvl}
+                  type="button"
+                  onClick={() => setLevel(lvl)}
+                  className={`p-3 rounded-xl border-2 transition-all ${
+                    level === lvl 
+                      ? 'bg-gradient-to-br from-blue-500 to-indigo-600 text-white border-blue-500 shadow-lg' 
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:border-blue-400 dark:hover:border-blue-500'
+                  }`}
+                >
+                  <div className="text-lg font-bold">{lvl}</div>
+                  <div className="text-xs mt-1">
+                    {lvl === 'A1' ? 'مبتدی' :
+                     lvl === 'A2' ? 'مقدماتی' :
+                     lvl === 'B1' ? 'متوسط' :
+                     lvl === 'B2' ? 'بالاتر از متوسط' :
+                     lvl === 'C1' ? 'پیشرفته' : 'مسلط'}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* لغات */}
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-900 dark:text-white">
+              لغت‌ها و عبارت‌های مهم
+            </label>
+            <textarea
+              id="vocabulary"
+              value={vocabularyText}
+              onChange={(e) => setVocabularyText(e.target.value)}
+              className="w-full p-4 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all min-h-[120px]"
+              placeholder="Hello|سلام
+World|جهان
+How are you?|حالت چطوره؟
+Good morning|صبح بخیر
+Thank you|ممنون"
+            />
+            <div className="text-xs text-gray-500 dark:text-gray-400 space-y-1">
+              <p>• هر خط یک لغت (فرمت: انگلیسی|فارسی)</p>
+              <p>• از کاراکتر | برای جدا کردن انگلیسی و فارسی استفاده کنید</p>
+              <p>• مثال: <code className="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded">Hello|سلام</code></p>
+            </div>
+          </div>
+
+          {/* زیرنویس */}
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-900 dark:text-white">
+              زیرنویس (فرمت VTT)
+            </label>
+            <textarea 
+              id="subtitles" 
+              value={subtitlesText} 
+              onChange={(e) => setSubtitlesText(e.target.value)} 
+              className="w-full p-4 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all min-h-[200px]"
+              placeholder="WEBVTT
+
+00:00:00.000 --> 00:00:03.500
+Hello, how are you?
+سلام، حال شما چطور است؟
+
+00:00:03.500 --> 00:00:06.000
+I am fine, thank you.
+من خوبم، ممنون.
+
+00:00:06.000 --> 00:00:09.000
+What is your name?
+اسم شما چیست؟"
+              required 
+            />
+            <div className="text-xs text-gray-500 dark:text-gray-400 space-y-1">
+              <p>• فرمت استاندارد VTT را رعایت کنید</p>
+              <p>• هر بخش شامل: زمان‌بندی + خط انگلیسی + خط فارسی</p>
+              <p>• حتماً با <code className="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded">WEBVTT</code> شروع شود</p>
+            </div>
+          </div>
+
+          {/* دکمه ارسال */}
+          <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+            <button 
+              type="submit" 
+              disabled={isSubmitting}
+              className="w-full py-4 px-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3 disabled:cursor-not-allowed"
+            >
+              {isSubmitting ? (
+                <>
+                  <div className="h-5 w-5 animate-spin rounded-full border-2 border-solid border-white border-t-transparent"></div>
+                  در حال آپلود...
+                </>
+              ) : (
+                <>
+                  <Upload className="h-5 w-5" />
+                  آپلود ویدیو
+                </>
+              )}
+            </button>
+          </div>
+
+          {/* پیام وضعیت */}
+          {message && (
+            <div className={`p-4 rounded-xl border ${
+              message.includes('✅') 
+                ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 text-green-700 dark:text-green-300' 
+                : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-700 dark:text-red-300'
+            }`}>
+              <div className="flex items-center gap-2">
+                {message.includes('✅') ? '✅' : '❌'}
+                <p>{message}</p>
+              </div>
+            </div>
+          )}
+        </form>
       </div>
-      <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-        Upload Video
-      </button>
-      {message && <p className={`mt-4 ${message.includes('Error') ? 'text-red-600' : 'text-green-600'}`}>{message}</p>}
-    </form>
+    </div>
   );
 }

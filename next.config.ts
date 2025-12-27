@@ -52,10 +52,18 @@ const nextConfig = {
         pathname: '/**',
       },
   
-      // {
-      //   protocol: 'https',
-      //   hostname: 'images.unsplash.com',
-      // },
+      {
+        protocol: 'http',
+        hostname: 'zabanion.ir',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'zabanion.ir',
+        port: '',
+        pathname: '/**',
+      },
 
     ],
   },

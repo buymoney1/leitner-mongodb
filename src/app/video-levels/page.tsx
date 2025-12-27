@@ -308,24 +308,7 @@ export default function VideoLevelsPage() {
                                   {video.title}
                                 </h3>
                                 
-                                {/* Stats */}
-                                <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-                                  <div className="flex items-center gap-3">
-                                    <div className="flex items-center gap-1">
-                                      <Users className="h-3 w-3" />
-                                      <span>{Math.floor(Math.random() * 100) + 50}</span>
-                                    </div>
-                                    <div className="flex items-center gap-1">
-                                      <Star className="h-3 w-3" />
-                                      <span>۴.۸</span>
-                                    </div>
-                                  </div>
-                                  
-                                  <div className="flex items-center gap-1">
-                                    <Clock className="h-3 w-3" />
-                                    <span>{video.duration || '۱۵:۳۰'}</span>
-                                  </div>
-                                </div>
+                        
                               </div>
                             </div>
                           </Link>

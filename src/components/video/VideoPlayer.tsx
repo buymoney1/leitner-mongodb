@@ -1,6 +1,7 @@
 "use client";
 import ReactPlayer from "react-player/lazy";
 import { useState, useRef, useEffect } from "react";
+import { useParams, useRouter } from 'next/navigation';
 import { parseVTT } from "@/utils";
 import { PlayerState, Subtitle, SubtitleSettings, VideoQuality, Vocabulary } from "../../../types";
 import PlayerControls from "../PlayerControls";
@@ -10,9 +11,24 @@ import SubtitleList from "../SubtitleList";
 import TabBar from "../TabBar";
 import VideoSubtitles from "../VideoSubtitles";
 import VocabularyList from "./VocabularyList";
+import { ArrowLeft, Play, AlertCircle } from 'lucide-react';
 
+interface VideoData {
+  id: string;
+  title: string;
+  description: string | null;
+  videoUrl: string;
+  thumbnailUrl: string | null;
+  level: string;
+  subtitlesVtt: string | null;
+  vocabularies: Vocabulary[];
+}
 
 export default function VideoPlayer() {
+  const params = useParams();
+  const router = useRouter();
+  const videoId = params.videoId as string;
+  
   // --- State ---
   const [playerState, setPlayerState] = useState<PlayerState>({
     playing: false,
@@ -23,8 +39,13 @@ export default function VideoPlayer() {
     videoHeight: 0
   });
 
+  const [showFullDescription, setShowFullDescription] = useState(false);
+
   const [subtitles, setSubtitles] = useState<Subtitle[]>([]);
   const [activeSubtitle, setActiveSubtitle] = useState<Subtitle | null>(null);
+  const [videoData, setVideoData] = useState<VideoData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
   const [subtitleSettings, setSubtitleSettings] = useState<SubtitleSettings>({
     mode: "both",
@@ -49,17 +70,77 @@ export default function VideoPlayer() {
 
   // --- Effects ---
   useEffect(() => {
-    fetch("/subs/text.vtt")
-      .then(r => r.text())
-      .then(content => setSubtitles(parseVTT(content)))
-      .catch(e => console.error("Error loading subs:", e));
+    const fetchVideoData = async () => {
+      try {
+        setLoading(true);
+        console.log('Fetching video data for ID:', videoId);
+        
+        const response = await fetch(`/api/videos/${videoId}`);
+        console.log('API Response status:', response.status);
+        
+        if (!response.ok) {
+          if (response.status === 404) {
+            throw new Error('ویدیو یافت نشد');
+          }
+          throw new Error(`خطا در دریافت ویدیو: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('Video data received:', data);
+        
+        if (!data || !data.id) {
+          throw new Error('داده‌های ویدیو نامعتبر است');
+        }
+        
+        setVideoData(data);
+        
+        // بارگذاری زیرنویس از دیتابیس
+        if (data.subtitlesVtt) {
+          console.log('Parsing subtitles...');
+          try {
+            const parsedSubtitles = parseVTT(data.subtitlesVtt);
+            console.log('Subtitles parsed:', parsedSubtitles.length, 'entries');
+            setSubtitles(parsedSubtitles);
+          } catch (parseError) {
+            console.error('Error parsing subtitles:', parseError);
+            // اگر زیرنویس مشکل داشت، لیست خالی بگذار
+            setSubtitles([]);
+          }
+        } else {
+          console.log('No subtitles available for this video');
+          setSubtitles([]);
+        }
+        
+        // بارگذاری لغات از دیتابیس
+        if (data.vocabularies && data.vocabularies.length > 0) {
+          console.log('Vocabularies found:', data.vocabularies.length);
+          const formattedVocabularies: Vocabulary[] = data.vocabularies.map((vocab: any) => ({
+            id: vocab.id,
+            word: vocab.word,
+            meaning: vocab.meaning,
+            videoId: vocab.videoId
+          }));
+          setVocabularies(formattedVocabularies);
+        } else {
+          console.log('No vocabularies available for this video');
+          setVocabularies([]);
+        }
+        
+      } catch (error) {
+        console.error("Error loading video:", error);
+        setError(error instanceof Error ? error.message : 'خطا در بارگذاری ویدیو');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    // بارگذاری لغات ذخیره شده از localStorage (موقت)
-    const savedVocabularies = localStorage.getItem('videoPlayerVocabularies');
-    if (savedVocabularies) {
-      setVocabularies(JSON.parse(savedVocabularies));
+    if (videoId) {
+      fetchVideoData();
+    } else {
+      setError('شناسه ویدیو نامعتبر است');
+      setLoading(false);
     }
-  }, []);
+  }, [videoId]);
 
   useEffect(() => {
     const handleFullScreenChange = () => 
@@ -85,11 +166,6 @@ export default function VideoPlayer() {
     
     return () => window.removeEventListener('resize', updateVideoHeight);
   }, []);
-
-  // ذخیره لغات در localStorage هنگام تغییر
-  useEffect(() => {
-    localStorage.setItem('videoPlayerVocabularies', JSON.stringify(vocabularies));
-  }, [vocabularies]);
 
   // --- Handlers ---
   const toggleFullScreen = () => {
@@ -118,8 +194,10 @@ export default function VideoPlayer() {
   };
 
   const handleSubtitleJump = (time: number) => {
-    playerRef.current?.seekTo(time, 'seconds');
-    setPlayerState(prev => ({ ...prev, playing: true }));
+    if (playerRef.current) {
+      playerRef.current.seekTo(time, 'seconds');
+      setPlayerState(prev => ({ ...prev, playing: true }));
+    }
   };
 
   const handleWordClick = (word: string) => {
@@ -199,6 +277,79 @@ export default function VideoPlayer() {
     setSelectedWord(null);
   };
 
+  // نمایش loading
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white dark:bg-gray-900 flex flex-col items-center justify-center p-4">
+        <div className="text-center">
+          <div className="h-16 w-16 animate-spin rounded-full border-4 border-solid border-cyan-500 border-t-transparent mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">در حال بارگذاری ویدیو...</p>
+      </div>
+      </div>
+    );
+  }
+
+  // نمایش خطا
+  if (error || !videoData) {
+    return (
+      <div className="min-h-screen bg-white dark:bg-gray-900 flex flex-col items-center justify-center p-4">
+        <div className="text-center max-w-md">
+          <div className="bg-red-100 dark:bg-red-900/30 rounded-full p-4 w-16 h-16 flex items-center justify-center mx-auto mb-4">
+            <AlertCircle className="w-8 h-8 text-red-600 dark:text-red-400" />
+          </div>
+          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+            {error || 'ویدیو یافت نشد'}
+          </h3>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">
+            متأسفانه ویدیو مورد نظر در دسترس نیست یا حذف شده است.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <button
+              onClick={() => router.back()}
+              className="inline-flex items-center justify-center gap-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-6 py-3 rounded-lg transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5" />
+              بازگشت
+            </button>
+            <button
+              onClick={() => router.push('/video-levels')}
+              className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white px-6 py-3 rounded-lg transition-all duration-300"
+            >
+              <Play className="w-5 h-5" />
+              لیست ویدیوها
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // اگر ویدیو URL ندارد
+  if (!videoData.videoUrl) {
+    return (
+      <div className="min-h-screen bg-white dark:bg-gray-900 flex flex-col items-center justify-center p-4">
+        <div className="text-center max-w-md">
+          <div className="bg-yellow-100 dark:bg-yellow-900/30 rounded-full p-4 w-16 h-16 flex items-center justify-center mx-auto mb-4">
+            <AlertCircle className="w-8 h-8 text-yellow-600 dark:text-yellow-400" />
+          </div>
+          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+            لینک ویدیو موجود نیست
+          </h3>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">
+            برای این ویدیو لینک پخش تنظیم نشده است.
+          </p>
+          <button
+            onClick={() => router.push('/video-levels')}
+            className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white px-6 py-3 rounded-lg transition-all duration-300"
+          >
+            <Play className="w-5 h-5" />
+            لیست ویدیوها
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full max-w-[900px] mx-auto font-sans bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100" dir="rtl">
       
@@ -222,7 +373,7 @@ export default function VideoPlayer() {
 
             <ReactPlayer
               ref={playerRef}
-              url="/test-video.mp4"
+              url={videoData.videoUrl}
               playing={playerState.playing}
               controls={false}
               width="100%"
@@ -251,7 +402,9 @@ export default function VideoPlayer() {
               onPlayPause={() => updatePlayerState({ playing: !playerState.playing })}
               onSeek={(time) => {
                 updatePlayerState({ currentTime: time });
-                playerRef.current?.seekTo(time, 'seconds');
+                if (playerRef.current) {
+                  playerRef.current.seekTo(time, 'seconds');
+                }
               }}
               onFullScreen={toggleFullScreen}
               onShowSettings={() => setShowSettings(true)}
@@ -290,6 +443,44 @@ export default function VideoPlayer() {
 
       {/* محتوای پایین */}
       <div className="px-4 pt-4 dark:bg-gray-900">
+        {/* اطلاعات ویدیو */}
+        <div className="mb-6">
+       
+{/* بخش توضیحات */}
+<div className="mt-4 mb-4">
+  <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+    <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+      {videoData.title}
+    </h1>
+
+    {/* توضیحات متغیر */}
+    {videoData.description ? (
+      <div className="relative">
+        <p className={`text-sm text-gray-700 dark:text-gray-300 mb-2 ${!showFullDescription ? 'line-clamp-2' : ''}`}>
+          {videoData.description}
+        </p>
+        {videoData.description.length > 100 && (
+          <button
+            onClick={() => setShowFullDescription(!showFullDescription)}
+            className="text-blue-600 dark:text-blue-400 text-sm font-medium hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
+          >
+            {showFullDescription ? 'بستن' : 'مشاهده بیشتر'}
+          </button>
+        )}
+      </div>
+    ) : (
+      <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
+        این ویدیوی آموزشی سطح {videoData.level} به شما کمک می‌کند تا مهارت‌های زبان خود را تقویت کنید. 
+        با مشاهده این ویدیو و تمرین لغات ارائه شده، می‌توانید درک شنیداری و دایره لغات خود را بهبود بخشید.
+      </p>
+    )}
+    
+
+
+  </div>
+</div>
+        </div>
+
         <TabBar
           activeTab={activeTab}
           vocabularyCount={vocabularies.length}
@@ -308,7 +499,8 @@ export default function VideoPlayer() {
             />
           ) : (
             <VocabularyList
-
+              vocabularies={vocabularies}
+              onRemoveWord={handleRemoveWord}
             />
           )}
         </div>
