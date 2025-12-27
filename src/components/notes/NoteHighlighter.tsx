@@ -234,7 +234,7 @@ export default function NoteHighlighter({
           color
         });
         
-        toast.success('متن با موفقیت هایلایت شد');
+     
       } catch (error) {
         toast.error('خطا در هایلایت کردن متن');
       }

@@ -3,10 +3,33 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Play, Star, Target, TrendingUp, Users, Clock, Upload } from 'lucide-react';
+import { Play, Star, Target, TrendingUp, Users, Clock, Upload, ChevronLeft } from 'lucide-react';
 import { useSession } from 'next-auth/react';
+import Image from 'next/image';
 
-const videoLevels = [
+interface Video {
+  id: string;
+  title: string;
+  level: string;
+  thumbnailUrl: string | null;
+  duration: string | null;
+  createdAt: Date;
+}
+
+interface VideoLevel {
+  level: string;
+  title: string;
+  description: string;
+  color: string;
+  iconColor: string;
+  bgColor: string;
+  borderColor: string;
+  estimatedTime: string;
+  wordCount: string;
+  learners: string;
+}
+
+const videoLevels: VideoLevel[] = [
   {
     level: 'A1',
     title: 'مبتدی',
@@ -81,20 +104,68 @@ const videoLevels = [
   }
 ];
 
+async function fetchVideosByLevel(level: string): Promise<Video[]> {
+  try {
+    const response = await fetch(`/api/videos/level/${level}?limit=4`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch videos');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error(`Error fetching videos for level ${level}:`, error);
+    return [];
+  }
+}
+
+function getLevelInfo(level: string) {
+  const levels: Record<string, { bgColor: string }> = {
+    'A1': { bgColor: 'bg-gradient-to-r from-green-500 to-emerald-600' },
+    'A2': { bgColor: 'bg-gradient-to-r from-blue-500 to-cyan-600' },
+    'B1': { bgColor: 'bg-gradient-to-r from-purple-500 to-violet-600' },
+    'B2': { bgColor: 'bg-gradient-to-r from-orange-500 to-amber-600' },
+    'C1': { bgColor: 'bg-gradient-to-r from-red-500 to-pink-600' },
+    'C2': { bgColor: 'bg-gradient-to-r from-gray-500 to-slate-600' }
+  };
+  return levels[level] || { bgColor: 'bg-gradient-to-r from-gray-500 to-slate-600' };
+}
+
 export default function VideoLevelsPage() {
   const { data: session, status } = useSession();
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [videosByLevel, setVideosByLevel] = useState<Record<string, Video[]>>({});
+  const [loadingVideos, setLoadingVideos] = useState(true);
 
   useEffect(() => {
     if (status === 'loading') return;
     
-    // بررسی اینکه آیا کاربر ادمین است
     if (session?.user?.role === 'admin') {
       setIsAdmin(true);
     }
     setIsLoading(false);
   }, [session, status]);
+
+  useEffect(() => {
+    const loadVideos = async () => {
+      setLoadingVideos(true);
+      const promises = videoLevels.map(async (level) => {
+        const videos = await fetchVideosByLevel(level.level);
+        return { level: level.level, videos };
+      });
+
+      const results = await Promise.all(promises);
+      const videosMap: Record<string, Video[]> = {};
+      
+      results.forEach(result => {
+        videosMap[result.level] = result.videos;
+      });
+
+      setVideosByLevel(videosMap);
+      setLoadingVideos(false);
+    };
+
+    loadVideos();
+  }, []);
 
   if (status === 'loading' || isLoading) {
     return (
@@ -110,7 +181,6 @@ export default function VideoLevelsPage() {
   return (
     <div className="overflow-x-hidden"> 
       <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300 py-8 px-4 sm:px-6 lg:px-8 relative">
-
         {/* Grid background */}
         <div className="fixed inset-0 bg-[linear-gradient(rgba(0,0,0,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.02)_1px,transparent_1px)] dark:bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,black,transparent)] pointer-events-none"></div>
 
@@ -122,9 +192,14 @@ export default function VideoLevelsPage() {
 
         <div className="relative z-10 max-w-7xl mx-auto">
           
-          {/* دکمه آپلود فقط برای ادمین */}
-          {isAdmin && (
-            <div className="mb-8">
+          {/* Header */}
+          <div className="mb-10 flex justify-between mb-8 ">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+              سطوح آموزشی ویدیوها
+            </h1>
+     {/* دکمه آپلود فقط برای ادمین */}
+     {isAdmin && (
+            <div className=" flex justify-end">
               <Link 
                 href="/admin/upload-video"
                 className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
@@ -132,19 +207,153 @@ export default function VideoLevelsPage() {
                 <Upload className="w-5 h-5" />
                 آپلود ویدیو جدید
               </Link>
-
             </div>
           )}
+          </div>
 
+       
 
           {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+
+          {/* Levels Grid با ویدیوهای افقی */}
+          <div className="space-y-12">
+            {videoLevels.map((level) => {
+              const videos = videosByLevel[level.level] || [];
+              const levelInfo = getLevelInfo(level.level);
+              
+              return (
+                <div key={level.level} className="space-y-4">
+                  {/* Level Header */}
+                  <div className="flex items-center justify-between mt-3">
+                    <div className="flex items-center gap-3">
+                      <div className={`p-2 rounded-lg bg-gradient-to-br ${level.color} shadow-md`}>
+                        <Target className="h-5 w-5 text-white" />
+                      </div>
+                      <div>
+                        <div className={`text-xl font-bold bg-gradient-to-r ${level.color} bg-clip-text text-transparent`}>
+                          {level.level}
+                        </div>
+                        <div className="text-xs text-gray-900 dark:text-white font-semibold">
+                          {level.title}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <Link 
+                      href={`/videos-by-level/${level.level}`}
+                      className="flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
+                    >
+                      مشاهده همه
+                      <ChevronLeft className="h-4 w-4" />
+                    </Link>
+                  </div>
+
+                  {/* Videos Horizontal Scroll */}
+                  {loadingVideos ? (
+                    <div className="flex gap-4 overflow-x-auto pb-4">
+                      {[1, 2, 3, 4].map((i) => (
+                        <div key={i} className="flex-shrink-0 w-72">
+                          <div className="relative overflow-hidden rounded-xl border border-gray-300 dark:border-gray-700/50 bg-gray-100 dark:bg-gray-800/50 animate-pulse">
+                            <div className="aspect-video bg-gray-300 dark:bg-gray-700"></div>
+                            <div className="p-4">
+                              <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded mb-2"></div>
+                              <div className="h-3 bg-gray-300 dark:bg-gray-700 rounded w-3/4"></div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : videos.length > 0 ? (
+                    <div className="relative">
+                      <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+                        {videos.map((video) => (
+                          <Link 
+                            key={video.id} 
+                            href={`/video/${video.id}`}
+                            className="flex-shrink-0 w-72 group"
+                          >
+                            <div className="relative overflow-hidden rounded-xl border border-gray-300 dark:border-gray-700/50 bg-white dark:bg-gray-800/50 transition-all duration-300 group-hover:shadow-lg dark:group-hover:shadow-gray-800/50 group-hover:border-gray-400 dark:group-hover:border-gray-600 h-full">
+                              {/* Thumbnail */}
+                              <div className="relative aspect-video overflow-hidden bg-gradient-to-br from-gray-300 to-gray-400 dark:from-gray-700 dark:to-gray-800">
+                                {video.thumbnailUrl ? (
+                                  <Image 
+                                    src={video.thumbnailUrl} 
+                                    alt={video.title}
+                                    width={400}
+                                    height={225}
+                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                  />
+                                ) : (
+                                  <div className="absolute inset-0 flex items-center justify-center">
+                                    <Play className="h-12 w-12 text-gray-500 dark:text-gray-400 group-hover:text-white/70 transition-colors" />
+                                  </div>
+                                )}
+                                
+                                {/* Duration badge */}
+                                {video.duration && (
+                                  <div className="absolute bottom-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
+                                    {video.duration}
+                                  </div>
+                                )}
+                                
+                                {/* Level badge */}
+                                <div className={`absolute top-2 right-2 ${levelInfo.bgColor} text-white px-2 py-1 rounded text-xs font-semibold`}>
+                                  {video.level}
+                                </div>
+                              </div>
+                              
+                              {/* Content */}
+                              <div className="p-4">
+                                <h3 className="text-sm font-medium text-gray-900 dark:text-white line-clamp-2 mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                                  {video.title}
+                                </h3>
+                                
+                                {/* Stats */}
+                                <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+                                  <div className="flex items-center gap-3">
+                                    <div className="flex items-center gap-1">
+                                      <Users className="h-3 w-3" />
+                                      <span>{Math.floor(Math.random() * 100) + 50}</span>
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                      <Star className="h-3 w-3" />
+                                      <span>۴.۸</span>
+                                    </div>
+                                  </div>
+                                  
+                                  <div className="flex items-center gap-1">
+                                    <Clock className="h-3 w-3" />
+                                    <span>{video.duration || '۱۵:۳۰'}</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 bg-gray-50/50 dark:bg-gray-800/30 rounded-xl border border-dashed border-gray-300 dark:border-gray-700">
+                      <p className="text-gray-500 dark:text-gray-400">
+                        هنوز ویدیویی برای این سطح اضافه نشده است
+                      </p>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 mt-8 ">
             <div className="bg-gray-100 dark:bg-gray-800/30 rounded-2xl p-4 border border-gray-300 dark:border-gray-700/50 backdrop-blur-sm text-center">
               <div className="text-xl font-bold text-cyan-600 dark:text-cyan-400 mb-1">6</div>
               <div className="text-gray-600 dark:text-gray-400 text-sm">سطح مختلف</div>
             </div>
             <div className="bg-gray-100 dark:bg-gray-800/30 rounded-2xl p-4 border border-gray-300 dark:border-gray-700/50 backdrop-blur-sm text-center">
-              <div className="text-xl font-bold text-purple-600 dark:text-purple-400 mb-1">100+</div>
+              <div className="text-xl font-bold text-purple-600 dark:text-purple-400 mb-1">
+                {Object.values(videosByLevel).flat().length}
+              </div>
               <div className="text-gray-600 dark:text-gray-400 text-sm">ویدیو آموزشی</div>
             </div>
             <div className="bg-gray-100 dark:bg-gray-800/30 rounded-2xl p-4 border border-gray-300 dark:border-gray-700/50 backdrop-blur-sm text-center">
@@ -157,63 +366,7 @@ export default function VideoLevelsPage() {
             </div>
           </div>
 
-          {/* Levels */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {videoLevels.map((level) => (
-              <Link key={level.level} href={`/videos-by-level/${level.level}`} className="group block">
-                <div className="relative overflow-hidden rounded-2xl border border-gray-300 dark:border-gray-700/50 bg-white dark:bg-gray-800/50 bg-gradient-to-br from-white to-gray-50/80 dark:from-gray-800/50 dark:to-gray-900/30 backdrop-blur-xl p-6 transition-all duration-500 group-hover:scale-105 group-hover:shadow-xl dark:group-hover:shadow-2xl h-full">
 
-                  {/* Hover border glow (fixed inset) */}
-                  <div className={`absolute inset-0 bg-gradient-to-r ${level.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300 rounded-2xl scale-110`}></div>
-
-                  {/* Content */}
-                  <div className="relative z-10">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex items-center gap-3">
-                        <div className={`p-3 rounded-xl bg-gradient-to-br ${level.color} shadow-lg`}>
-                          <Target className={`h-6 w-6 ${level.iconColor}`} />
-                        </div>
-                        <div>
-                          <div className={`text-2xl font-bold bg-gradient-to-r ${level.color} bg-clip-text text-transparent`}>
-                            {level.level}
-                          </div>
-                          <div className="text-gray-900 dark:text-white font-semibold text-lg">{level.title}</div>
-                        </div>
-                      </div>
-                      <div className={`w-2 h-2 rounded-full bg-gradient-to-r ${level.color} mt-2`}></div>
-                    </div>
-
-                    <p className="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">{level.description}</p>
-
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-                        <Clock className="h-4 w-4" />
-                        <span>مدت زمان: {level.estimatedTime}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-                        <Star className="h-4 w-4" />
-                        <span>دایره لغات: {level.wordCount}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-                        <Users className="h-4 w-4" />
-                        <span>{level.learners}</span>
-                      </div>
-                    </div>
-
-                    <div className="mt-6 pt-4 border-t border-gray-300 dark:border-gray-700/50">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-500 dark:text-gray-400">شروع یادگیری</span>
-                        <div className={`p-2 rounded-lg ${level.bgColor} border ${level.borderColor} group-hover:scale-110 transition-transform duration-300`}>
-                          <Play className={`h-4 w-4 ${level.iconColor}`} />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                </div>
-              </Link>
-            ))}
-          </div>
 
           {/* Footer CTA */}
           <div className="mt-16 mb-20 text-center">

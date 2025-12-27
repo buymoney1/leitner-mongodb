@@ -3,7 +3,8 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { BookOpen,Notebook, Brain, Plus, Play, Home, Video, Settings, Mic, Music, User, Map, FileText, Trash2 } from "lucide-react";
+import { BookOpen,Notebook,User2, Brain, Plus, Play, Home, Video, Settings, Mic, Music, User, Map, FileText, Trash2 } from "lucide-react";
+
 
 
 
@@ -25,6 +26,7 @@ export function DashboardClient({ userName, userRole }: DashboardClientProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'overview' | 'videos' | 'manage'>('overview');
   const [isMobile, setIsMobile] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -32,6 +34,13 @@ export function DashboardClient({ userName, userRole }: DashboardClientProps) {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  useEffect(() => {
+    // بررسی role کاربر
+    if (userRole === 'admin') {
+      setIsAdmin(true);
+    }
+  }, [userRole]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -114,7 +123,6 @@ export function DashboardClient({ userName, userRole }: DashboardClientProps) {
             <h3 className="whitespace-nowrap font-semibold text-gray-900 dark:text-white mb-1 text-[12px] line-clamp-1">
               {label}
             </h3>
-
           </div>
         </div>
         
@@ -123,11 +131,22 @@ export function DashboardClient({ userName, userRole }: DashboardClientProps) {
     </Link>
   );
 
-
-
- 
-  const quickActions = [
-
+  // تعریف quick actions پایه برای همه کاربران
+  const baseQuickActions = [
+    {
+      href: "/profile",
+      icon: User2, 
+      label: "پروفایل کاربری",
+      description: "پروفایل کاربری",
+      color: {
+        border: "border-lime-500/20",
+        bg: "from-lime-500/10 to-green-600/5",
+        iconBg: "bg-lime-500/20",
+        icon: "text-lime-600 dark:text-lime-400",
+        dot: "bg-lime-500",
+        glow: "bg-lime-500"
+      }
+    },
     {
       href: "/journey",
       icon: Map, 
@@ -254,7 +273,6 @@ export function DashboardClient({ userName, userRole }: DashboardClientProps) {
         glow: "bg-fuchsia-500"
       }
     },
-  
     {
       href: "/add-card",
       icon: Plus,
@@ -285,14 +303,35 @@ export function DashboardClient({ userName, userRole }: DashboardClientProps) {
     }
   ];
 
-  
+  // تعریف quick actions مخصوص ادمین
+  const adminQuickActions = [
+    {
+      href: "/admin/users",
+      icon: User, 
+      label: "مدیریت کاربران",
+      description: "مشاهده و مدیریت کاربران",
+      color: {
+        border: "border-cyan-500/20",
+        bg: "from-cyan-500/10 to-blue-600/5",
+        iconBg: "bg-cyan-500/20",
+        icon: "text-cyan-600 dark:text-cyan-400",
+        dot: "bg-cyan-500",
+        glow: "bg-cyan-500"
+      }
+    }
+  ];
+
+  // ترکیب actions بر اساس نقش کاربر
+  const quickActions = isAdmin 
+    ? [...baseQuickActions, ...adminQuickActions]
+    : baseQuickActions;
+
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white pb-20 md:pb-0 transition-colors duration-300">
       {/* Background Effects */}
       <div className="fixed inset-0 bg-[linear-gradient(rgba(0,0,0,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.02)_1px,transparent_1px)] dark:bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,black,transparent)]"></div>
       
       <div className="relative z-10">
-
         {/* Header */}
         <div className="p-4 pb-1">
           <div className="flex items-center justify-between">
@@ -305,19 +344,15 @@ export function DashboardClient({ userName, userRole }: DashboardClientProps) {
           </div>
         </div>
 
-        {/* Desktop Tabs */}
-        {/* ... existing desktop tabs code ... */}
-
         {/* Tab Content */}
         <div className="px-3 md:px-6">
           {activeTab === 'overview' && (
             <div className="space-y-6">
               {/* Quick Actions Grid */}
               <section>
-                <div className=" grid grid-cols-3 gap-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+                <div className="grid grid-cols-3 gap-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
                   {quickActions.map((action, index) => (
                     <QuickActionButton
-                   
                       key={index}
                       href={action.href}
                       icon={action.icon}
@@ -330,12 +365,8 @@ export function DashboardClient({ userName, userRole }: DashboardClientProps) {
               </section>
             </div>
           )}
-
         </div>
-
       </div>
-     
-
     </div>
   );
 }

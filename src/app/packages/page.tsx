@@ -374,7 +374,7 @@ export default function PackagesPage() {
         
         {/* دکمه واتساپ - با شماره شما */}
         <a 
-          href="https://wa.me/98939351743?text=سلام%20👋%0Aدر%20مورد%20پکیج%20های%20اشتراکی%20سوال%20دارم%20لطفا%20راهنمایی%20کنید."
+          href="https://wa.me/989398351743?text=سلام%20👋%0Aدر%20مورد%20پکیج%20های%20اشتراکی%20سوال%20دارم%20لطفا%20راهنمایی%20کنید."
           target="_blank"
           rel="noopener noreferrer"
           className="mt-4 inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl hover:from-green-600 hover:to-green-700 transition-all shadow-md hover:shadow-lg"

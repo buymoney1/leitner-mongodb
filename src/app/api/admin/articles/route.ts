@@ -5,12 +5,11 @@ import { getAuthSession } from '../../../../../lib/server-auth';
 // GET - لیست مقالات برای ادمین
 export async function GET(request: Request) {
   try {
-    const session = await getAuthSession();
-
-    if (!session?.user?.id || session.user.role !== 'admin') {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+   const session = await getAuthSession();
+    
+    if (!session?.user?.id) {
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
-
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');

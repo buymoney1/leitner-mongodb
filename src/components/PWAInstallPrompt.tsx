@@ -196,32 +196,6 @@ export function PWAInstallPrompt() {
           با نصب اپ، بدون نیاز به مرورگر و با سرعت بیشتر به تمام محتواهای آموزشی دسترسی داشته باشید.
         </p>
 
-        <div className="grid grid-cols-2 gap-2 mb-4">
-          <div className="flex items-center gap-2 text-xs bg-white/10 p-2 rounded-lg">
-            <div className="w-6 h-6 bg-white/20 rounded flex items-center justify-center">
-              <span className="text-xs">⚡</span>
-            </div>
-            <span>سرعت بیشتر</span>
-          </div>
-          <div className="flex items-center gap-2 text-xs bg-white/10 p-2 rounded-lg">
-            <div className="w-6 h-6 bg-white/20 rounded flex items-center justify-center">
-              <span className="text-xs">📂</span>
-            </div>
-            <span>دسترسی آفلاین</span>
-          </div>
-          <div className="flex items-center gap-2 text-xs bg-white/10 p-2 rounded-lg">
-            <div className="w-6 h-6 bg-white/20 rounded flex items-center justify-center">
-              <span className="text-xs">🔔</span>
-            </div>
-            <span>نوتیفیکیشن</span>
-          </div>
-          <div className="flex items-center gap-2 text-xs bg-white/10 p-2 rounded-lg">
-            <div className="w-6 h-6 bg-white/20 rounded flex items-center justify-center">
-              <span className="text-xs">🎯</span>
-            </div>
-            <span>تجربه بهتر</span>
-          </div>
-        </div>
 
         <div className="flex flex-col sm:flex-row gap-2">
           <button
