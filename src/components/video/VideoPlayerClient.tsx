@@ -65,5 +65,5 @@ export default function VideoPlayerClient({ initialVideoData }: VideoPlayerClien
     onRemoveWord: handleRemoveWord
   };
 
-  return <VideoPlayer {...videoPlayerProps} />;
+  return <VideoPlayer />;
 }
