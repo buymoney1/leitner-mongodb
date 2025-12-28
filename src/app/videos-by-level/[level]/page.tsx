@@ -2,9 +2,22 @@
 import Link from 'next/link';
 import { PrismaClient } from '@prisma/client';
 import Image from 'next/image';
-import { ArrowRight, Play, Clock, Users, Star, ChevronLeft, ChevronDown } from 'lucide-react';
+import { 
+  ArrowRight, 
+  Play, 
+  Clock, 
+  Users, 
+  Star, 
+  ChevronLeft, 
+  ChevronDown,
+  Edit,
+  Trash2,
+  Eye
+} from 'lucide-react';
 
-const prisma = new PrismaClient();
+import DeleteVideoButton from '@/components/video/DeleteVideoButton';
+import { prisma } from '@/lib/prisma';
+import { getAuthSession } from '../../../../lib/server-auth';
 
 async function getVideosByLevel(level: string) {
   const videos = await prisma.video.findMany({
@@ -65,6 +78,8 @@ export default async function LevelVideosPage({ params }: { params: Promise<{ le
   const { level } = await params;
   const videos = await getVideosByLevel(level);
   const levelInfo = getLevelInfo(level);
+  const session = await getAuthSession();
+  const isAdmin = session?.user?.role === 'admin';
 
   const allLevels = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
 
@@ -86,20 +101,37 @@ export default async function LevelVideosPage({ params }: { params: Promise<{ le
                 href="/video-levels"
                 className="inline-flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors mb-3"
               >
-                بازگشت
                 <ChevronLeft className="h-4 w-4" />
-
+                بازگشت
               </Link>
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
                 ویدیوهای سطح {level}
               </h1>
- 
             </div>
-            
 
+            {/* مشاهده همه ویدیوها */}
+            <div className="flex items-center gap-4">
+              <Link 
+                href="/all-videos"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white rounded-lg font-medium transition-all duration-300 shadow-md hover:shadow-lg"
+              >
+                <Eye className="h-4 w-4" />
+                مشاهده همه ویدیوها
+              </Link>
+              
+              {isAdmin && (
+                <Link 
+                  href="/admin/upload-video"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white rounded-lg font-medium transition-all duration-300 shadow-md hover:shadow-lg"
+                >
+                  <Edit className="h-4 w-4" />
+                  آپلود ویدیو جدید
+                </Link>
+              )}
+            </div>
           </div>
 
-          {/* فیلتر سطوح - شبیه Airbnb */}
+          {/* فیلتر سطوح */}
           <div className="mb-8">
             <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 pb-4">
               <div className="flex items-center gap-4 overflow-x-auto scrollbar-hide">
@@ -117,8 +149,6 @@ export default async function LevelVideosPage({ params }: { params: Promise<{ le
                   </Link>
                 ))}
               </div>
-              
-
             </div>
           </div>
         </div>
@@ -127,68 +157,86 @@ export default async function LevelVideosPage({ params }: { params: Promise<{ le
         {videos.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {videos.map((video) => (
-              <Link key={video.id} href={`/video/${video.id}`} className="group block">
-                <div className="relative overflow-hidden rounded-xl border border-gray-300 dark:border-gray-700/50 bg-white dark:bg-gray-800/50 transition-all duration-300 group-hover:scale-105 group-hover:shadow-lg dark:group-hover:shadow-gray-800/50 group-hover:border-gray-400 dark:group-hover:border-gray-600 h-full">
-                  
-                  {/* Thumbnail */}
-                  <div className="relative aspect-video overflow-hidden">
-                    {video.thumbnailUrl ? (
-                      <Image 
-                        src={video.thumbnailUrl} 
-                        alt={video.title}
-                        width={400}
-                        height={225}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center">
-                        <Play className="h-12 w-12 text-gray-500 dark:text-gray-400 group-hover:text-white/70 transition-colors" />
-                      </div>
-                    )}
+              <div key={video.id} className="group relative">
+                {/* Action Buttons for Admin - در بالای کارت */}
+                {isAdmin && (
+                  <div className="absolute top-3 left-3 z-20 flex gap-2">
+                    <Link
+                      href={`/admin/edit-video/${video.id}`}
+                      className="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-lg shadow-lg transition-all duration-300 hover:scale-110"
+                      title="ویرایش ویدیو"
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Link>
                     
-                    {/* Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    
-                    {/* Play Button */}
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <div className="bg-white/20 dark:bg-white/20 backdrop-blur-sm rounded-full p-4 border border-white/30">
-                        <Play className="h-8 w-8 text-white fill-white" />
-                      </div>
-                    </div>
-
-                    {/* Level Badge */}
-                    <div className={`absolute top-3 right-3 ${levelInfo.bgColor} text-white px-2 py-1 rounded-lg text-xs font-semibold backdrop-blur-sm`}>
-                      {video.level}
-                    </div>
+                    {/* استفاده از کامپوننت client-side برای حذف */}
+                    <DeleteVideoButton videoId={video.id} />
                   </div>
+                )}
 
-                  {/* Content */}
-                  <div className="p-4">
-                    <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-2 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                      {video.title}
-                    </h3>
+                <Link href={`/video/${video.id}`} className="block">
+                  <div className="relative overflow-hidden rounded-xl border border-gray-300 dark:border-gray-700/50 bg-white dark:bg-gray-800/50 transition-all duration-300 group-hover:scale-105 group-hover:shadow-lg dark:group-hover:shadow-gray-800/50 group-hover:border-gray-400 dark:group-hover:border-gray-600 h-full">
                     
-                    {/* Stats */}
-                    <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-                      <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-1">
-                          <Users className="h-3 w-3" />
-                          <span>{Math.floor(Math.random() * 100) + 50}</span>
+                    {/* Thumbnail */}
+                    <div className="relative aspect-video overflow-hidden">
+                      {video.thumbnailUrl ? (
+                        <Image 
+                          src={video.thumbnailUrl} 
+                          alt={video.title}
+                          width={400}
+                          height={225}
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center">
+                          <Play className="h-12 w-12 text-gray-500 dark:text-gray-400 group-hover:text-white/70 transition-colors" />
                         </div>
-                        <div className="flex items-center gap-1">
-                          <Star className="h-3 w-3" />
-                          <span>۴.۸</span>
-                        </div>
-                      </div>
+                      )}
                       
-                      <div className="flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
-                        <span>۱۵:۳۰</span>
+                      {/* Overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                      
+                      {/* Play Button */}
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <div className="bg-white/20 dark:bg-white/20 backdrop-blur-sm rounded-full p-4 border border-white/30">
+                          <Play className="h-8 w-8 text-white fill-white" />
+                        </div>
+                      </div>
+
+                      {/* Level Badge */}
+                      <div className={`absolute top-3 right-3 ${levelInfo.bgColor} text-white px-2 py-1 rounded-lg text-xs font-semibold backdrop-blur-sm`}>
+                        {video.level}
+                      </div>
+                    </div>
+
+                    {/* Content */}
+                    <div className="p-4">
+                      <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-2 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                        {video.title}
+                      </h3>
+                      
+                      {/* Stats */}
+                      <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+                        <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-1">
+                            <Users className="h-3 w-3" />
+                            <span>{Math.floor(Math.random() * 100) + 50}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Star className="h-3 w-3" />
+                            <span>۴.۸</span>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          <span>۱۵:۳۰</span>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </Link>
+                </Link>
+              </div>
             ))}
           </div>
         ) : (
