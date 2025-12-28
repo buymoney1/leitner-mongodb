@@ -86,25 +86,17 @@ export default async function LevelVideosPage({ params }: { params: Promise<{ le
                 href="/video-levels"
                 className="inline-flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors mb-3"
               >
+                بازگشت
                 <ChevronLeft className="h-4 w-4" />
-                بازگشت به همه سطوح
+
               </Link>
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
                 ویدیوهای سطح {level}
               </h1>
-              <p className="text-gray-600 dark:text-gray-400 mt-2">
-                {levelInfo.description}
-              </p>
+ 
             </div>
             
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600 dark:text-gray-400">
-                تعداد ویدیوها:
-              </span>
-              <span className="text-lg font-bold text-gray-900 dark:text-white">
-                {videos.length}
-              </span>
-            </div>
+
           </div>
 
           {/* فیلتر سطوح - شبیه Airbnb */}
@@ -126,13 +118,7 @@ export default async function LevelVideosPage({ params }: { params: Promise<{ le
                 ))}
               </div>
               
-              {/* Sort dropdown placeholder */}
-              <div className="hidden sm:block">
-                <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:border-gray-400 dark:hover:border-gray-500 transition-colors">
-                  <span className="text-sm text-gray-700 dark:text-gray-300">مرتب‌سازی</span>
-                  <ChevronDown className="h-4 w-4" />
-                </button>
-              </div>
+
             </div>
           </div>
         </div>
