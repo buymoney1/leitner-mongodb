@@ -1,64 +1,93 @@
 // app/api/videos/level/[level]/route.ts
-import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient, VideoLevel } from '@prisma/client';
+import { NextResponse } from 'next/server';
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-// تعریف یک type guard برای بررسی معتبر بودن level
-function isValidVideoLevel(level: string): level is VideoLevel {
-  return Object.values(VideoLevel).includes(level as VideoLevel);
-}
-
 export async function GET(
-  request: NextRequest,
+  request: Request,
   { params }: { params: Promise<{ level: string }> }
 ) {
   try {
     const { level } = await params;
-    
-    // بررسی معتبر بودن level
-    if (!isValidVideoLevel(level)) {
-      return NextResponse.json(
-        { error: 'سطح ویدیو نامعتبر است' },
-        { status: 400 }
-      );
-    }
-
     const { searchParams } = new URL(request.url);
-    const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : undefined;
+    const limit = parseInt(searchParams.get('limit') || '4');
 
-    // حالا می‌توانیم از level به عنوان VideoLevel استفاده کنیم
-    const videos = await prisma.video.findMany({
-      where: { level: level }, // دیگر نیازی به type assertion نیست
-      orderBy: { createdAt: 'desc' },
-      take: limit,
+    console.log(`🔍 API Called: Fetching ${limit} videos for level ${level}`);
+
+    // لیست تمام ویدیوها برای دیباگ
+    const allVideos = await prisma.video.findMany({
       select: {
         id: true,
         title: true,
         level: true,
-        thumbnailUrl: true,
-        createdAt: true,
-        description: true, // اضافه کردن description
+        isPublished: true,
+        isSeries: true
       }
     });
-
-    // تبدیل createdAt به string برای serialization
-    const formattedVideos = videos.map(video => ({
-      ...video,
-      createdAt: video.createdAt.toISOString(),
-    }));
-
-    return NextResponse.json(formattedVideos);
-  } catch (error) {
-    console.error('Error fetching videos:', error);
     
-    // نمایش خطای دقیق‌تر
-    if (error instanceof Error) {
-      console.error('Error details:', error.message);
+    console.log('📊 All videos in database:', allVideos);
+    
+    // بررسی کنید آیا ویدیوها سطح دارند
+    const videosWithLevels = allVideos.filter(v => v.level);
+    console.log('🎯 Videos with levels:', videosWithLevels.length);
+    
+    const requestedLevelVideos = allVideos.filter(v => v.level === level);
+    console.log(`🎯 Videos with level ${level}:`, requestedLevelVideos.length);
+
+    // دریافت ویدیوهای منتشر شده برای سطح مورد نظر
+    const videos = await prisma.video.findMany({
+      where: { 
+        level: level as any,
+        isPublished: true 
+      },
+      select: {
+        id: true,
+        title: true,
+        level: true,
+        description: true,
+        thumbnailUrl: true,
+        coverImage: true,
+        isSeries: true,
+        totalSeasons: true,
+        totalEpisodes: true,
+        duration: true,
+        createdAt: true,
+      },
+      orderBy: {
+        createdAt: 'desc'
+      },
+      take: limit
+    });
+
+    console.log(`✅ Found ${videos.length} published videos for level ${level}:`, videos);
+
+    // اگر ویدیویی پیدا نشد، ویدیوهای منتشر نشده را هم نشان بده
+    if (videos.length === 0) {
+      const unpublished = await prisma.video.findMany({
+        where: { 
+          level: level as any,
+          isPublished: false 
+        },
+        select: {
+          id: true,
+          title: true,
+          level: true,
+          isPublished: true
+        }
+      });
+      
+      console.log(`📋 Unpublished videos for ${level}:`, unpublished);
     }
-    
+
+    return NextResponse.json(videos);
+  } catch (error) {
+    console.error('❌ Error fetching videos by level:', error);
     return NextResponse.json(
-      { error: 'خطا در دریافت ویدیوها' },
+      { 
+        error: 'خطا در دریافت ویدیوها',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
       { status: 500 }
     );
   }

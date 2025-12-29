@@ -2,7 +2,7 @@
 import { PrismaClient } from '@prisma/client';
 import { notFound, redirect } from 'next/navigation';
 import { getAuthSession } from '../../../../lib/server-auth';
-import VideoPlayerClient from '@/components/video/VideoPlayerClient';
+import VideoPlayer from '@/components/video/VideoPlayer';
 
 const prisma = new PrismaClient();
 
@@ -61,7 +61,36 @@ export default async function VideoPage({ params }: { params: Promise<{ videoId:
       notFound();
     }
 
-    return <VideoPlayerClient initialVideoData={videoData} />;
+    // آماده کردن داده برای VideoPlayer
+    const videoDataForPlayer = {
+      id: videoData.id,
+      title: videoData.title,
+      description: videoData.description,
+      videoUrl: videoData.videoUrl || '', // اگر videoUrl نداشت، رشته خالی بگذار
+      thumbnailUrl: videoData.thumbnailUrl,
+      level: videoData.level,
+      subtitlesVtt: videoData.subtitlesVtt,
+      vocabularies: videoData.vocabularies.map(v => ({
+        id: v.id,
+        word: v.word,
+        meaning: v.meaning,
+        videoId: v.videoId
+      }))
+    };
+
+    // اگر ویدیو سریال است، به صفحه سریال ریدایرکت کن
+    if (videoData.isSeries) {
+      redirect(`/series/${videoId}`);
+    }
+
+    return (
+      <div className="min-h-screen bg-gray-900">
+        <VideoPlayer 
+          initialVideoData={videoDataForPlayer}
+          videoId={videoId}
+        />
+      </div>
+    );
   } catch (error) {
     console.error('Error loading video:', error);
     notFound();

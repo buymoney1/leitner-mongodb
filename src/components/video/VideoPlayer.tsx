@@ -1,7 +1,8 @@
+// components/video/VideoPlayer.tsx
 "use client";
 import ReactPlayer from "react-player/lazy";
 import { useState, useRef, useEffect } from "react";
-import { useParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { parseVTT } from "@/utils";
 import { PlayerState, Subtitle, SubtitleSettings, VideoQuality, Vocabulary } from "../../../types";
 import PlayerControls from "../PlayerControls";
@@ -11,23 +12,34 @@ import SubtitleList from "../SubtitleList";
 import TabBar from "../TabBar";
 import VideoSubtitles from "../VideoSubtitles";
 import VocabularyList from "./VocabularyList";
-import { ArrowLeft, Play, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Play, AlertCircle, Home } from 'lucide-react';
+import Link from "next/link";
 
-interface VideoData {
-  id: string;
-  title: string;
-  description: string | null;
-  videoUrl: string;
-  thumbnailUrl: string | null;
-  level: string;
-  subtitlesVtt: string | null;
-  vocabularies: Vocabulary[];
+interface VideoPlayerProps {
+  initialVideoData?: {
+    id: string;
+    title: string;
+    description: string | null;
+    videoUrl: string;
+    thumbnailUrl: string | null;
+    level: string;
+    subtitlesVtt: string | null;
+    vocabularies: Vocabulary[];
+  };
+  episodeNumber?: number;
+  seasonNumber?: number;
+  seriesTitle?: string;
+  videoId?: string; // اضافه کردن videoId به props
 }
 
-export default function VideoPlayer() {
-  const params = useParams();
+export default function VideoPlayer({ 
+  initialVideoData, 
+  episodeNumber,
+  seasonNumber,
+  seriesTitle,
+  videoId 
+}: VideoPlayerProps) {
   const router = useRouter();
-  const videoId = params.videoId as string;
   
   // --- State ---
   const [playerState, setPlayerState] = useState<PlayerState>({
@@ -43,8 +55,8 @@ export default function VideoPlayer() {
 
   const [subtitles, setSubtitles] = useState<Subtitle[]>([]);
   const [activeSubtitle, setActiveSubtitle] = useState<Subtitle | null>(null);
-  const [videoData, setVideoData] = useState<VideoData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [videoData, setVideoData] = useState<any>(null);
+  const [loading, setLoading] = useState(!initialVideoData);
   const [error, setError] = useState<string | null>(null);
   
   const [subtitleSettings, setSubtitleSettings] = useState<SubtitleSettings>({
@@ -70,10 +82,23 @@ export default function VideoPlayer() {
 
   // --- Effects ---
   useEffect(() => {
+    // اگر initialVideoData داریم، از آن استفاده کن
+    if (initialVideoData) {
+      console.log('🎬 Using initial video data:', initialVideoData.title);
+      processVideoData(initialVideoData);
+      setLoading(false);
+      return;
+    }
+
+    // در غیر این صورت از API بگیر
     const fetchVideoData = async () => {
       try {
         setLoading(true);
-        console.log('Fetching video data for ID:', videoId);
+        console.log('📡 Fetching video data for ID:', videoId);
+        
+        if (!videoId) {
+          throw new Error('شناسه ویدیو نامعتبر است');
+        }
         
         const response = await fetch(`/api/videos/${videoId}`);
         console.log('API Response status:', response.status);
@@ -92,39 +117,7 @@ export default function VideoPlayer() {
           throw new Error('داده‌های ویدیو نامعتبر است');
         }
         
-        setVideoData(data);
-        
-        // بارگذاری زیرنویس از دیتابیس
-        if (data.subtitlesVtt) {
-          console.log('Parsing subtitles...');
-          try {
-            const parsedSubtitles = parseVTT(data.subtitlesVtt);
-            console.log('Subtitles parsed:', parsedSubtitles.length, 'entries');
-            setSubtitles(parsedSubtitles);
-          } catch (parseError) {
-            console.error('Error parsing subtitles:', parseError);
-            // اگر زیرنویس مشکل داشت، لیست خالی بگذار
-            setSubtitles([]);
-          }
-        } else {
-          console.log('No subtitles available for this video');
-          setSubtitles([]);
-        }
-        
-        // بارگذاری لغات از دیتابیس
-        if (data.vocabularies && data.vocabularies.length > 0) {
-          console.log('Vocabularies found:', data.vocabularies.length);
-          const formattedVocabularies: Vocabulary[] = data.vocabularies.map((vocab: any) => ({
-            id: vocab.id,
-            word: vocab.word,
-            meaning: vocab.meaning,
-            videoId: vocab.videoId
-          }));
-          setVocabularies(formattedVocabularies);
-        } else {
-          console.log('No vocabularies available for this video');
-          setVocabularies([]);
-        }
+        processVideoData(data);
         
       } catch (error) {
         console.error("Error loading video:", error);
@@ -140,7 +133,44 @@ export default function VideoPlayer() {
       setError('شناسه ویدیو نامعتبر است');
       setLoading(false);
     }
-  }, [videoId]);
+  }, [initialVideoData, videoId]);
+
+  // تابع برای پردازش داده‌های ویدیو
+  const processVideoData = (data: any) => {
+    setVideoData(data);
+    
+    // بارگذاری زیرنویس از دیتابیس
+    if (data.subtitlesVtt) {
+      console.log('Parsing subtitles...');
+      try {
+        const parsedSubtitles = parseVTT(data.subtitlesVtt);
+        console.log('Subtitles parsed:', parsedSubtitles.length, 'entries');
+        setSubtitles(parsedSubtitles);
+      } catch (parseError) {
+        console.error('Error parsing subtitles:', parseError);
+        // اگر زیرنویس مشکل داشت، لیست خالی بگذار
+        setSubtitles([]);
+      }
+    } else {
+      console.log('No subtitles available for this video');
+      setSubtitles([]);
+    }
+    
+    // بارگذاری لغات از دیتابیس
+    if (data.vocabularies && data.vocabularies.length > 0) {
+      console.log('Vocabularies found:', data.vocabularies.length);
+      const formattedVocabularies: Vocabulary[] = data.vocabularies.map((vocab: any) => ({
+        id: vocab.id,
+        word: vocab.word,
+        meaning: vocab.meaning,
+        videoId: data.id
+      }));
+      setVocabularies(formattedVocabularies);
+    } else {
+      console.log('No vocabularies available for this video');
+      setVocabularies([]);
+    }
+  };
 
   useEffect(() => {
     const handleFullScreenChange = () => 
@@ -277,6 +307,24 @@ export default function VideoPlayer() {
     setSelectedWord(null);
   };
 
+  // ساخت عنوان کامل
+  const getFullTitle = () => {
+    if (!videoData) return '';
+    
+    let title = videoData.title;
+    
+    // اگر اطلاعات سریال داریم، به عنوان اضافه کنیم
+    if (seasonNumber && episodeNumber) {
+      title = `فصل ${seasonNumber}، قسمت ${episodeNumber}: ${title}`;
+    }
+    
+    if (seriesTitle) {
+      title = `${seriesTitle} - ${title}`;
+    }
+    
+    return title;
+  };
+
   // نمایش loading
   if (loading) {
     return (
@@ -284,7 +332,7 @@ export default function VideoPlayer() {
         <div className="text-center">
           <div className="h-16 w-16 animate-spin rounded-full border-4 border-solid border-cyan-500 border-t-transparent mx-auto mb-4"></div>
           <p className="text-gray-600 dark:text-gray-400">در حال بارگذاری ویدیو...</p>
-      </div>
+        </div>
       </div>
     );
   }
@@ -311,13 +359,13 @@ export default function VideoPlayer() {
               <ArrowLeft className="w-5 h-5" />
               بازگشت
             </button>
-            <button
-              onClick={() => router.push('/video-levels')}
+            <Link
+              href="/video-levels"
               className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white px-6 py-3 rounded-lg transition-all duration-300"
             >
-              <Play className="w-5 h-5" />
-              لیست ویدیوها
-            </button>
+              <Home className="w-5 h-5" />
+              صفحه اصلی
+            </Link>
           </div>
         </div>
       </div>
@@ -338,17 +386,28 @@ export default function VideoPlayer() {
           <p className="text-gray-600 dark:text-gray-400 mb-6">
             برای این ویدیو لینک پخش تنظیم نشده است.
           </p>
-          <button
-            onClick={() => router.push('/video-levels')}
-            className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white px-6 py-3 rounded-lg transition-all duration-300"
-          >
-            <Play className="w-5 h-5" />
-            لیست ویدیوها
-          </button>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <button
+              onClick={() => router.back()}
+              className="inline-flex items-center justify-center gap-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-6 py-3 rounded-lg transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5" />
+              بازگشت
+            </button>
+            <Link
+              href="/video-levels"
+              className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white px-6 py-3 rounded-lg transition-all duration-300"
+            >
+              <Home className="w-5 h-5" />
+              صفحه اصلی
+            </Link>
+          </div>
         </div>
       </div>
     );
   }
+
+  const fullTitle = getFullTitle();
 
   return (
     <div className="w-full max-w-[900px] mx-auto font-sans bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100" dir="rtl">
@@ -445,40 +504,54 @@ export default function VideoPlayer() {
       <div className="px-4 pt-4 dark:bg-gray-900">
         {/* اطلاعات ویدیو */}
         <div className="mb-6">
-       
-{/* بخش توضیحات */}
-<div className="mt-4 mb-4">
-  <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
-    <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-      {videoData.title}
-    </h1>
+          {/* بخش توضیحات */}
+          <div className="mt-4 mb-4">
+            <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+              <div className="flex items-start justify-between gap-4 mb-2">
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex-1">
+                  {fullTitle}
+                </h1>
+                
+                {/* نشانگر سریال */}
+                {seasonNumber && episodeNumber && (
+                  <div className="flex items-center gap-2 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 px-3 py-1 rounded-lg">
+                    <span className="font-bold">فصل {seasonNumber}</span>
+                    <span className="text-gray-500">|</span>
+                    <span>قسمت {episodeNumber}</span>
+                  </div>
+                )}
+              </div>
 
-    {/* توضیحات متغیر */}
-    {videoData.description ? (
-      <div className="relative">
-        <p className={`text-sm text-gray-700 dark:text-gray-300 mb-2 ${!showFullDescription ? 'line-clamp-2' : ''}`}>
-          {videoData.description}
-        </p>
-        {videoData.description.length > 100 && (
-          <button
-            onClick={() => setShowFullDescription(!showFullDescription)}
-            className="text-blue-600 dark:text-blue-400 text-sm font-medium hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
-          >
-            {showFullDescription ? 'بستن' : 'مشاهده بیشتر'}
-          </button>
-        )}
-      </div>
-    ) : (
-      <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
-        این ویدیوی آموزشی سطح {videoData.level} به شما کمک می‌کند تا مهارت‌های زبان خود را تقویت کنید. 
-        با مشاهده این ویدیو و تمرین لغات ارائه شده، می‌توانید درک شنیداری و دایره لغات خود را بهبود بخشید.
-      </p>
-    )}
-    
+              {/* سطح ویدیو */}
+              <div className="mb-3">
+                <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded text-sm font-medium">
+                  سطح {videoData.level}
+                </span>
+              </div>
 
-
-  </div>
-</div>
+              {/* توضیحات متغیر */}
+              {videoData.description ? (
+                <div className="relative">
+                  <p className={`text-sm text-gray-700 dark:text-gray-300 mb-2 ${!showFullDescription ? 'line-clamp-2' : ''}`}>
+                    {videoData.description}
+                  </p>
+                  {videoData.description.length > 100 && (
+                    <button
+                      onClick={() => setShowFullDescription(!showFullDescription)}
+                      className="text-blue-600 dark:text-blue-400 text-sm font-medium hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
+                    >
+                      {showFullDescription ? 'بستن' : 'مشاهده بیشتر'}
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
+                  این ویدیوی آموزشی سطح {videoData.level} به شما کمک می‌کند تا مهارت‌های زبان خود را تقویت کنید. 
+                  با مشاهده این ویدیو و تمرین لغات ارائه شده، می‌توانید درک شنیداری و دایره لغات خود را بهبود بخشید.
+                </p>
+              )}
+            </div>
+          </div>
         </div>
 
         <TabBar
@@ -504,6 +577,19 @@ export default function VideoPlayer() {
             />
           )}
         </div>
+        
+        {/* لینک بازگشت به سریال (اگر سریال است) */}
+        {seriesTitle && (
+          <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-800/30 rounded-xl">
+            <Link 
+              href={`/series/${videoData.id}`}
+              className="inline-flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              بازگشت به صفحه سریال {seriesTitle}
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );

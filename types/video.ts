@@ -25,3 +25,21 @@ export interface VideoPlayerProps {
     loop: boolean;
     fullscreen: boolean;
   }
+
+  export interface Vocabulary {
+    id: string;
+    word: string;
+    meaning: string;
+    videoId: string;
+  }
+  
+  export interface VideoData {
+    id: string;
+    title: string;
+    description: string | null;
+    videoUrl: string;
+    thumbnailUrl: string | null;
+    level: string;
+    subtitlesVtt: string | null;
+    vocabularies: Vocabulary[];
+  }

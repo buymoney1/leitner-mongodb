@@ -68,7 +68,7 @@ model User {
   articles Article[]
   songs    Song[] // اضافه کردن رابطه با Song
 
-
+uploadedVideos Video[] 
   activityTrackings ActivityTracking[]
 
   // اضافه کردن رابطه با DailyActivity
@@ -164,23 +164,93 @@ model Video {
   id           String            @id @default(auto()) @map("_id") @db.ObjectId
   title        String
   description  String?
-  videoUrl     String
+  videoUrl     String? // اختیاری برای فیلم‌های فصل‌بندی شده
   thumbnailUrl String?
+  coverImage   String? // بنر اصلی فیلم
   level        VideoLevel
   subtitlesVtt String?
+  
+  // فصل‌های فیلم
+  seasons      Season[]
+  
+  // لغات عمومی فیلم
   vocabularies VideoVocabulary[]
+  
 
-  // اضافه کردن رابطه با DailyActivity
+  isSeries     Boolean           @default(false) // آیا سریال است یا تک فیلم
+  totalSeasons Int              @default(1)
+  totalEpisodes Int             @default(1)
+  releaseYear  Int?
+  rating       Float?           @default(0)
+  duration     Int?             // مدت زمان کل (دقیقه)
+  
+  // رابطه با DailyActivity
   dailyActivities DailyActivity[]
-
+  
+  // رابطه‌های سیستمی
+ createdById  String?           @db.ObjectId
+  createdBy    User?             @relation(fields: [createdById], references: [id])
+  isPublished  Boolean           @default(true)
+  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
+model Season {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  seasonNumber Int      // شماره فصل
+  title       String   // عنوان فصل
+  description String?
+  thumbnailUrl String?
+  releaseDate DateTime?
+  
+  videoId    String   @db.ObjectId
+  video      Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  
+  episodes   Episode[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@unique([videoId, seasonNumber])
+}
+
+model Episode {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  episodeNumber Int      // شماره قسمت
+  title       String   // عنوان قسمت
+  description String?
+  videoUrl    String   // لینک ویدیوی قسمت
+  thumbnailUrl String?
+  duration    Int      // مدت زمان به ثانیه
+  
+  seasonId    String   @db.ObjectId
+  season      Season   @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+  
+  // لغات مخصوص این قسمت
+  vocabularies EpisodeVocabulary[]
+  
+  // زیرنویس مخصوص این قسمت
+  subtitlesVtt String?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@unique([seasonId, episodeNumber])
+}
+
+model EpisodeVocabulary {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  episodeId String  @db.ObjectId
+  episode   Episode @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+  word      String
+  meaning   String
+}
+
 model VideoVocabulary {
-  id      String @id @default(auto()) @map("_id") @db.ObjectId
-  videoId String @db.ObjectId
-  video   Video  @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  id      String  @id @default(auto()) @map("_id") @db.ObjectId
+  videoId String  @db.ObjectId
+  video   Video   @relation(fields: [videoId], references: [id], onDelete: Cascade)
   word    String
   meaning String
 }
