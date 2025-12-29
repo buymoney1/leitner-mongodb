@@ -111,14 +111,7 @@ export default async function LevelVideosPage({ params }: { params: Promise<{ le
 
             {/* مشاهده همه ویدیوها */}
             <div className="flex items-center gap-4">
-              <Link 
-                href="/all-videos"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white rounded-lg font-medium transition-all duration-300 shadow-md hover:shadow-lg"
-              >
-                <Eye className="h-4 w-4" />
-                مشاهده همه ویدیوها
-              </Link>
-              
+  
               {isAdmin && (
                 <Link 
                   href="/admin/upload-video"
