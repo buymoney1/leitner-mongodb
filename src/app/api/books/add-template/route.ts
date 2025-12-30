@@ -1,134 +1,144 @@
-// app/api/books/add-template/route.ts
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { readFile } from "fs/promises";
-import path from "path";
-import { getAuthSession } from "../../../../../lib/server-auth";
+import { NextRequest, NextResponse } from 'next/server';
 
-interface TemplateBook {
-  id: string;
-  title: string;
-  description: string;
-  cards: { front: string; back: string; hint: string }[];
-}
+import {prisma} from '@/lib/prisma';
+import path from 'path';
+import { promises as fs } from 'fs';
+import { getAuthSession } from '../../../../../lib/server-auth';
 
 export async function POST(request: NextRequest) {
   try {
     const session = await getAuthSession();
-
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session?.user) {
+      return NextResponse.json({ error: 'لطفاً وارد شوید' }, { status: 401 });
     }
 
-    const userId = session.user.id;
     const { templateBookId } = await request.json();
 
-    if (!templateBookId) {
-      return NextResponse.json({ error: "Template book ID is required" }, { status: 400 });
-    }
-
-    // ۱. خواندن فایل JSON از دیسک
-    const filePath = path.join(process.cwd(), 'data', 'template-books.json');
-    const fileContent = await readFile(filePath, 'utf-8');
-    const templateBooks = JSON.parse(fileContent) as TemplateBook[];
-
-    // ۲. پیدا کردن کتاب الگو بر اساس id
-    const templateBook = templateBooks.find((book) => book.id === templateBookId);
-
+    // 1. خواندن اطلاعات کتاب از فایل اصلی
+    const booksIndexPath = path.join(
+      process.cwd(),
+      'data',
+      'template-books',
+      'index.json'
+    );
+    const booksData = await fs.readFile(booksIndexPath, 'utf-8');
+    const allBooks = JSON.parse(booksData);
+    
+    const templateBook = allBooks.find((book: any) => book.id === templateBookId);
+    
     if (!templateBook) {
-      return NextResponse.json({ error: "Template book not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: 'کتاب مورد نظر یافت نشد' },
+        { status: 404 }
+      );
     }
 
-    let message = "";
-    let bookToReturn;
-    let cardsCount = 0;
+    // 2. خواندن کارت‌ها از فایل جداگانه
+    const cardsFilePath = path.join(
+      process.cwd(),
+      'data',
+      'template-cards',
+      templateBook.cardsFile
+    );
+    const cardsData = await fs.readFile(cardsFilePath, 'utf-8');
+    const templateCards = JSON.parse(cardsData);
 
-    // ۳. بررسی اینکه آیا کاربر قبلا این کتاب را اضافه کرده است
+    // 3. بررسی وجود کتاب در دیتابیس
     const existingBook = await prisma.book.findFirst({
       where: {
-        userId: userId,
+        userId: session.user.id,
         title: templateBook.title,
       },
       include: {
-        cards: true
+        cards: {
+          select: { front: true }
+        }
       }
     });
 
-    // ۴. استفاده از تراکنش
-    const result = await prisma.$transaction(async (tx) => {
-      if (existingBook) {
-        // اگر کتاب از قبل وجود دارد، فقط کارت‌های جدید اضافه می‌شوند
-        message = "این کتاب قبلاً در مجموعه شما موجود بود. لغات جدید به آن اضافه شد.";
-        
-        if (templateBook.cards && templateBook.cards.length > 0) {
-          // فقط کارت‌هایی که قبلاً وجود ندارند را اضافه می‌کنیم
-          const existingCardFronts = new Set(existingBook.cards.map(card => card.front));
-          const newCards = templateBook.cards.filter(card => !existingCardFronts.has(card.front));
-          
-          if (newCards.length > 0) {
-            await tx.card.createMany({
-              data: newCards.map((card) => ({
-                front: card.front,
-                back: card.back,
-                hint: card.hint,
-                userId: userId,
-                bookId: existingBook.id,
-              })),
-            });
-            cardsCount = newCards.length;
-          } else {
-            message = "تمام لغات این کتاب قبلاً در مجموعه شما موجود هستند.";
-          }
-        }
-        
-        // کتاب موجود را با کارت‌های به‌روز شده برمی‌گردانیم
-        bookToReturn = await tx.book.findUnique({
-          where: { id: existingBook.id },
-          include: { cards: true }
-        });
-        
-      } else {
-        // اگر کتاب وجود ندارد، کتاب جدید و تمام کارت‌هایش را ایجاد می‌کنیم
-        const newUserBook = await tx.book.create({
-          data: {
-            title: templateBook.title,
-            description: templateBook.description,
-            userId: userId,
-          },
-        });
+    let cardsAdded = 0;
+    let bookId;
 
-        if (templateBook.cards && templateBook.cards.length > 0) {
-          await tx.card.createMany({
-            data: templateBook.cards.map((card) => ({
+    if (existingBook) {
+      // کتاب موجود است - فقط کارت‌های جدید اضافه کن
+      bookId = existingBook.id;
+      
+      // استخراج کارت‌های موجود
+      const existingCardFronts = new Set(
+        existingBook.cards.map(card => card.front)
+      );
+      
+      // فقط کارت‌های جدید که قبلاً وجود ندارند
+      const newCards = templateCards.filter(
+        (card: any) => !existingCardFronts.has(card.front)
+      );
+      
+      if (newCards.length > 0) {
+        // اضافه کردن کارت‌های جدید
+        await prisma.card.createMany({
+          data: newCards.map((card: any) => ({
+            front: card.front,
+            back: card.back,
+            hint: card.hint || '',
+            bookId: existingBook.id,
+            userId: session.user.id,
+            boxNumber: 1,
+            lastReviewedAt: new Date(),
+            nextReviewAt: new Date(),
+          }))
+        });
+        
+        cardsAdded = newCards.length;
+      }
+      
+      return NextResponse.json({
+        success: true,
+        alreadyExists: true,
+        cardsAdded,
+        message: cardsAdded > 0 
+          ? `${cardsAdded} لغت جدید اضافه شد` 
+          : 'همه لغات قبلاً اضافه شده‌اند',
+      });
+      
+    } else {
+      // کتاب جدید - ایجاد کتاب و کارت‌ها
+      const newBook = await prisma.book.create({
+        data: {
+          title: templateBook.title,
+          description: templateBook.description,
+          userId: session.user.id,
+          cards: {
+            create: templateCards.map((card: any) => ({
               front: card.front,
               back: card.back,
-              hint: card.hint,
-              userId: userId,
-              bookId: newUserBook.id,
-            })),
-          });
-          cardsCount = templateBook.cards.length;
+              hint: card.hint || '',
+              userId: session.user.id,
+              boxNumber: 1,
+              lastReviewedAt: new Date(),
+              nextReviewAt: new Date(),
+            }))
+          }
+        },
+        include: {
+          cards: true
         }
-
-        message = "کتاب جدید با موفقیت به مجموعه شما اضافه شد.";
-        bookToReturn = newUserBook;
-      }
-
-      return { book: bookToReturn, message, cardsCount };
-    });
-
-    return NextResponse.json({
-      success: true,
-      message: result.message,
-      book: result.book,
-      cardsAdded: result.cardsCount,
-      alreadyExists: !!existingBook
-    }, { status: 200 });
+      });
+      
+      bookId = newBook.id;
+      cardsAdded = templateCards.length;
+      
+      return NextResponse.json({
+        success: true,
+        alreadyExists: false,
+        cardsAdded,
+        message: 'کتاب جدید با موفقیت اضافه شد',
+      });
+    }
 
   } catch (error) {
-    console.error("Error adding template book:", error);
+    console.error('خطا در اضافه کردن کتاب:', error);
     return NextResponse.json(
-      { error: "خطای سرور داخلی" },
+      { error: 'خطا در اضافه کردن کتاب' },
       { status: 500 }
     );
   }

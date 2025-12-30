@@ -1,3 +1,4 @@
+// components/TemplateBookCard.tsx
 "use client";
 import { useState } from "react";
 import { Plus, BookOpen, CheckCircle2, AlertCircle, Info } from "lucide-react";
@@ -8,11 +9,12 @@ interface TemplateBook {
   title: string;
   description: string;
   image?: string;
-  cards: { front: string; back: string; hint: string }[];
+  cardsFile?: string; 
   level?: string;
   category?: string;
   estimatedTime?: string;
   popularity?: number;
+  wordCount?: number; 
 }
 
 interface TemplateBookCardProps {
@@ -31,14 +33,16 @@ export function TemplateBookCard({ book }: TemplateBookCardProps) {
       const res = await fetch("/api/books/add-template", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ templateBookId: book.id }),
+        body: JSON.stringify({ 
+          templateBookId: book.id,
+          cardsFile: book.cardsFile // ✅ ارسال نام فایل کارت‌ها
+        }),
       });
 
       const data = await res.json();
       
       if (res.ok) {
         if (data.alreadyExists) {
-          // اگر کتاب قبلاً وجود داشته
           setIsAlreadyExists(true);
           setIsAdded(true);
           
@@ -58,7 +62,6 @@ export function TemplateBookCard({ book }: TemplateBookCardProps) {
             });
           }
         } else {
-          // اگر کتاب جدید است
           setIsAlreadyExists(false);
           setIsAdded(true);
           
@@ -77,8 +80,9 @@ export function TemplateBookCard({ book }: TemplateBookCardProps) {
         });
       }
     } catch (error) {
+      console.error("خطا در افزودن کتاب:", error);
       toast.error("خطا در ارتباط", {
-        description: "خطا در ارتباط با سرور. لطفاً اتصال اینترنت خود را بررسی کنید.",
+        description: "خطا در ارتباط با سرور. لطفاً دوباره تلاش کنید.",
       });
     } finally {
       setIsLoading(false);
@@ -86,7 +90,7 @@ export function TemplateBookCard({ book }: TemplateBookCardProps) {
   };
 
   // رنگ سطح
-  const levelStyle: any = {
+  const levelStyle: Record<string, string> = {
     A1: "bg-emerald-500",
     A2: "bg-sky-500",
     B1: "bg-violet-500",
@@ -122,7 +126,7 @@ export function TemplateBookCard({ book }: TemplateBookCardProps) {
         </div>
       )}
 
-      {/* Ribbon تعداد کارت */}
+      {/* Ribbon تعداد لغات */}
       <div
         className={`
           absolute left-0 top-0
@@ -132,7 +136,7 @@ export function TemplateBookCard({ book }: TemplateBookCardProps) {
           rounded-br-lg
         `}
       >
-        {book.cards.length} لغت
+        {book.wordCount || book.estimatedTime || "?"} {book.wordCount ? "لغت" : "دقیقه"}
         {isAlreadyExists && " (موجود)"}
       </div>
 
@@ -155,6 +159,7 @@ export function TemplateBookCard({ book }: TemplateBookCardProps) {
               src={book.image}
               alt={book.title}
               className="w-full h-full object-cover"
+              loading="lazy"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
@@ -169,9 +174,33 @@ export function TemplateBookCard({ book }: TemplateBookCardProps) {
         text-[13px] font-semibold text-center 
         text-gray-800 dark:text-white 
         line-clamp-2
+        
       ">
         {book.title}
       </h3>
+
+
+      {/* <p className="
+        text-[11px] text-gray-600 dark:text-gray-400 
+        text-center line-clamp-2
+        mb-2 px-1
+      ">
+        {book.description}
+      </p> */}
+
+
+      {/* <div className="flex items-center justify-center gap-3 mb-3">
+        {book.category && (
+          <span className="text-[10px] bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 px-2 py-1 rounded-full">
+            {book.category}
+          </span>
+        )}
+        {book.popularity && (
+          <span className="text-[10px] flex items-center gap-1 text-gray-500">
+            👥 {book.popularity}
+          </span>
+        )}
+      </div> */}
 
       {/* دکمه */}
       <button
@@ -181,19 +210,23 @@ export function TemplateBookCard({ book }: TemplateBookCardProps) {
           mt-auto
           w-full py-2 rounded-lg font-medium text-sm
           flex items-center justify-center gap-2
-          transition-all
+          transition-all duration-200
           ${
             isAlreadyExists
               ? "bg-yellow-500 hover:bg-yellow-600 text-white"
               : isAdded
-              ? "bg-emerald-500 text-white"
+              ? "bg-emerald-500 hover:bg-emerald-600 text-white"
               : "bg-blue-600 hover:bg-blue-700 text-white"
           }
-          disabled:opacity-50
+          disabled:opacity-50 disabled:cursor-not-allowed
+          active:scale-95
         `}
       >
         {isLoading ? (
-          <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+          <>
+            <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            <span>در حال افزودن...</span>
+          </>
         ) : isAlreadyExists ? (
           <>
             <CheckCircle2 className="w-4 h-4" />

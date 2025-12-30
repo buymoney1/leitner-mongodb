@@ -1,0 +1,5 @@
+[
+    { "front": "Negotiate", "back": "مذاکره کردن", "hint": "Negotiation" },
+    { "front": "Revenue", "back": "درآمد، عایدات", "hint": "Turnover" },
+    { "front": "Asset", "back": "دارایی، سرمایه", "hint": "Liability (مخالف)" }
+  ]
