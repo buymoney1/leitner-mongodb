@@ -131,8 +131,15 @@ export function DashboardClient({ userName, userRole }: DashboardClientProps) {
   return (
     <div className="min-h-screen bg-gray-50/50 dark:bg-[#0a0a0a] text-gray-900 dark:text-gray-100 transition-colors duration-300 selection:bg-cyan-500/30">
       {/* پس‌زمینه الگو - بسیار ریزتر و ملایم‌تر */}
-      <div className="fixed inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
-      
+      <div className="
+  fixed inset-0 
+  bg-[linear-gradient(to_right,#e5e5e5_0.5px,transparent_0.5px),linear-gradient(to_bottom,#e5e5e5_0.5px,transparent_0.5px)] 
+  dark:bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)]
+  bg-[size:24px_24px] 
+  pointer-events-none 
+  opacity-20
+  dark:opacity-100
+" />
       <div className="relative z-10 max-w-7xl mx-auto px-4 py-6 md:py-8 space-y-8">
         
 
