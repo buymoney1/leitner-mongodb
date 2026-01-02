@@ -2,10 +2,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Search, BookOpen, Sparkles, Plus, Trash2 } from 'lucide-react';
-import DictionaryModal from '../DictionaryModal';
+import { Search, BookOpen, Sparkles } from 'lucide-react';
 
-// Type برای لغات ویدیو
 interface VideoVocabulary {
   id: string;
   word: string;
@@ -15,83 +13,25 @@ interface VideoVocabulary {
 
 interface VocabularyListProps {
   vocabularies: VideoVocabulary[];
-  onRemoveWord?: (id: string) => void;
+  onWordClick: (vocab: VideoVocabulary) => void;
 }
 
 export default function VocabularyList({ 
   vocabularies = [], 
-  onRemoveWord 
+  onWordClick 
 }: VocabularyListProps) {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedWord, setSelectedWord] = useState<VideoVocabulary | null>(null);
-  const [isDictionaryModalOpen, setIsDictionaryModalOpen] = useState(false);
-  const [selectedWordForModal, setSelectedWordForModal] = useState("");
-  const [selectedWordMeaning, setSelectedWordMeaning] = useState("");
 
-  // تابع برای افزودن کارت به فلش‌کارت
-  const handleAddToFlashcards = async (word: string, meaning: string) => {
-    try {
-      const response = await fetch("/api/cards", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          front: word.trim(), 
-          back: meaning.trim() 
-        }),
-      });
-
-      if (response.ok) {
-        alert("لغت با موفقیت به فلش‌کارت‌ها اضافه شد!");
-        return Promise.resolve();
-      } else {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "خطا در افزودن لغت.");
-      }
-    } catch (error) {
-      alert("خطا در ارتباط با سرور.");
-      return Promise.reject(error);
-    }
-  };
-
-  // فیلتر لغات بر اساس جستجو
   const filteredVocabularies = vocabularies.filter(vocab =>
     vocab.word.toLowerCase().includes(searchTerm.toLowerCase()) ||
     vocab.meaning.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // باز کردن مودال برای لغت انتخابی
-  const handleWordClick = (vocab: VideoVocabulary) => {
-    console.log('Word clicked:', vocab);
-    setSelectedWord(vocab);
-    setSelectedWordForModal(vocab.word);
-    setSelectedWordMeaning(vocab.meaning);
-    setIsDictionaryModalOpen(true);
-  };
-
-  // باز کردن مودال با دکمه + (برای جلوگیری از bubbling event)
-  const handleAddButtonClick = (e: React.MouseEvent, vocab: VideoVocabulary) => {
-    e.stopPropagation();
-    console.log('Add button clicked for:', vocab);
-    setSelectedWord(vocab);
-    setSelectedWordForModal(vocab.word);
-    setSelectedWordMeaning(vocab.meaning);
-    setIsDictionaryModalOpen(true);
-  };
-
-  // حذف لغت
-  const handleRemoveClick = (e: React.MouseEvent, vocabId: string) => {
-    e.stopPropagation();
-    if (onRemoveWord && confirm('آیا از حذف این لغت مطمئن هستید؟')) {
-      onRemoveWord(vocabId);
-    }
-  };
-
-  // نمایش loading state اگر vocabularies undefined باشد
   if (!vocabularies) {
     return (
-      <div className="min-h-full bg-white dark:bg-gray-900 flex items-center justify-center p-4">
+      <div className="h-full flex items-center justify-center p-4">
         <div className="text-center">
-          <div className="h-12 w-12 animate-spin rounded-full border-4 border-solid border-cyan-500 border-t-transparent mx-auto mb-4"></div>
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-solid border-blue-500 border-t-transparent mx-auto mb-4"></div>
           <p className="text-gray-600 dark:text-gray-400">در حال بارگذاری لغات...</p>
         </div>
       </div>
@@ -99,156 +39,96 @@ export default function VocabularyList({
   }
 
   return (
-    <div className="min-h-full bg-white dark:bg-gray-900 transition-colors duration-300 p-4">
-      {/* مودال دیکشنری */}
-      <DictionaryModal
-        isOpen={isDictionaryModalOpen}
-        onClose={() => {
-          setIsDictionaryModalOpen(false);
-          setSelectedWord(null);
-          setSelectedWordForModal("");
-          setSelectedWordMeaning("");
-        }}
-        initialWord={selectedWordForModal}
-        initialMeaning={selectedWordMeaning}
-        onAddToFlashcards={handleAddToFlashcards}
-      />
-
-      {/* هدر و اطلاعات */}
-      <div className="mb-6">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">لغات ویدیو</h2>
-        <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
-          <div className="flex items-center gap-2">
-            <BookOpen className="w-4 h-4" />
-            <span>لغات آموزشی ویدیو</span>
+    <div className="h-full flex flex-col">
+      {/* Header */}
+      <div className="mb-4">
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <h3 className="font-bold text-lg text-gray-900 dark:text-white">لغات ویدیو</h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">کلیک روی هر لغت برای مشاهده جزئیات</p>
           </div>
-          <span className="bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400 px-2 py-1 rounded-full">
+          <span className="bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 px-3 py-1.5 rounded-full text-sm font-medium">
             {vocabularies.length} لغت
           </span>
         </div>
-      </div>
-
-      {/* Search Box */}
-      <div className="relative mb-6 group">
-        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 rounded-2xl blur-sm group-hover:blur-md transition-all duration-300"></div>
-        <div className="relative bg-white dark:bg-gray-900/80 rounded-2xl border border-gray-300 dark:border-gray-700/50 backdrop-blur-xl">
-          <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 text-cyan-500 dark:text-cyan-400 w-5 h-5" />
+        
+        {/* Search */}
+        <div className="relative">
+          <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4 h-4" />
           <input
             type="text"
             placeholder="جستجوی لغت یا معنی..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full p-4 pr-12 bg-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none rounded-2xl"
+            className="w-full p-3 pr-10 bg-gray-50 dark:bg-gray-800/50 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-400 rounded-lg text-sm border border-gray-200 dark:border-gray-700"
           />
-          <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
-            <span className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 px-2 py-1 rounded-full">
-              {filteredVocabularies.length} نتیجه
-            </span>
-          </div>
+          {searchTerm && (
+            <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+              <span className="text-xs bg-blue-500 text-white px-2 py-1 rounded">
+                {filteredVocabularies.length}
+              </span>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Vocabulary List */}
-      <div className="space-y-3 mb-10">
+      {/* List */}
+      <div className="flex-1 overflow-y-auto">
         {vocabularies.length === 0 ? (
           <div className="text-center py-12">
-            <div className="p-4 bg-gray-100/50 dark:bg-gray-800/50 rounded-2xl border border-gray-300 dark:border-gray-700/50 backdrop-blur-sm">
-              <BookOpen className="w-12 h-12 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
-              <p className="text-gray-500 dark:text-gray-500 text-lg mb-2">هنوز لغتی برای این ویدیو ثبت نشده است</p>
-              <p className="text-gray-400 dark:text-gray-600 text-sm">
-                مدیر سیستم هنوز لغاتی برای این ویدیو اضافه نکرده است
+            <div className="p-6 bg-gray-50 dark:bg-gray-800/30 rounded-xl border border-gray-200 dark:border-gray-700">
+              <BookOpen className="w-10 h-10 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
+              <p className="text-gray-500 dark:text-gray-400 text-sm font-medium mb-1">هنوز لغتی ثبت نشده</p>
+              <p className="text-gray-400 dark:text-gray-500 text-xs">
+                روی کلمات انگلیسی در زیرنویس‌ها کلیک کنید
               </p>
             </div>
           </div>
         ) : filteredVocabularies.length === 0 ? (
           <div className="text-center py-12">
-            <div className="p-4 bg-gray-100/50 dark:bg-gray-800/50 rounded-2xl border border-gray-300 dark:border-gray-700/50 backdrop-blur-sm">
-              <Search className="w-12 h-12 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
-              <p className="text-gray-500 dark:text-gray-500 text-lg mb-2">لغتی یافت نشد</p>
-              <p className="text-gray-400 dark:text-gray-600 text-sm">
+            <div className="p-6 bg-gray-50 dark:bg-gray-800/30 rounded-xl border border-gray-200 dark:border-gray-700">
+              <Search className="w-10 h-10 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
+              <p className="text-gray-500 dark:text-gray-400 text-sm font-medium mb-1">لغتی یافت نشد</p>
+              <p className="text-gray-400 dark:text-gray-500 text-xs">
                 با معیارهای جستجوی شما هیچ لغتی مطابقت ندارد
               </p>
             </div>
           </div>
         ) : (
-          filteredVocabularies.map((vocab) => (
-            <div
-              key={vocab.id}
-              onClick={() => handleWordClick(vocab)}
-              className={`px-4 py-3 rounded-2xl border backdrop-blur-sm transition-all duration-300 cursor-pointer group relative overflow-hidden
-                ${selectedWord?.id === vocab.id
-                  ? 'bg-gradient-to-r from-cyan-500/30 to-purple-500/30 border-cyan-400/50 shadow-2xl shadow-cyan-500/20 transform scale-105'
-                  : 'bg-gray-100/50 dark:bg-gray-800/30 border-gray-300 dark:border-gray-700/50 hover:bg-gray-200/50 dark:hover:bg-gray-800/50 hover:border-gray-400 dark:hover:border-gray-600/50 hover:shadow-lg'
-                }`}
-            >
-              {/* Background Glow Effect */}
-              <div className={`absolute inset-0 bg-gradient-to-r from-cyan-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
-                selectedWord?.id === vocab.id ? 'opacity-100' : ''
-              }`}></div>
-              
-              <div className="relative z-10">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <p className={`font-bold text-lg tracking-wide ${
-                          selectedWord?.id === vocab.id 
-                            ? 'text-cyan-600 dark:text-cyan-300' 
-                            : 'text-gray-900 dark:text-white group-hover:text-cyan-600 dark:group-hover:text-cyan-200'
-                        }`}>
-                          {vocab.word}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <button 
-                          onClick={(e) => handleAddButtonClick(e, vocab)}
-                          className="p-1.5 rounded-lg bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400 hover:bg-cyan-200 dark:hover:bg-cyan-800/50 transition-colors"
-                          title="افزودن به فلش‌کارت"
-                        >
-                          <Plus className="w-4 h-4" />
-                        </button>
-
-                      </div>
-                    </div>
-                    
-                    {/* Word Meaning */}
-                    <div className="mt-2">
-                      <p className={`text-base leading-relaxed ${
-                        selectedWord?.id === vocab.id 
-                          ? 'text-gray-800 dark:text-gray-100 font-medium' 
-                          : 'text-gray-700 dark:text-gray-300'
-                      }`}>
-                        {vocab.meaning}
+          <div className="space-y-2">
+            {filteredVocabularies.map((vocab) => (
+              <div
+                key={vocab.id}
+                onClick={() => onWordClick(vocab)}
+                className="p-3 bg-white dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-200 dark:hover:border-blue-800/30 cursor-pointer transition-all duration-200 group"
+              >
+                <div className="flex items-start gap-3">
+       
+      
+                  
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between mb-1">
+                      <p className="font-medium text-gray-900 dark:text-white text-sm truncate">
+                        {vocab.word}
                       </p>
                     </div>
                     
+                    <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed line-clamp-2">
+                      {vocab.meaning}
+                    </p>
                   </div>
                 </div>
               </div>
-
-              {/* Hover Border Effect */}
-              <div className={`absolute inset-0 rounded-2xl border-2 border-transparent bg-gradient-to-r from-cyan-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10 ${
-                selectedWord?.id === vocab.id ? 'opacity-100' : ''
-              }`}>
-                <div className="absolute inset-[2px] rounded-2xl bg-white dark:bg-gray-900"></div>
-              </div>
-            </div>
-          ))
+            ))}
+          </div>
         )}
       </div>
 
-      {/* Help Text */}
-      <div className="mb-10 text-center text-sm text-gray-500 dark:text-gray-400 mt-8 pb-4">
-        <div className="bg-gray-100/50 dark:bg-gray-800/30 rounded-xl p-4 border border-gray-200 dark:border-gray-700/50">
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <Sparkles className="w-4 h-4" />
-            <p className="font-medium">راهنمای استفاده</p>
-          </div>
-          <p className="text-xs leading-relaxed">
-            ۱. روی هر لغت کلیک کنید تا اطلاعات کامل آن را ببینید<br />
-            ۲. از دکمه <span className="text-cyan-600 dark:text-cyan-400">+</span> برای افزودن به فلش‌کارت استفاده کنید<br />
-          ۴. در قسمت جستجو، هم کلمه انگلیسی و هم معنی فارسی قابل جستجو است
-          </p>
+      {/* Footer */}
+      <div className="pt-4 mt-4 border-t border-gray-200 dark:border-gray-700">
+        <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+          <Sparkles className="w-3 h-3" />
+          <p>کلیک روی کلمات انگلیسی در زیرنویس‌ها برای افزودن به این لیست</p>
         </div>
       </div>
     </div>

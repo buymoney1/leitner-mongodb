@@ -84,7 +84,8 @@ export function DashboardClient({ userName, userRole }: DashboardClientProps) {
   ];
 
   const adminActions: ActionItem[] = [
-    { href: "/admin/users", icon: User, label: "مدیریت کاربران", description: "پنل ادمین", colorTheme: "blue" },
+    { href: "/admin/users", icon: Notebook, label: "مدیریت کاربران", description: "پنل ادمین", colorTheme: "blue" },
+    { href: "/dashboard/media", icon: User, label: "مدیریت فایل", description: "پنل ادمین", colorTheme: "blue" },
   ];
 
   const actions = isAdmin ? [...baseActions, ...adminActions] : baseActions;

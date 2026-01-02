@@ -76,6 +76,8 @@ uploadedVideos Video[]
 
   notes Note[]
 
+  mediaFiles MediaFile[] 
+
   // === اضافه کردن Notification Settings ===
   notificationToken   String? // توکن push notification
   notificationEnabled Boolean   @default(true) // فعال بودن نوتیفیکیشن
@@ -478,5 +480,51 @@ model Note {
 }
 
 
-
+model MediaFile {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  fileName        String   @unique
+  originalName    String
+  fileType        String   // video, audio, image, document
+  mimeType        String   // video/mp4, audio/mp3, image/jpeg, etc
+  fileSize        Int      // حجم به بایت
+  fileSizeMB      Float    // حجم به مگابایت
+  
+  // لینک‌های پارس‌پک
+  storageKey      String   // کلید اصلی در پارس‌پک
+  publicUrl       String?  // لینک عمومی
+  signedUrl       String?  // لینک موقت
+  urlExpiresAt    DateTime? // زمان انقضای لینک موقت
+  
+  // تنظیمات دسترسی
+  isPublic        Boolean  @default(false)
+  accessLevel     String   @default("private")
+  
+  // متادیتای فایل
+  duration        Int?     // مدت زمان (ثانیه)
+  dimensions      String?  // ابعاد تصاویر
+  resolution      String?  // رزولوشن ویدیو
+  
+  // اطلاعات آپلود
+  uploaderId      String?  @db.ObjectId
+  uploader        User?    @relation(fields: [uploaderId], references: [id])
+  
+  // تگ‌ها و دسته‌بندی
+  tags            String[]
+  category        String?
+  
+  // آمار
+  views           Int      @default(0)
+  downloads       Int      @default(0)
+  
+  // اطلاعات زمانی
+  lastAccessedAt  DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@index([fileType])
+  @@index([isPublic])
+  @@index([uploaderId])
+  @@index([createdAt])
+  @@index([tags])
+}
 

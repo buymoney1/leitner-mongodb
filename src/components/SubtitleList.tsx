@@ -1,5 +1,4 @@
 import { useRef, useEffect } from 'react';
-
 import { formatTime } from '../utils';
 import { Subtitle, SubtitleSettings } from '../../types';
 
@@ -32,15 +31,14 @@ const ClickableText = ({ text, settings, onWordClick }: ClickableTextProps) => {
             key={index}
             onClick={() => isEnglishWord && onWordClick(cleanWord)}
             style={{ 
-              backgroundColor: settings.backgroundColor, 
-              color: settings.textColor, 
-              fontSize: `${settings.fontSize}px`,
+              color: settings.textColor,
+              fontSize: '13px',
               cursor: isEnglishWord ? 'pointer' : 'default'
             }}
-            className={`inline-block px-1.5 py-0.5 m-[2px] rounded-md border border-white/20 backdrop-blur-sm transition-all duration-200 ${
+            className={`inline-block transition-all duration-200 mx-0.5 ${
               isEnglishWord 
-                ? 'hover:scale-110 hover:bg-blue-500 dark:hover:bg-blue-600 pointer-events-auto' 
-                : 'pointer-events-none'
+                ? 'hover:text-blue-600 dark:hover:text-blue-400 hover:underline' 
+                : ''
             }`}
           >
             {word}
@@ -86,21 +84,21 @@ export default function SubtitleList({
   return (
     <div 
       ref={subtitlesContainerRef}
-      className="relative z-0 w-full bg-white dark:bg-gray-900"
+      className="relative w-full bg-white dark:bg-gray-900"
       style={{ 
         height: `calc(100vh - ${videoHeight}px)`,
         overflowY: 'auto'
       }}
     >
-      <div className="px-4 pt-1 pb-32 space-y-4">
+      <div className="px-3 py-3 space-y-3">
         {subtitleSettings.mode === "none" && (
-          <span className="text-xs text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/30 px-3 py-2 rounded-full border border-orange-200 dark:border-orange-800 font-medium">
+          <span className="text-xs text-orange-600 dark:text-orange-400 px-2 py-1 rounded">
             زیرنویس غیرفعال
           </span>
         )}
       
         {subtitles.length > 0 ? (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {subtitles.map((sub, i) => {
               const isActive = sub === activeSubtitle;
               return (
@@ -108,24 +106,24 @@ export default function SubtitleList({
                   key={i}
                   ref={isActive ? activeSubtitleRef : null}
                   onClick={() => onSubtitleJump(sub.startTime)}
-                  className={`p-4 rounded-xl cursor-pointer transition-all duration-300 border-2 ${
+                  className={`p-3 rounded-lg cursor-pointer transition-all duration-200 ${
                     isActive 
-                      ? 'bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-700 shadow-lg ring-2 ring-blue-100 dark:ring-blue-800/50 transform scale-101' 
-                      : 'bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-200 dark:hover:border-gray-600 hover:shadow-md'
+                      ? 'bg-blue-50 dark:bg-blue-900/20 border-r-4 border-blue-500' 
+                      : 'hover:bg-gray-50 dark:hover:bg-gray-800/50'
                   }`}
                 >
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="text-xs text-gray-500 dark:text-gray-400 font-mono bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded-lg">
+                  <div className="flex justify-between items-center mb-1.5">
+                    <span className="text-xs text-gray-500 dark:text-gray-400 font-mono">
                       {formatTime(sub.startTime)}
                     </span>
                     {isActive && (
-                      <span className="text-xs text-blue-600 dark:text-blue-400 font-bold bg-blue-100 dark:bg-blue-900/50 px-3 py-1 rounded-full">
-                        🔴 در حال پخش
+                      <span className="text-xs text-blue-600 dark:text-blue-400 font-medium">
+                        ● پخش
                       </span>
                     )}
                   </div>
                   
-                  <p className={`text-base leading-8 mb-1 ${isActive ? 'font-bold text-gray-900 dark:text-white' : 'text-gray-700 dark:text-gray-300'}`}>
+                  <p className={`text-sm leading-relaxed mb-1.5 tracking-wide ${isActive ? 'font-medium' : ''}`}>
                     <ClickableText 
                       text={sub.persianText} 
                       settings={subtitleSettings}
@@ -134,8 +132,8 @@ export default function SubtitleList({
                   </p>
                   
                   {subtitleSettings.mode === 'both' && sub.englishText && (
-                    <div className="pt-3 border-t border-gray-100 dark:border-gray-700">
-                      <p dir="ltr" className="text-sm text-gray-500 dark:text-gray-400 font-light leading-relaxed">
+                    <div className="pt-2.5 mt-2.5 border-t border-gray-100 dark:border-gray-800">
+                      <p dir="ltr" className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed tracking-wide">
                         <ClickableText 
                           text={sub.englishText} 
                           settings={subtitleSettings}
@@ -149,9 +147,9 @@ export default function SubtitleList({
             })}
           </div>
         ) : (
-          <div className="text-center py-16">
-            <div className="text-gray-400 dark:text-gray-600 text-lg mb-4">📝</div>
-            <div className="text-gray-500 dark:text-gray-400 text-sm">در حال بارگذاری زیرنویس...</div>
+          <div className="text-center py-12">
+            <div className="text-gray-400 dark:text-gray-600 text-sm mb-2">📝</div>
+            <div className="text-gray-500 dark:text-gray-400 text-xs">در حال بارگذاری زیرنویس...</div>
           </div>
         )}
       </div>

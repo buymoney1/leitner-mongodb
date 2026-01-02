@@ -1,18 +1,19 @@
-// components/video/VideoPlayer.tsx
 "use client";
+
 import ReactPlayer from "react-player/lazy";
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from 'next/navigation';
 import { parseVTT } from "@/utils";
 import { PlayerState, Subtitle, SubtitleSettings, VideoQuality, Vocabulary } from "../../../types";
 import PlayerControls from "../PlayerControls";
-import SaveWordPopup from "../SaveWordPopup";
 import SettingsPanel from "../SettingsPanel";
-import SubtitleList from "../SubtitleList";
 import TabBar from "../TabBar";
 import VideoSubtitles from "../VideoSubtitles";
 import VocabularyList from "./VocabularyList";
-import { ArrowLeft, Play, AlertCircle, Home } from 'lucide-react';
+import SubtitleList from "../SubtitleList";
+import DictionaryModal from "../DictionaryModal";
+import QuickWordDialog from "./QuickWordDialog";
+import { ArrowLeft, Play, AlertCircle, Home, Film, Volume2, BookOpen, Clock, ChevronDown, ChevronUp } from 'lucide-react';
 import Link from "next/link";
 
 interface VideoPlayerProps {
@@ -29,18 +30,18 @@ interface VideoPlayerProps {
   episodeNumber?: number;
   seasonNumber?: number;
   seriesTitle?: string;
-  videoId?: string; // اضافه کردن videoId به props
+  videoId?: string;
 }
 
-export default function VideoPlayer({ 
-  initialVideoData, 
+export default function VideoPlayer({
+  initialVideoData,
   episodeNumber,
   seasonNumber,
   seriesTitle,
-  videoId 
+  videoId
 }: VideoPlayerProps) {
   const router = useRouter();
-  
+
   // --- State ---
   const [playerState, setPlayerState] = useState<PlayerState>({
     playing: false,
@@ -52,73 +53,86 @@ export default function VideoPlayer({
   });
 
   const [showFullDescription, setShowFullDescription] = useState(false);
-
+  const [isMobileInfoExpanded, setIsMobileInfoExpanded] = useState(false);
   const [subtitles, setSubtitles] = useState<Subtitle[]>([]);
   const [activeSubtitle, setActiveSubtitle] = useState<Subtitle | null>(null);
   const [videoData, setVideoData] = useState<any>(null);
   const [loading, setLoading] = useState(!initialVideoData);
   const [error, setError] = useState<string | null>(null);
-  
+
   const [subtitleSettings, setSubtitleSettings] = useState<SubtitleSettings>({
     mode: "both",
     fontSize: 12,
     backgroundColor: "rgba(0, 0, 0, 0.7)",
     textColor: "white"
   });
-  
+
   const [videoQuality, setVideoQuality] = useState<VideoQuality>("auto");
   const [showSettings, setShowSettings] = useState(false);
   const [activeTab, setActiveTab] = useState<'subtitles' | 'vocabulary'>('subtitles');
-  
-  // State جدید برای مدیریت لغات
+
+  // State برای مدیریت لغات
   const [vocabularies, setVocabularies] = useState<Vocabulary[]>([]);
-  const [selectedWord, setSelectedWord] = useState<string | null>(null);
-  const [showSavePopup, setShowSavePopup] = useState(false);
+  const [quickWordDialog, setQuickWordDialog] = useState<{
+    isOpen: boolean;
+    word: string;
+    meaning?: string;
+  }>({
+    isOpen: false,
+    word: '',
+    meaning: ''
+  });
+
+  // State برای مودال دیکشنری اصلی
+  const [dictionaryModal, setDictionaryModal] = useState<{
+    isOpen: boolean;
+    word: string;
+    meaning: string;
+  }>({
+    isOpen: false,
+    word: '',
+    meaning: ''
+  });
 
   // --- Refs ---
   const playerRef = useRef<ReactPlayer | null>(null);
   const playerContainerRef = useRef<HTMLDivElement>(null);
   const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const mobileInfoRef = useRef<HTMLDivElement>(null);
 
   // --- Effects ---
   useEffect(() => {
-    // اگر initialVideoData داریم، از آن استفاده کن
     if (initialVideoData) {
-      console.log('🎬 Using initial video data:', initialVideoData.title);
       processVideoData(initialVideoData);
       setLoading(false);
       return;
     }
 
-    // در غیر این صورت از API بگیر
     const fetchVideoData = async () => {
       try {
         setLoading(true);
-        console.log('📡 Fetching video data for ID:', videoId);
-        
+
         if (!videoId) {
           throw new Error('شناسه ویدیو نامعتبر است');
         }
-        
+
         const response = await fetch(`/api/videos/${videoId}`);
-        console.log('API Response status:', response.status);
-        
+
         if (!response.ok) {
           if (response.status === 404) {
             throw new Error('ویدیو یافت نشد');
           }
           throw new Error(`خطا در دریافت ویدیو: ${response.status}`);
         }
-        
+
         const data = await response.json();
-        console.log('Video data received:', data);
-        
+
         if (!data || !data.id) {
           throw new Error('داده‌های ویدیو نامعتبر است');
         }
-        
+
         processVideoData(data);
-        
+
       } catch (error) {
         console.error("Error loading video:", error);
         setError(error instanceof Error ? error.message : 'خطا در بارگذاری ویدیو');
@@ -135,30 +149,22 @@ export default function VideoPlayer({
     }
   }, [initialVideoData, videoId]);
 
-  // تابع برای پردازش داده‌های ویدیو
   const processVideoData = (data: any) => {
     setVideoData(data);
-    
-    // بارگذاری زیرنویس از دیتابیس
+
     if (data.subtitlesVtt) {
-      console.log('Parsing subtitles...');
       try {
         const parsedSubtitles = parseVTT(data.subtitlesVtt);
-        console.log('Subtitles parsed:', parsedSubtitles.length, 'entries');
         setSubtitles(parsedSubtitles);
       } catch (parseError) {
         console.error('Error parsing subtitles:', parseError);
-        // اگر زیرنویس مشکل داشت، لیست خالی بگذار
         setSubtitles([]);
       }
     } else {
-      console.log('No subtitles available for this video');
       setSubtitles([]);
     }
-    
-    // بارگذاری لغات از دیتابیس
+
     if (data.vocabularies && data.vocabularies.length > 0) {
-      console.log('Vocabularies found:', data.vocabularies.length);
       const formattedVocabularies: Vocabulary[] = data.vocabularies.map((vocab: any) => ({
         id: vocab.id,
         word: vocab.word,
@@ -167,15 +173,14 @@ export default function VideoPlayer({
       }));
       setVocabularies(formattedVocabularies);
     } else {
-      console.log('No vocabularies available for this video');
       setVocabularies([]);
     }
   };
 
   useEffect(() => {
-    const handleFullScreenChange = () => 
+    const handleFullScreenChange = () =>
       setPlayerState(prev => ({ ...prev, isFullScreen: !!document.fullscreenElement }));
-    
+
     document.addEventListener("fullscreenchange", handleFullScreenChange);
     return () => document.removeEventListener("fullscreenchange", handleFullScreenChange);
   }, []);
@@ -184,18 +189,30 @@ export default function VideoPlayer({
   useEffect(() => {
     const updateVideoHeight = () => {
       if (playerContainerRef.current) {
-        setPlayerState(prev => ({ 
-          ...prev, 
-          videoHeight: playerContainerRef.current!.offsetHeight 
+        setPlayerState(prev => ({
+          ...prev,
+          videoHeight: playerContainerRef.current!.offsetHeight
         }));
       }
     };
 
     updateVideoHeight();
     window.addEventListener('resize', updateVideoHeight);
-    
+
     return () => window.removeEventListener('resize', updateVideoHeight);
   }, []);
+
+  // اسکرول به آکاردئون هنگام باز شدن
+  useEffect(() => {
+    if (isMobileInfoExpanded && mobileInfoRef.current) {
+      setTimeout(() => {
+        mobileInfoRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest'
+        });
+      }, 100);
+    }
+  }, [isMobileInfoExpanded]);
 
   // --- Handlers ---
   const toggleFullScreen = () => {
@@ -211,7 +228,7 @@ export default function VideoPlayer({
     setPlayerState(prev => ({ ...prev, showControls: true }));
     if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
     controlsTimeoutRef.current = setTimeout(() => {
-      if (playerState.playing && !showSettings && !showSavePopup) {
+      if (playerState.playing && !showSettings && !quickWordDialog.isOpen && !dictionaryModal.isOpen) {
         setPlayerState(prev => ({ ...prev, showControls: false }));
       }
     }, 3000);
@@ -231,15 +248,27 @@ export default function VideoPlayer({
   };
 
   const handleWordClick = (word: string) => {
-    setSelectedWord(word);
-    setShowSavePopup(true);
-    // وقتی پاپ‌آپ باز است، کنترل‌ها را نشان بده
-    setPlayerState(prev => ({ ...prev, showControls: true }));
+    console.log('Word clicked:', word);
+
+    // Pause video and show controls when dialog opens
+    setPlayerState(prev => ({
+      ...prev,
+      playing: false,
+      showControls: true
+    }));
+
+    // Find existing meaning
+    const existingWord = vocabularies.find(v => v.word.toLowerCase() === word.toLowerCase());
+
+    setQuickWordDialog({
+      isOpen: true,
+      word: word,
+      meaning: existingWord?.meaning || ''
+    });
   };
 
-  const handleSaveWord = async (word: string, meaning: string) => {
+  const handleAddToLeitner = async (word: string, meaning: string) => {
     try {
-      // ارسال به API
       const response = await fetch("/api/cards", {
         method: "POST",
         headers: {
@@ -264,20 +293,55 @@ export default function VideoPlayer({
         word: word.trim(),
         meaning: meaning.trim()
       };
-      
+
       setVocabularies(prev => [...prev, newVocabulary]);
-      
-      console.log("Word saved successfully:", { word, meaning, savedCard });
-      
+
+      console.log("Word saved to Leitner system:", { word, meaning });
+
+      // بستن دیالوگ
+      setQuickWordDialog({ isOpen: false, word: '', meaning: '' });
+
     } catch (error) {
-      console.error("Error saving word to API:", error);
+      console.error("Error saving word to Leitner:", error);
+      throw error;
+    }
+  };
+
+  const handleViewDetails = () => {
+    setDictionaryModal({
+      isOpen: true,
+      word: quickWordDialog.word,
+      meaning: quickWordDialog.meaning || ''
+    });
+    setQuickWordDialog({ isOpen: false, word: '', meaning: '' });
+  };
+
+  const handleAddToFlashcards = async (word: string, meaning: string) => {
+    try {
+      const response = await fetch("/api/cards", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          front: word.trim(),
+          back: meaning.trim()
+        }),
+      });
+
+      if (response.ok) {
+        console.log("Word added to flashcards:", word);
+        return Promise.resolve();
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "خطا در افزودن لغت.");
+      }
+    } catch (error) {
+      console.error("Error adding to flashcards:", error);
       throw error;
     }
   };
 
   const handleRemoveWord = async (id: string) => {
     try {
-      // حذف از API
       const response = await fetch(`/api/cards/${id}`, {
         method: "DELETE",
       });
@@ -286,14 +350,11 @@ export default function VideoPlayer({
         throw new Error("خطا در حذف کارت");
       }
 
-      // حذف از لیست محلی
       setVocabularies(prev => prev.filter(v => v.id !== id));
-      
       console.log("Word removed successfully:", id);
-      
+
     } catch (error) {
       console.error("Error removing word from API:", error);
-      // حتی اگر API خطا داد، از لیست محلی حذف کن
       setVocabularies(prev => prev.filter(v => v.id !== id));
     }
   };
@@ -302,295 +363,429 @@ export default function VideoPlayer({
     setPlayerState(prev => ({ ...prev, ...updates }));
   };
 
-  const handleClosePopup = () => {
-    setShowSavePopup(false);
-    setSelectedWord(null);
-  };
-
-  // ساخت عنوان کامل
   const getFullTitle = () => {
     if (!videoData) return '';
-    
+
     let title = videoData.title;
-    
-    // اگر اطلاعات سریال داریم، به عنوان اضافه کنیم
+
     if (seasonNumber && episodeNumber) {
       title = `فصل ${seasonNumber}، قسمت ${episodeNumber}: ${title}`;
     }
-    
+
     if (seriesTitle) {
       title = `${seriesTitle} - ${title}`;
     }
-    
+
     return title;
   };
 
-  // نمایش loading
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-white dark:bg-gray-900 flex flex-col items-center justify-center p-4">
-        <div className="text-center">
-          <div className="h-16 w-16 animate-spin rounded-full border-4 border-solid border-cyan-500 border-t-transparent mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">در حال بارگذاری ویدیو...</p>
+  // --- Render Helpers ---
+  const renderLoading = () => (
+    <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4 relative overflow-hidden">
+      {/* Animated Background Blobs */}
+      <div className="absolute top-0 left-0 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl animate-pulse"></div>
+      <div className="absolute bottom-0 right-0 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+      
+      <div className="z-10 text-center">
+        <div className="relative w-24 h-24 mx-auto mb-6">
+          <div className="absolute inset-0 rounded-full border-4 border-slate-800"></div>
+          <div className="absolute inset-0 rounded-full border-4 border-t-blue-500 border-r-transparent border-b-purple-500 border-l-transparent animate-spin"></div>
+          <Film className="absolute inset-0 m-auto w-10 h-10 text-slate-400" />
+        </div>
+        <h2 className="text-2xl font-bold text-white mb-2">در حال آماده‌سازی پخش‌کننده...</h2>
+        <p className="text-slate-400">لطفاً چند لحظه صبر کنید</p>
+      </div>
+    </div>
+  );
+
+  const renderError = (errorMessage: string) => (
+    <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4 relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-red-900/10 to-slate-950"></div>
+      <div className="z-10 max-w-md w-full bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-3xl p-8 text-center shadow-2xl">
+        <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
+          <AlertCircle className="w-8 h-8 text-red-500" />
+        </div>
+        <h3 className="text-2xl font-bold text-white mb-2">متاسفانه مشکلی پیش آمد</h3>
+        <p className="text-slate-400 mb-8 leading-relaxed">
+          {errorMessage || 'ویدیو مورد نظر یافت نشد یا در دسترس نیست.'}
+        </p>
+        <div className="flex gap-4 justify-center">
+          <button
+            onClick={() => router.back()}
+            className="px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-medium transition-all border border-slate-700 flex items-center gap-2"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            بازگشت
+          </button>
+          <Link
+            href="/video-levels"
+            className="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-medium transition-all shadow-lg shadow-blue-600/20 flex items-center gap-2"
+          >
+            <Home className="w-5 h-5" />
+            صفحه اصلی
+          </Link>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
+
+  // نمایش loading
+  if (loading) return renderLoading();
 
   // نمایش خطا
-  if (error || !videoData) {
-    return (
-      <div className="min-h-screen bg-white dark:bg-gray-900 flex flex-col items-center justify-center p-4">
-        <div className="text-center max-w-md">
-          <div className="bg-red-100 dark:bg-red-900/30 rounded-full p-4 w-16 h-16 flex items-center justify-center mx-auto mb-4">
-            <AlertCircle className="w-8 h-8 text-red-600 dark:text-red-400" />
-          </div>
-          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-            {error || 'ویدیو یافت نشد'}
-          </h3>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
-            متأسفانه ویدیو مورد نظر در دسترس نیست یا حذف شده است.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <button
-              onClick={() => router.back()}
-              className="inline-flex items-center justify-center gap-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-6 py-3 rounded-lg transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5" />
-              بازگشت
-            </button>
-            <Link
-              href="/video-levels"
-              className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white px-6 py-3 rounded-lg transition-all duration-300"
-            >
-              <Home className="w-5 h-5" />
-              صفحه اصلی
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  if (error || !videoData) return renderError(error || 'ویدیو یافت نشد');
 
-  // اگر ویدیو URL ندارد
-  if (!videoData.videoUrl) {
-    return (
-      <div className="min-h-screen bg-white dark:bg-gray-900 flex flex-col items-center justify-center p-4">
-        <div className="text-center max-w-md">
-          <div className="bg-yellow-100 dark:bg-yellow-900/30 rounded-full p-4 w-16 h-16 flex items-center justify-center mx-auto mb-4">
-            <AlertCircle className="w-8 h-8 text-yellow-600 dark:text-yellow-400" />
-          </div>
-          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-            لینک ویدیو موجود نیست
-          </h3>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
-            برای این ویدیو لینک پخش تنظیم نشده است.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <button
-              onClick={() => router.back()}
-              className="inline-flex items-center justify-center gap-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-6 py-3 rounded-lg transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5" />
-              بازگشت
-            </button>
-            <Link
-              href="/video-levels"
-              className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white px-6 py-3 rounded-lg transition-all duration-300"
-            >
-              <Home className="w-5 h-5" />
-              صفحه اصلی
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  if (!videoData.videoUrl) return renderError('لینک ویدیو نامعتبر است');
 
   const fullTitle = getFullTitle();
 
   return (
-    <div className="w-full max-w-[900px] mx-auto font-sans bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100" dir="rtl">
-      
-      {/* ویدیو پلیر */}
-      <div className="fixed top-0 left-0 right-0 z-[9999] bg-black dark:bg-gray-900 shadow-2xl">
-        <div className="w-full max-w-[800px] mx-auto">
-          <div 
-            ref={playerContainerRef}
-            onMouseMove={handleMouseMove}
-            onMouseLeave={() => playerState.playing && !showSettings && !showSavePopup && updatePlayerState({ showControls: false })}
-            className={`
-              relative bg-black flex justify-center items-center transition-all duration-300 overflow-hidden
-              ${playerState.isFullScreen ? 'w-full h-screen' : 'w-full aspect-video'}
-            `}
-          >
-            <div className="absolute inset-0 z-0" onClick={() => {
-              if (!showSavePopup) {
-                updatePlayerState({ playing: !playerState.playing });
-              }
-            }}></div>
-
-            <ReactPlayer
-              ref={playerRef}
-              url={videoData.videoUrl}
-              playing={playerState.playing}
-              controls={false}
-              width="100%"
-              height="100%"
-              onProgress={handleProgress}
-              onDuration={(duration) => updatePlayerState({ duration })}
-              onEnded={() => updatePlayerState({ playing: false })}
-              config={{ file: { attributes: { controlsList: 'nodownload' } } }}
-            />
-
-            {/* زیرنویس روی ویدیو */}
-            <VideoSubtitles
-              activeSubtitle={activeSubtitle}
-              subtitleSettings={subtitleSettings}
-              showControls={playerState.showControls}
-              onWordClick={handleWordClick}
-            />
-
-            {/* نوار کنترل */}
-            <PlayerControls
-              playing={playerState.playing}
-              currentTime={playerState.currentTime}
-              duration={playerState.duration}
-              isFullScreen={playerState.isFullScreen}
-              showControls={playerState.showControls && !showSavePopup}
-              onPlayPause={() => updatePlayerState({ playing: !playerState.playing })}
-              onSeek={(time) => {
-                updatePlayerState({ currentTime: time });
-                if (playerRef.current) {
-                  playerRef.current.seekTo(time, 'seconds');
-                }
-              }}
-              onFullScreen={toggleFullScreen}
-              onShowSettings={() => setShowSettings(true)}
-            />
-
-            {/* پاپ‌آپ ذخیره لغت - داخل ویدیو پلیر */}
-            {showSavePopup && selectedWord && (
-              <div className="fixed absolute inset-0 z-[10000] flex items-center justify-center p-4 bg-black/50 dark:bg-gray-900/90 backdrop-blur-sm">
-                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
-                  <SaveWordPopup
-                    word={selectedWord}
-                    onClose={handleClosePopup}
-                    onSave={handleSaveWord}
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* پنل تنظیمات */}
-            <SettingsPanel
-              isOpen={showSettings}
-              activeTab={activeTab}
-              subtitleSettings={subtitleSettings}
-              videoQuality={videoQuality}
-              onClose={() => setShowSettings(false)}
-              onTabChange={setActiveTab}
-              onSubtitleSettingsChange={setSubtitleSettings}
-              onVideoQualityChange={setVideoQuality}
-            />
-          </div>
-        </div>
+    <div className="min-h-screen bg-slate-950 text-slate-200 font-sans selection:bg-blue-500/30">
+      {/* Decorative Background Elements */}
+      <div className="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
+        <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[100px]"></div>
+        <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[100px]"></div>
       </div>
 
-      {/* فضای خالی داینامیک */}
-      <div style={{ height: `${playerState.videoHeight}px` }}></div>
+      {/* Quick Word Dialog */}
+      <QuickWordDialog
+        isOpen={quickWordDialog.isOpen}
+        word={quickWordDialog.word}
+        meaning={quickWordDialog.meaning}
+        onClose={() => setQuickWordDialog({ isOpen: false, word: '', meaning: '' })}
+        onAddToLeitner={handleAddToLeitner}
+        onViewDetails={handleViewDetails}
+      />
 
-      {/* محتوای پایین */}
-      <div className="px-4 pt-4 dark:bg-gray-900">
-        {/* اطلاعات ویدیو */}
-        <div className="mb-6">
-          {/* بخش توضیحات */}
-          <div className="mt-4 mb-4">
-            <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
-              <div className="flex items-start justify-between gap-4 mb-2">
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex-1">
-                  {fullTitle}
-                </h1>
-                
-                {/* نشانگر سریال */}
-                {seasonNumber && episodeNumber && (
-                  <div className="flex items-center gap-2 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 px-3 py-1 rounded-lg">
-                    <span className="font-bold">فصل {seasonNumber}</span>
-                    <span className="text-gray-500">|</span>
-                    <span>قسمت {episodeNumber}</span>
+      {/* Main Dictionary Modal */}
+      <DictionaryModal
+        isOpen={dictionaryModal.isOpen}
+        onClose={() => setDictionaryModal({ isOpen: false, word: '', meaning: '' })}
+        initialWord={dictionaryModal.word}
+        initialMeaning={dictionaryModal.meaning}
+        onAddToFlashcards={handleAddToFlashcards}
+      />
+
+      {/* Container */}
+      <div className="w-full max-w-[1600px] mx-auto p-4 lg:p-6 lg:pt-8" dir="rtl">
+        
+        {/* Main Layout Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+          
+          {/* LEFT SIDE (on RTL layout, this is visually right): Video Player */}
+          <div className="lg:col-span-8 flex flex-col gap-6">
+            
+            {/* Video Container */}
+            <div 
+              ref={playerContainerRef}
+              onMouseMove={handleMouseMove}
+              onMouseLeave={() => {
+                if (playerState.playing && !showSettings && !quickWordDialog.isOpen && !dictionaryModal.isOpen) {
+                  updatePlayerState({ showControls: false });
+                }
+              }}
+              className="relative group bg-black rounded-2xl overflow-hidden shadow-2xl shadow-black/50 border border-slate-800"
+              style={{ aspectRatio: '16/9', pointerEvents: 'auto' }}
+              onClick={(e) => {
+                if (!e.target.closest('[class*="hover:bg-blue-500"]') && 
+                    !quickWordDialog.isOpen && 
+                    !dictionaryModal.isOpen && 
+                    !showSettings) {
+                  updatePlayerState({ playing: !playerState.playing });
+                }
+              }}
+            >
+              <ReactPlayer
+                ref={playerRef}
+                url={videoData.videoUrl}
+                playing={playerState.playing}
+                controls={false}
+                width="100%"
+                height="100%"
+                onProgress={handleProgress}
+                onDuration={(duration) => updatePlayerState({ duration })}
+                onEnded={() => updatePlayerState({ playing: false })}
+                config={{ 
+                  file: { 
+                    attributes: { 
+                      controlsList: 'nodownload',
+                      disablePictureInPicture: true
+                    } 
+                  } 
+                }}
+                style={{ background: '#000' }}
+              />
+
+              {/* Subtitles Overlay */}
+              <VideoSubtitles
+                activeSubtitle={activeSubtitle}
+                subtitleSettings={subtitleSettings}
+                showControls={playerState.showControls}
+                onWordClick={handleWordClick}
+              />
+
+              {/* Controls Overlay (Glassmorphism) */}
+              <div className={`absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${playerState.showControls ? 'opacity-100' : 'opacity-0'}`}>
+                <PlayerControls
+                  playing={playerState.playing}
+                  currentTime={playerState.currentTime}
+                  duration={playerState.duration}
+                  isFullScreen={playerState.isFullScreen}
+                  showControls={playerState.showControls}
+                  onPlayPause={() => updatePlayerState({ playing: !playerState.playing })}
+                  onSeek={(time) => {
+                    updatePlayerState({ currentTime: time });
+                    if (playerRef.current) playerRef.current.seekTo(time, 'seconds');
+                  }}
+                  onFullScreen={toggleFullScreen}
+                  onShowSettings={() => setShowSettings(true)}
+                />
+              </div>
+
+              {/* Settings Panel */}
+              <SettingsPanel
+                isOpen={showSettings}
+                activeTab={activeTab}
+                subtitleSettings={subtitleSettings}
+                videoQuality={videoQuality}
+                onClose={() => setShowSettings(false)}
+                onTabChange={setActiveTab}
+                onSubtitleSettingsChange={setSubtitleSettings}
+                onVideoQualityChange={setVideoQuality}
+              />
+            </div>
+
+            {/* Mobile Accordion - Video Info Section */}
+            <div ref={mobileInfoRef} className="lg:hidden">
+              <div className="bg-slate-900/50 backdrop-blur-md border border-slate-800 rounded-2xl overflow-hidden shadow-xl transition-all duration-300">
+                {/* Accordion Header - Minimal Mobile View */}
+                <button
+                  onClick={() => setIsMobileInfoExpanded(!isMobileInfoExpanded)}
+                  className="w-full p-4 flex items-center justify-between text-right hover:bg-slate-800/30 transition-colors"
+                  aria-expanded={isMobileInfoExpanded}
+                >
+                  <div className="flex flex-col items-end gap-1.5 flex-1 min-w-0">
+        
+                    
+                    {/* Title - Truncated */}
+                    <h2 className="text-sm font-bold text-white truncate text-right w-full">
+                      {fullTitle}
+                    </h2>
+                    
+
+                  </div>
+                  
+                  {/* Expand/Collapse Icon */}
+                  <div className="flex-shrink-0 mr-3">
+                    {isMobileInfoExpanded ? (
+                      <ChevronUp className="w-5 h-5 text-slate-400" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-slate-400" />
+                    )}
+                  </div>
+                </button>
+
+                {/* Accordion Content - Expanded Details */}
+                {isMobileInfoExpanded && (
+                  <div className="px-4 pb-4 border-t border-slate-800/50 animate-in slide-in-from-top duration-300">
+                    {/* Detailed Stats Grid */}
+                    <div className="grid grid-cols-2 gap-3 my-4">
+                      <div className="bg-slate-800/50 rounded-xl p-3 border border-slate-700/50">
+                        <div className="text-slate-400 text-xs mb-1 flex items-center gap-1">
+                          <Clock className="w-3 h-3" />
+                          کل زیرنویس‌ها
+                        </div>
+                        <div className="text-lg font-bold text-white">{subtitles.length}</div>
+                      </div>
+                      <div className="bg-slate-800/50 rounded-xl p-3 border border-slate-700/50">
+                        <div className="text-slate-400 text-xs mb-1 flex items-center gap-1">
+                          <BookOpen className="w-3 h-3" />
+                          لغات ذخیره شده
+                        </div>
+                        <div className="text-lg font-bold text-white">{vocabularies.length}</div>
+                      </div>
+                    </div>
+
+                    {/* Description Section */}
+                    {videoData.description && (
+                      <div className="pt-3 border-t border-slate-800/50">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-slate-300 text-sm font-semibold">توضیحات</span>
+                          <div className="flex-1 h-px bg-slate-800/50"></div>
+                        </div>
+                        <p className="text-slate-300 text-sm leading-relaxed">
+                          {videoData.description}
+                        </p>
+                        {videoData.description.length > 300 && (
+                          <button
+                            onClick={() => setShowFullDescription(!showFullDescription)}
+                            className="mt-2 text-blue-400 hover:text-blue-300 text-xs font-medium transition-colors flex items-center gap-1"
+                          >
+                            {showFullDescription ? 'نمایش کمتر' : 'ادامه توضیحات'}
+                            <ArrowLeft className={`w-3 h-3 transition-transform ${showFullDescription ? 'rotate-0' : 'rotate-180'}`} />
+                          </button>
+                        )}
+                      </div>
+                    )}
+
+
                   </div>
                 )}
               </div>
+            </div>
 
-              {/* سطح ویدیو */}
-              <div className="mb-3">
-                <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded text-sm font-medium">
-                  سطح {videoData.level}
-                </span>
-              </div>
-
-              {/* توضیحات متغیر */}
-              {videoData.description ? (
-                <div className="relative">
-                  <p className={`text-sm text-gray-700 dark:text-gray-300 mb-2 ${!showFullDescription ? 'line-clamp-2' : ''}`}>
-                    {videoData.description}
-                  </p>
-                  {videoData.description.length > 100 && (
-                    <button
-                      onClick={() => setShowFullDescription(!showFullDescription)}
-                      className="text-blue-600 dark:text-blue-400 text-sm font-medium hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
-                    >
-                      {showFullDescription ? 'بستن' : 'مشاهده بیشتر'}
-                    </button>
-                  )}
+            {/* Desktop Video Info Section */}
+            <div className="hidden lg:block bg-slate-900/50 backdrop-blur-md border border-slate-800 rounded-2xl p-6 lg:p-8 shadow-xl">
+              <div className="flex flex-col gap-6">
+                
+                {/* Title Header */}
+                <div className="flex flex-col gap-4">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <span className="px-3 py-1.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-lg text-xs font-bold uppercase tracking-wider">
+                      {videoData.level}
+                    </span>
+                    {seasonNumber && episodeNumber && (
+                      <span className="px-3 py-1.5 bg-purple-500/10 text-purple-400 border border-purple-500/20 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-1">
+                        <Film className="w-3 h-3" />
+                        S{seasonNumber} E{episodeNumber}
+                      </span>
+                    )}
+                  </div>
+                  
+                  <h1 className="text-2xl lg:text-3xl font-extrabold text-white leading-tight">
+                    {fullTitle}
+                  </h1>
                 </div>
-              ) : (
-                <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
-                  این ویدیوی آموزشی سطح {videoData.level} به شما کمک می‌کند تا مهارت‌های زبان خود را تقویت کنید. 
-                  با مشاهده این ویدیو و تمرین لغات ارائه شده، می‌توانید درک شنیداری و دایره لغات خود را بهبود بخشید.
-                </p>
-              )}
+
+                {/* Stats Grid */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  <div className="bg-slate-800/50 rounded-xl p-3 border border-slate-700/50">
+                    <div className="text-slate-400 text-xs mb-1 flex items-center gap-1">
+                      <Clock className="w-3 h-3" />
+                      زیرنویس‌ها
+                    </div>
+                    <div className="text-lg font-bold text-white">{subtitles.length}</div>
+                  </div>
+                  <div className="bg-slate-800/50 rounded-xl p-3 border border-slate-700/50">
+                    <div className="text-slate-400 text-xs mb-1 flex items-center gap-1">
+                      <BookOpen className="w-3 h-3" />
+                      لغات
+                    </div>
+                    <div className="text-lg font-bold text-white">{vocabularies.length}</div>
+                  </div>
+                </div>
+
+                {/* Description */}
+                {videoData.description && (
+                  <div className="pt-4 border-t border-slate-800">
+                    <div className="relative">
+                      <p className={`text-slate-300 leading-7 text-sm lg:text-base ${
+                        !showFullDescription ? 'line-clamp-3' : ''
+                      }`}>
+                        {videoData.description}
+                      </p>
+                      {videoData.description.length > 150 && (
+                        <button
+                          onClick={() => setShowFullDescription(!showFullDescription)}
+                          className="mt-3 text-blue-400 hover:text-blue-300 text-sm font-medium transition-colors flex items-center gap-1"
+                        >
+                          {showFullDescription ? 'نمایش کمتر' : 'ادامه مطلب'}
+                          <ArrowLeft className={`w-4 h-4 transition-transform ${showFullDescription ? 'rotate-0' : 'rotate-180'}`} />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
 
-        <TabBar
-          activeTab={activeTab}
-          vocabularyCount={vocabularies.length}
-          onTabChange={setActiveTab}
-        />
-        
-        <div className="mt-4">
-          {activeTab === 'subtitles' ? (
-            <SubtitleList
-              subtitles={subtitles}
-              activeSubtitle={activeSubtitle}
-              subtitleSettings={subtitleSettings}
-              videoHeight={playerState.videoHeight}
-              onSubtitleJump={handleSubtitleJump}
-              onWordClick={handleWordClick}
-            />
-          ) : (
-            <VocabularyList
-              vocabularies={vocabularies}
-              onRemoveWord={handleRemoveWord}
-            />
-          )}
-        </div>
-        
-        {/* لینک بازگشت به سریال (اگر سریال است) */}
-        {seriesTitle && (
-          <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-800/30 rounded-xl">
-            <Link 
-              href={`/series/${videoData.id}`}
-              className="inline-flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              بازگشت به صفحه سریال {seriesTitle}
-            </Link>
+          {/* RIGHT SIDE (Visually Left in RTL): Interactive Sidebar */}
+          <div className="lg:col-span-4 flex flex-col h-full max-h-[calc(100vh-40px)] lg:max-h-[calc(100vh-100px)] sticky top-6">
+            <div className="bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col h-full">
+              
+              {/* Glassmorphism Header Tabs */}
+              <TabBar
+                activeTab={activeTab}
+                vocabularyCount={vocabularies.length}
+                onTabChange={setActiveTab}
+              />
+              
+              {/* Scrollable Content Area */}
+              <div className="flex-1 overflow-hidden relative">
+                <div className="h-full overflow-y-auto custom-scrollbar p-4">
+                  {activeTab === 'subtitles' ? (
+                    <SubtitleList
+                      subtitles={subtitles}
+                      activeSubtitle={activeSubtitle}
+                      subtitleSettings={subtitleSettings}
+                      videoHeight={playerState.videoHeight}
+                      onSubtitleJump={handleSubtitleJump}
+                      onWordClick={handleWordClick}
+                    />
+                  ) : (
+                    <VocabularyList
+                      vocabularies={vocabularies}
+                      onWordClick={(vocab) => {
+                        setQuickWordDialog({
+                          isOpen: true,
+                          word: vocab.word,
+                          meaning: vocab.meaning
+                        });
+                      }}
+                    />
+                  )}
+                </div>
+              </div>
+              
+              {/* Bottom Gradient for fade effect */}
+              <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-slate-900 to-transparent pointer-events-none"></div>
+            </div>
           </div>
-        )}
+
+        </div>
       </div>
+
+      {/* Global Custom Scrollbar Styles */}
+      <style jsx global>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: rgba(30, 41, 59, 0.5);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(148, 163, 184, 0.3);
+          border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgba(148, 163, 184, 0.5);
+        }
+        
+        /* Line Clamp Utilities */
+        .line-clamp-3 {
+          display: -webkit-box;
+          -webkit-line-clamp: 3;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+
+        /* Animation classes */
+        @keyframes slide-in-from-top {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        .animate-in {
+          animation: slide-in-from-top 0.3s ease-out;
+        }
+      `}</style>
     </div>
   );
 }
