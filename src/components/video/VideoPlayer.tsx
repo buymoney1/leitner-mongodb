@@ -487,7 +487,7 @@ export default function VideoPlayer({
               className="relative group bg-black rounded-2xl overflow-hidden shadow-2xl shadow-black/50 border border-slate-800"
               style={{ aspectRatio: '16/9', pointerEvents: 'auto' }}
               onClick={(e) => {
-                if (!e.target.closest('[class*="hover:bg-blue-500"]') && 
+                if (!(e.currentTarget as HTMLElement).closest('[class*="hover:bg-blue-500"]') && 
                     !quickWordDialog.isOpen && 
                     !dictionaryModal.isOpen && 
                     !showSettings) {

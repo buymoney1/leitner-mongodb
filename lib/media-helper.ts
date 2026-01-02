@@ -1,5 +1,9 @@
 // lib/media-helper.ts
-import { prisma } from './prisma';
+import { PrismaClient } from '@prisma/client';
+
+// یک instance جدید از PrismaClient بسازید
+const prisma = new PrismaClient();
+
 import { parspackService } from './parspack';
 
 export class MediaHelper {
@@ -30,7 +34,7 @@ export class MediaHelper {
       }
 
       // لینک جدید بساز
-      const newUrl = await parspackService.getFileUrl(mediaFile.storageKey, 604800);
+      const newUrl = await parspackService.getFileUrl(mediaFile.storageKey);
       
       // ذخیره در دیتابیس
       await prisma.mediaFile.update({
