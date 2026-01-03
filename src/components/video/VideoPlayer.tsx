@@ -13,7 +13,7 @@ import VocabularyList from "./VocabularyList";
 import SubtitleList from "../SubtitleList";
 import DictionaryModal from "../DictionaryModal";
 import QuickWordDialog from "./QuickWordDialog";
-import { ArrowLeft, Play, AlertCircle, Home, Film, Volume2, BookOpen, Clock, ChevronDown, ChevronUp } from 'lucide-react';
+import { ArrowLeft, Play, AlertCircle, Home, Film, Volume2, BookOpen, Clock, ChevronDown, ChevronUp, Globe, User, Calendar, Hash, Info } from 'lucide-react';
 import Link from "next/link";
 
 interface VideoPlayerProps {
@@ -381,45 +381,45 @@ export default function VideoPlayer({
 
   // --- Render Helpers ---
   const renderLoading = () => (
-    <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col items-center justify-center p-4 relative overflow-hidden">
       {/* Animated Background Blobs */}
-      <div className="absolute top-0 left-0 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl animate-pulse"></div>
-      <div className="absolute bottom-0 right-0 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+      <div className="absolute top-0 left-0 w-96 h-96 bg-blue-100 dark:bg-blue-600/20 rounded-full blur-3xl animate-pulse"></div>
+      <div className="absolute bottom-0 right-0 w-96 h-96 bg-purple-100 dark:bg-purple-600/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
       
       <div className="z-10 text-center">
         <div className="relative w-24 h-24 mx-auto mb-6">
-          <div className="absolute inset-0 rounded-full border-4 border-slate-800"></div>
+          <div className="absolute inset-0 rounded-full border-4 border-gray-200 dark:border-gray-800"></div>
           <div className="absolute inset-0 rounded-full border-4 border-t-blue-500 border-r-transparent border-b-purple-500 border-l-transparent animate-spin"></div>
-          <Film className="absolute inset-0 m-auto w-10 h-10 text-slate-400" />
+          <Film className="absolute inset-0 m-auto w-10 h-10 text-gray-400 dark:text-gray-600" />
         </div>
-        <h2 className="text-2xl font-bold text-white mb-2">در حال آماده‌سازی پخش‌کننده...</h2>
-        <p className="text-slate-400">لطفاً چند لحظه صبر کنید</p>
+        <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">در حال آماده‌سازی پخش‌کننده...</h2>
+        <p className="text-gray-500 dark:text-gray-400">لطفاً چند لحظه صبر کنید</p>
       </div>
     </div>
   );
 
   const renderError = (errorMessage: string) => (
-    <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4 relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-red-900/10 to-slate-950"></div>
-      <div className="z-10 max-w-md w-full bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-3xl p-8 text-center shadow-2xl">
-        <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col items-center justify-center p-4 relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-red-100/50 dark:from-red-900/10 to-gray-50 dark:to-gray-950"></div>
+      <div className="z-10 max-w-md w-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border border-gray-200 dark:border-gray-800 rounded-2xl p-8 text-center shadow-2xl">
+        <div className="w-16 h-16 bg-red-100 dark:bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
           <AlertCircle className="w-8 h-8 text-red-500" />
         </div>
-        <h3 className="text-2xl font-bold text-white mb-2">متاسفانه مشکلی پیش آمد</h3>
-        <p className="text-slate-400 mb-8 leading-relaxed">
+        <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">متاسفانه مشکلی پیش آمد</h3>
+        <p className="text-gray-600 dark:text-gray-400 mb-8 leading-relaxed">
           {errorMessage || 'ویدیو مورد نظر یافت نشد یا در دسترس نیست.'}
         </p>
         <div className="flex gap-4 justify-center">
           <button
             onClick={() => router.back()}
-            className="px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-medium transition-all border border-slate-700 flex items-center gap-2"
+            className="px-6 py-3 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-800 dark:text-white font-medium transition-all border border-gray-300 dark:border-gray-700 flex items-center gap-2"
           >
             <ArrowLeft className="w-5 h-5" />
             بازگشت
           </button>
           <Link
             href="/video-levels"
-            className="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-medium transition-all shadow-lg shadow-blue-600/20 flex items-center gap-2"
+            className="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-medium transition-all shadow-lg shadow-blue-600/20 dark:shadow-blue-600/10 flex items-center gap-2"
           >
             <Home className="w-5 h-5" />
             صفحه اصلی
@@ -440,11 +440,11 @@ export default function VideoPlayer({
   const fullTitle = getFullTitle();
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 font-sans selection:bg-blue-500/30">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-200 font-sans selection:bg-blue-500/30">
       {/* Decorative Background Elements */}
       <div className="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
-        <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[100px]"></div>
-        <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[100px]"></div>
+        <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-blue-100 dark:bg-blue-600/10 rounded-full blur-[100px]"></div>
+        <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-purple-100 dark:bg-purple-600/10 rounded-full blur-[100px]"></div>
       </div>
 
       {/* Quick Word Dialog */}
@@ -484,7 +484,7 @@ export default function VideoPlayer({
                   updatePlayerState({ showControls: false });
                 }
               }}
-              className="relative group bg-black rounded-2xl overflow-hidden shadow-2xl shadow-black/50 border border-slate-800"
+              className="relative group bg-black rounded-xl lg:rounded-2xl overflow-hidden shadow-lg lg:shadow-2xl shadow-gray-300/50 dark:shadow-black/50 border border-gray-200 dark:border-gray-800"
               style={{ aspectRatio: '16/9', pointerEvents: 'auto' }}
               onClick={(e) => {
                 if (!(e.currentTarget as HTMLElement).closest('[class*="hover:bg-blue-500"]') && 
@@ -524,7 +524,7 @@ export default function VideoPlayer({
                 onWordClick={handleWordClick}
               />
 
-              {/* Controls Overlay (Glassmorphism) */}
+              {/* Controls Overlay */}
               <div className={`absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${playerState.showControls ? 'opacity-100' : 'opacity-0'}`}>
                 <PlayerControls
                   playing={playerState.playing}
@@ -557,69 +557,71 @@ export default function VideoPlayer({
 
             {/* Mobile Accordion - Video Info Section */}
             <div ref={mobileInfoRef} className="lg:hidden">
-              <div className="bg-slate-900/50 backdrop-blur-md border border-slate-800 rounded-2xl overflow-hidden shadow-xl transition-all duration-300">
+              <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden shadow-lg transition-all duration-300">
                 {/* Accordion Header - Minimal Mobile View */}
                 <button
                   onClick={() => setIsMobileInfoExpanded(!isMobileInfoExpanded)}
-                  className="w-full p-4 flex items-center justify-between text-right hover:bg-slate-800/30 transition-colors"
+                  className="w-full p-4 flex items-center justify-between text-right hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors"
                   aria-expanded={isMobileInfoExpanded}
                 >
                   <div className="flex flex-col items-end gap-1.5 flex-1 min-w-0">
-        
+                    {/* Level Badge */}
+      
+      
                     
                     {/* Title - Truncated */}
-                    <h2 className="text-sm font-bold text-white truncate text-right w-full">
+                    <h2 className="text-sm font-bold text-gray-800 dark:text-white truncate text-right w-full">
                       {fullTitle}
                     </h2>
-                    
-
+    
+    
                   </div>
                   
                   {/* Expand/Collapse Icon */}
                   <div className="flex-shrink-0 mr-3">
                     {isMobileInfoExpanded ? (
-                      <ChevronUp className="w-5 h-5 text-slate-400" />
+                      <ChevronUp className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                     ) : (
-                      <ChevronDown className="w-5 h-5 text-slate-400" />
+                      <ChevronDown className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                     )}
                   </div>
                 </button>
 
                 {/* Accordion Content - Expanded Details */}
                 {isMobileInfoExpanded && (
-                  <div className="px-4 pb-4 border-t border-slate-800/50 animate-in slide-in-from-top duration-300">
+                  <div className="px-4 pb-4 border-t border-gray-200 dark:border-gray-800/50 animate-in slide-in-from-top duration-300">
                     {/* Detailed Stats Grid */}
                     <div className="grid grid-cols-2 gap-3 my-4">
-                      <div className="bg-slate-800/50 rounded-xl p-3 border border-slate-700/50">
-                        <div className="text-slate-400 text-xs mb-1 flex items-center gap-1">
+                      <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-3 border border-gray-200 dark:border-gray-700">
+                        <div className="text-gray-600 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
                           <Clock className="w-3 h-3" />
                           کل زیرنویس‌ها
                         </div>
-                        <div className="text-lg font-bold text-white">{subtitles.length}</div>
+                        <div className="text-lg font-bold text-gray-800 dark:text-white">{subtitles.length}</div>
                       </div>
-                      <div className="bg-slate-800/50 rounded-xl p-3 border border-slate-700/50">
-                        <div className="text-slate-400 text-xs mb-1 flex items-center gap-1">
+                      <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-3 border border-gray-200 dark:border-gray-700">
+                        <div className="text-gray-600 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
                           <BookOpen className="w-3 h-3" />
                           لغات ذخیره شده
                         </div>
-                        <div className="text-lg font-bold text-white">{vocabularies.length}</div>
+                        <div className="text-lg font-bold text-gray-800 dark:text-white">{vocabularies.length}</div>
                       </div>
                     </div>
 
                     {/* Description Section */}
                     {videoData.description && (
-                      <div className="pt-3 border-t border-slate-800/50">
+                      <div className="pt-3 border-t border-gray-200 dark:border-gray-800/50">
                         <div className="flex items-center gap-2 mb-2">
-                          <span className="text-slate-300 text-sm font-semibold">توضیحات</span>
-                          <div className="flex-1 h-px bg-slate-800/50"></div>
+                          <span className="text-gray-700 dark:text-gray-300 text-sm font-semibold">توضیحات</span>
+                          <div className="flex-1 h-px bg-gray-300 dark:bg-gray-800/50"></div>
                         </div>
-                        <p className="text-slate-300 text-sm leading-relaxed">
+                        <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
                           {videoData.description}
                         </p>
                         {videoData.description.length > 300 && (
                           <button
                             onClick={() => setShowFullDescription(!showFullDescription)}
-                            className="mt-2 text-blue-400 hover:text-blue-300 text-xs font-medium transition-colors flex items-center gap-1"
+                            className="mt-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-xs font-medium transition-colors flex items-center gap-1"
                           >
                             {showFullDescription ? 'نمایش کمتر' : 'ادامه توضیحات'}
                             <ArrowLeft className={`w-3 h-3 transition-transform ${showFullDescription ? 'rotate-0' : 'rotate-180'}`} />
@@ -627,59 +629,58 @@ export default function VideoPlayer({
                         )}
                       </div>
                     )}
-
-
                   </div>
                 )}
               </div>
             </div>
 
             {/* Desktop Video Info Section */}
-            <div className="hidden lg:block bg-slate-900/50 backdrop-blur-md border border-slate-800 rounded-2xl p-6 lg:p-8 shadow-xl">
+            <div className="hidden lg:block bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border border-gray-200 dark:border-gray-800 rounded-2xl p-6 lg:p-8 shadow-lg dark:shadow-xl">
               <div className="flex flex-col gap-6">
                 
                 {/* Title Header */}
                 <div className="flex flex-col gap-4">
                   <div className="flex flex-wrap items-center gap-3">
-                    <span className="px-3 py-1.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-lg text-xs font-bold uppercase tracking-wider">
+                    <span className="px-3 py-1.5 bg-blue-100 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-500/20 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-1">
+                      <Globe className="w-3 h-3" />
                       {videoData.level}
                     </span>
                     {seasonNumber && episodeNumber && (
-                      <span className="px-3 py-1.5 bg-purple-500/10 text-purple-400 border border-purple-500/20 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-1">
+                      <span className="px-3 py-1.5 bg-purple-100 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-500/20 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-1">
                         <Film className="w-3 h-3" />
                         S{seasonNumber} E{episodeNumber}
                       </span>
                     )}
                   </div>
                   
-                  <h1 className="text-2xl lg:text-3xl font-extrabold text-white leading-tight">
+                  <h1 className="text-2xl lg:text-3xl font-extrabold text-gray-800 dark:text-white leading-tight">
                     {fullTitle}
                   </h1>
                 </div>
 
                 {/* Stats Grid */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                  <div className="bg-slate-800/50 rounded-xl p-3 border border-slate-700/50">
-                    <div className="text-slate-400 text-xs mb-1 flex items-center gap-1">
+                  <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-3 border border-gray-200 dark:border-gray-700">
+                    <div className="text-gray-600 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
                       <Clock className="w-3 h-3" />
                       زیرنویس‌ها
                     </div>
-                    <div className="text-lg font-bold text-white">{subtitles.length}</div>
+                    <div className="text-lg font-bold text-gray-800 dark:text-white">{subtitles.length}</div>
                   </div>
-                  <div className="bg-slate-800/50 rounded-xl p-3 border border-slate-700/50">
-                    <div className="text-slate-400 text-xs mb-1 flex items-center gap-1">
+                  <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-3 border border-gray-200 dark:border-gray-700">
+                    <div className="text-gray-600 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
                       <BookOpen className="w-3 h-3" />
                       لغات
                     </div>
-                    <div className="text-lg font-bold text-white">{vocabularies.length}</div>
+                    <div className="text-lg font-bold text-gray-800 dark:text-white">{vocabularies.length}</div>
                   </div>
                 </div>
 
                 {/* Description */}
                 {videoData.description && (
-                  <div className="pt-4 border-t border-slate-800">
+                  <div className="pt-4 border-t border-gray-200 dark:border-gray-800">
                     <div className="relative">
-                      <p className={`text-slate-300 leading-7 text-sm lg:text-base ${
+                      <p className={`text-gray-700 dark:text-gray-300 leading-7 text-sm lg:text-base ${
                         !showFullDescription ? 'line-clamp-3' : ''
                       }`}>
                         {videoData.description}
@@ -687,7 +688,7 @@ export default function VideoPlayer({
                       {videoData.description.length > 150 && (
                         <button
                           onClick={() => setShowFullDescription(!showFullDescription)}
-                          className="mt-3 text-blue-400 hover:text-blue-300 text-sm font-medium transition-colors flex items-center gap-1"
+                          className="mt-3 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-sm font-medium transition-colors flex items-center gap-1"
                         >
                           {showFullDescription ? 'نمایش کمتر' : 'ادامه مطلب'}
                           <ArrowLeft className={`w-4 h-4 transition-transform ${showFullDescription ? 'rotate-0' : 'rotate-180'}`} />
@@ -702,7 +703,7 @@ export default function VideoPlayer({
 
           {/* RIGHT SIDE (Visually Left in RTL): Interactive Sidebar */}
           <div className="lg:col-span-4 flex flex-col h-full max-h-[calc(100vh-40px)] lg:max-h-[calc(100vh-100px)] sticky top-6">
-            <div className="bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col h-full">
+            <div className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border border-gray-200 dark:border-gray-800 rounded-2xl shadow-lg dark:shadow-2xl overflow-hidden flex flex-col h-full">
               
               {/* Glassmorphism Header Tabs */}
               <TabBar
@@ -739,10 +740,9 @@ export default function VideoPlayer({
               </div>
               
               {/* Bottom Gradient for fade effect */}
-              <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-slate-900 to-transparent pointer-events-none"></div>
+              <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white dark:from-gray-900 to-transparent pointer-events-none"></div>
             </div>
           </div>
-
         </div>
       </div>
 
@@ -752,14 +752,28 @@ export default function VideoPlayer({
           width: 6px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
-          background: rgba(30, 41, 59, 0.5);
+          background: rgba(243, 244, 246, 0.5);
+          border-radius: 10px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: rgba(148, 163, 184, 0.3);
+          background: rgba(156, 163, 175, 0.3);
           border-radius: 10px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: rgba(148, 163, 184, 0.5);
+          background: rgba(156, 163, 175, 0.5);
+        }
+        
+        /* Dark mode scrollbar */
+        @media (prefers-color-scheme: dark) {
+          .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(31, 41, 55, 0.5);
+          }
+          .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(75, 85, 99, 0.3);
+          }
+          .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(75, 85, 99, 0.5);
+          }
         }
         
         /* Line Clamp Utilities */

@@ -1,3 +1,4 @@
+// components/SubtitleList.tsx
 import { useRef, useEffect } from 'react';
 import { formatTime } from '../utils';
 import { Subtitle, SubtitleSettings } from '../../types';
@@ -15,11 +16,32 @@ interface ClickableTextProps {
   text: string;
   settings: SubtitleSettings;
   onWordClick: (word: string) => void;
+  isPersian?: boolean;
 }
 
-const ClickableText = ({ text, settings, onWordClick }: ClickableTextProps) => {
+const ClickableText = ({ text, settings, onWordClick, isPersian = true }: ClickableTextProps) => {
   const words = text.split(/\s+/);
   
+  // تعیین رنگ متن بر اساس mode
+  const getTextColor = () => {
+    // اگر رنگ سفید است و در لایت مود هستیم، از رنگ تیره استفاده کن
+    if (settings.textColor === 'white' || settings.textColor === '#ffffff') {
+      return isPersian 
+        ? 'text-gray-800 dark:text-white' 
+        : 'text-gray-700 dark:text-gray-300';
+    }
+    
+    // اگر رنگ سیاه است و در دارک مود هستیم، از رنگ روشن استفاده کن
+    if (settings.textColor === 'black' || settings.textColor === '#000000') {
+      return isPersian 
+        ? 'text-gray-800 dark:text-white' 
+        : 'text-gray-700 dark:text-gray-300';
+    }
+    
+    // در غیر این صورت از رنگ تنظیم شده استفاده کن
+    return '';
+  };
+
   return (
     <>
       {words.map((word, index) => {
@@ -31,13 +53,17 @@ const ClickableText = ({ text, settings, onWordClick }: ClickableTextProps) => {
             key={index}
             onClick={() => isEnglishWord && onWordClick(cleanWord)}
             style={{ 
-              color: settings.textColor,
+              // فقط اگر رنگ سفید یا سیاه نبود، از رنگ تنظیم شده استفاده کن
+              color: (settings.textColor === 'white' || settings.textColor === 'black' || 
+                      settings.textColor === '#ffffff' || settings.textColor === '#000000') 
+                      ? undefined 
+                      : settings.textColor,
               fontSize: '13px',
               cursor: isEnglishWord ? 'pointer' : 'default'
             }}
-            className={`inline-block transition-all duration-200 mx-0.5 ${
+            className={`inline-block transition-all duration-200 mx-0.5 ${getTextColor()} ${
               isEnglishWord 
-                ? 'hover:text-blue-600 dark:hover:text-blue-400 hover:underline' 
+                ? 'hover:text-blue-600 dark:hover:text-blue-400 hover:underline hover:underline-offset-2' 
                 : ''
             }`}
           >
@@ -71,7 +97,8 @@ export default function SubtitleList({
         const elementHeight = activeElement.offsetHeight;
         const containerHeight = container.clientHeight;
         
-        const scrollPosition = elementTop - (containerHeight / 2) + (elementHeight / 2);
+        // قرار دادن در یک‌چهارم بالایی کانتینر
+        const scrollPosition = elementTop - (containerHeight / 8) + (elementHeight / 2);
         
         container.scrollTo({
           top: Math.max(0, scrollPosition),
@@ -84,17 +111,18 @@ export default function SubtitleList({
   return (
     <div 
       ref={subtitlesContainerRef}
-      className="relative w-full bg-white dark:bg-gray-900"
+      className="relative w-full bg-white dark:bg-gray-900 overflow-y-auto"
       style={{ 
-        height: `calc(100vh - ${videoHeight}px)`,
-        overflowY: 'auto'
+        height: `calc(100vh - ${videoHeight}px)`
       }}
     >
       <div className="px-3 py-3 space-y-3">
         {subtitleSettings.mode === "none" && (
-          <span className="text-xs text-orange-600 dark:text-orange-400 px-2 py-1 rounded">
-            زیرنویس غیرفعال
-          </span>
+          <div className="inline-flex items-center px-2 py-1 rounded bg-orange-100 dark:bg-orange-900/30 border border-orange-200 dark:border-orange-800/30">
+            <span className="text-xs text-orange-700 dark:text-orange-400 font-medium">
+              زیرنویس غیرفعال
+            </span>
+          </div>
         )}
       
         {subtitles.length > 0 ? (
@@ -106,40 +134,46 @@ export default function SubtitleList({
                   key={i}
                   ref={isActive ? activeSubtitleRef : null}
                   onClick={() => onSubtitleJump(sub.startTime)}
-                  className={`p-3 rounded-lg cursor-pointer transition-all duration-200 ${
+                  className={`p-3 rounded-lg cursor-pointer transition-all duration-200 border ${
                     isActive 
-                      ? 'bg-blue-50 dark:bg-blue-900/20 border-r-4 border-blue-500' 
-                      : 'hover:bg-gray-50 dark:hover:bg-gray-800/50'
+                      ? 'bg-blue-50 dark:bg-blue-900/20 border-r-4 border-blue-500 dark:border-blue-400 border-l border-t border-b border-gray-200 dark:border-gray-700 shadow-sm' 
+                      : 'border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50 hover:border-gray-300 dark:hover:border-gray-700'
                   }`}
                 >
                   <div className="flex justify-between items-center mb-1.5">
-                    <span className="text-xs text-gray-500 dark:text-gray-400 font-mono">
+                    <span className="text-xs text-gray-600 dark:text-gray-400 font-mono bg-gray-100 dark:bg-gray-800/50 px-2 py-1 rounded">
                       {formatTime(sub.startTime)}
                     </span>
                     {isActive && (
-                      <span className="text-xs text-blue-600 dark:text-blue-400 font-medium">
-                        ● پخش
+                      <span className="inline-flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 font-medium">
+                        <span className="relative flex h-2 w-2">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                        </span>
+                        <span>پخش</span>
                       </span>
                     )}
                   </div>
                   
-                  <p className={`text-sm leading-relaxed mb-1.5 tracking-wide ${isActive ? 'font-medium' : ''}`}>
+                  <div className={`text-sm leading-relaxed mb-1.5 tracking-wide ${isActive ? 'font-medium' : ''}`}>
                     <ClickableText 
                       text={sub.persianText} 
                       settings={subtitleSettings}
                       onWordClick={onWordClick}
+                      isPersian={true}
                     />
-                  </p>
+                  </div>
                   
                   {subtitleSettings.mode === 'both' && sub.englishText && (
-                    <div className="pt-2.5 mt-2.5 border-t border-gray-100 dark:border-gray-800">
-                      <p dir="ltr" className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed tracking-wide">
+                    <div className="pt-2.5 mt-2.5 border-t border-gray-100 dark:border-gray-800/50">
+                      <div dir="ltr" className="text-xs leading-relaxed tracking-wide">
                         <ClickableText 
                           text={sub.englishText} 
                           settings={subtitleSettings}
                           onWordClick={onWordClick}
+                          isPersian={false}
                         />
-                      </p>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -147,9 +181,12 @@ export default function SubtitleList({
             })}
           </div>
         ) : (
-          <div className="text-center py-12">
-            <div className="text-gray-400 dark:text-gray-600 text-sm mb-2">📝</div>
-            <div className="text-gray-500 dark:text-gray-400 text-xs">در حال بارگذاری زیرنویس...</div>
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <div className="text-gray-400 dark:text-gray-600 text-lg mb-2">📝</div>
+            <div className="text-gray-600 dark:text-gray-400 text-sm font-medium">در حال بارگذاری زیرنویس...</div>
+            <div className="text-gray-500 dark:text-gray-500 text-xs mt-1">
+              لطفاً چند لحظه صبر کنید
+            </div>
           </div>
         )}
       </div>
