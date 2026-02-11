@@ -1,44 +1,41 @@
-// app/packages/page.js
+// app/packages/page.tsx
+'use client'
 
-import Link from 'next/link';
-
-export const metadata = {
-  title: 'پکیج‌های اشتراکی',
-  description: 'انتخاب پکیج اشتراکی مناسب بر اساس مدت زمان',
-};
+import { useState } from 'react'
+import PaymentModal from '@/components/PaymentModal'
 
 const packages = [
-    {
-      id: 1,
-      name: 'پکیج یک ماهه',
-      duration: 'یک ماه',
-      price: '۱۹۸,۰۰۰ تومان',
-      originalPrice: '۲۵۰,۰۰۰ تومان',
-      discount: '۲۱٪',
-      popular: false,
-      monthlyPrice: '۱۹۸,۰۰۰ تومان',
-    },
-    {
-      id: 2,
-      name: 'پکیج سه ماهه',
-      duration: 'سه ماه',
-      price: '۵۴۰,۰۰۰ تومان', // 180,000 × 3
-      originalPrice: '۷۵۰,۰۰۰ تومان',
-      discount: '۲۸٪',
-      popular: true,
-      monthlyPrice: '۱۸۰,۰۰۰ تومان', // 540,000 ÷ 3
-    },
-    {
-      id: 3,
-      name: 'پکیج شش ماهه',
-      duration: 'شش ماه',
-      price: '۹۹۰,۰۰۰ تومان', // 165,000 × 6
-      originalPrice: '۱,۵۰۰,۰۰۰ تومان',
-      discount: '۳۴٪',
-      popular: false,
-      monthlyPrice: '۱۶۵,۰۰۰ تومان', // 990,000 ÷ 6
-    },
-  ];
+  {
+    id: 1,
+    name: 'پکیج یک ماهه',
+    duration: 'یک ماه',
+    price: '۱۹۸,۰۰۰ تومان',
+    originalPrice: '۲۵۰,۰۰۰ تومان',
+    discount: '۲۱٪',
+    popular: false,
+    monthlyPrice: '۱۹۸,۰۰۰ تومان',
+  },
+  {
+    id: 2,
+    name: 'پکیج سه ماهه',
+    duration: 'سه ماه',
+    price: '۵۴۰,۰۰۰ تومان',
+    originalPrice: '۷۵۰,۰۰۰ تومان',
+    discount: '۲۸٪',
+    popular: true,
+    monthlyPrice: '۱۸۰,۰۰۰ تومان',
+  },
+  {
+    id: 3,
+    name: 'پکیج شش ماهه',
+    duration: 'شش ماه',
+    price: '۹۹۰,۰۰۰ تومان',
+    originalPrice: '۱,۵۰۰,۰۰۰ تومان',
+    discount: '۳۴٪',
+    popular: false,
+    monthlyPrice: '۱۶۵,۰۰۰ تومان',
+  },
+];
 
 const features = [
   'دسترسی کامل به تمام دوره‌های آموزشی',
@@ -56,27 +53,30 @@ const features = [
   'پلنر حرفه ای و آمار دقیق یادگیری',
   'دسترسی به آپدیت‌های دوره‌ها به صورت رایگان',
   'پشتیبانی تخصصی (پاسخ‌گویی در ۲۴ ساعت کاری)',
-
 ];
 
+// Main Packages Page Component
 export default function PackagesPage() {
-  return (
-    <div className=" text-gray-900 dark:text-white transition-colors duration-300">
-      {/* هدر */}
-      <header className="py-12 px-6 text-center  dark:from-gray-900 dark:to-black">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">
-          پلن‌های اشتراک
-          </h1>
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedPackage, setSelectedPackage] = useState(null);
 
+  const handlePackageSelect = (pkg) => {
+    setSelectedPackage(pkg);
+    setIsModalOpen(true);
+  };
+
+  return (
+    <div className="text-gray-900 dark:text-white transition-colors duration-300">
+      <header className="py-12 px-6 text-center dark:from-gray-900 dark:to-black">
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-4xl md:text-5xl font-bold  bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">
+            پلن‌های اشتراک
+          </h1>
         </div>
       </header>
 
-      {/* بخش پکیج‌ها */}
-      <section className=" py-10 px-6 bg-gray-50 dark:bg-gray-900">
+      <section className="py-10 px-6 bg-gray-50 dark:bg-gray-900">
         <div className="max-w-7xl mx-auto">
-
-
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {packages.map((pkg) => (
               <div
@@ -87,7 +87,6 @@ export default function PackagesPage() {
                     : 'border-gray-300 dark:border-gray-800'
                 } ${pkg.popular ? 'bg-gradient-to-b from-blue-50 to-white dark:from-gray-800 dark:to-black' : 'bg-white dark:bg-gray-800'}`}
               >
-                {/* نشانگر محبوب */}
                 {pkg.popular && (
                   <div className="absolute top-0 right-0 left-0 bg-gradient-to-r from-blue-500 to-purple-500 dark:from-blue-600 dark:to-purple-600 text-white text-center py-1 font-bold text-xs">
                     پرفروش‌ترین
@@ -99,8 +98,7 @@ export default function PackagesPage() {
                     <h3 className="text-2xl font-bold mb-3 text-gray-800 dark:text-white">
                       {pkg.name}
                     </h3>
-                   
-                    {/* مدت زمان */}
+                    
                     <div className="bg-gradient-to-r from-blue-50 to-gray-50 dark:from-gray-800 dark:to-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-4 mb-6">
                       <div className="flex items-center justify-between">
                         <div>
@@ -115,65 +113,59 @@ export default function PackagesPage() {
                       </div>
                     </div>
 
-                    {/* قیمت */}
                     <div className="mb-8 text-center">
-  {/* قیمت اصلی با خط قرمز خورده - بالا و کوچک */}
-  {pkg.originalPrice && (
-    <div className="mb-2">
-      <div className="relative inline-block">
-        <span className="text-gray-400 dark:text-gray-500 line-through text-sm">
-          {pkg.originalPrice}
-        </span>
-        <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-red-400 dark:bg-red-500 transform -translate-y-1/2"></div>
-      </div>
-    </div>
-  )}
-  
-  {/* قیمت فعلی - بزرگ و برجسته */}
-  <div className="flex items-baseline justify-center mb-3">
-    <span className="text-4xl md:text-5xl font-bold text-gray-800 dark:text-white">
-      {pkg.price}
-    </span>
-  </div>
-  
-  {/* قیمت ماهیانه و تخفیف در یک راستا */}
-  <div className="flex flex-wrap items-center justify-center gap-4 mb-4">
-    <div className="text-center">
-      <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">
-        قیمت ماهیانه
-      </div>
-      <div className="text-lg font-semibold text-green-600 dark:text-green-400">
-        {pkg.monthlyPrice}
-      </div>
-    </div>
-    
-    {pkg.discount && (
-      <div className="text-center">
-        <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">
-          صرفه‌جویی
-        </div>
-        <div className="text-sm font-bold text-white bg-gradient-to-r from-amber-500 to-orange-500 px-3 py-1 rounded-full">
-          {pkg.discount}
-        </div>
-      </div>
-    )}
-  </div>
-</div>
+                      {pkg.originalPrice && (
+                        <div className="mb-2">
+                          <div className="relative inline-block">
+                            <span className="text-gray-400 dark:text-gray-500 line-through text-sm">
+                              {pkg.originalPrice}
+                            </span>
+                            <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-red-400 dark:bg-red-500 transform -translate-y-1/2"></div>
+                          </div>
+                        </div>
+                      )}
+                      
+                      <div className="flex items-baseline justify-center mb-3">
+                        <span className="text-4xl md:text-5xl font-bold text-gray-800 dark:text-white">
+                          {pkg.price}
+                        </span>
+                      </div>
+                      
+                      <div className="flex flex-wrap items-center justify-center gap-4 mb-4">
+                        <div className="text-center">
+                          <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                            قیمت ماهیانه
+                          </div>
+                          <div className="text-lg font-semibold text-green-600 dark:text-green-400">
+                            {pkg.monthlyPrice}
+                          </div>
+                        </div>
+                        
+                        {pkg.discount && (
+                          <div className="text-center">
+                            <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                              صرفه‌جویی
+                            </div>
+                            <div className="text-sm font-bold text-white bg-gradient-to-r from-amber-500 to-orange-500 px-3 py-1 rounded-full">
+                              {pkg.discount}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
 
-                    <Link href={`/checkout?package=${pkg.id}`}>
-                      <button
-                        className={`w-full py-4 rounded-xl font-bold text-lg transition-all duration-300 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg shadow-blue-200 dark:shadow-blue-500/30`}
-                      >
-                        {pkg.popular ? 'انتخاب پکیج محبوب' : 'انتخاب این پکیج'}
-                      </button>
-                    </Link>
+                    <button
+                      onClick={() => handlePackageSelect(pkg)}
+                      className={`w-full py-4 rounded-xl font-bold text-lg transition-all duration-300 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg shadow-blue-200 dark:shadow-blue-500/30`}
+                    >
+                      {pkg.popular ? 'انتخاب پکیج محبوب' : 'انتخاب این پکیج'}
+                    </button>
                   </div>
                 </div>
               </div>
             ))}
           </div>
 
-          {/* جدول مقایسه قیمت */}
           <div className="mt-16">
             <h2 className="text-2xl font-bold text-center mb-8 text-gray-800 dark:text-white">
               مقایسه قیمت‌ها
@@ -217,7 +209,6 @@ export default function PackagesPage() {
         </div>
       </section>
 
-      {/* بخش ویژگی‌های مشترک */}
       <section className="py-16 px-6 bg-white dark:bg-black">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
@@ -251,7 +242,6 @@ export default function PackagesPage() {
             ))}
           </div>
 
-          {/* دسته‌بندی ویژگی‌ها */}
           <div className="mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div className="text-center">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-blue-100 to-blue-50 dark:from-blue-900/40 dark:to-blue-900/10 mb-4">
@@ -280,7 +270,7 @@ export default function PackagesPage() {
                 </svg>
               </div>
               <h3 className="text-xl font-bold mb-2 text-gray-800 dark:text-white">پرداخت ایمن</h3>
-              <p className="text-gray-500 dark:text-gray-400">پرداخت‌ها تحت محافظت SSL </p>
+              <p className="text-gray-500 dark:text-gray-400">پرداخت‌ها تحت محافظت SSL</p>
             </div>
 
             <div className="text-center">
@@ -296,7 +286,6 @@ export default function PackagesPage() {
         </div>
       </section>
 
-      {/* سوالات متداول */}
       <section className="py-16 px-6 bg-gray-50 dark:bg-gray-900">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-12 text-gray-800 dark:text-white">
@@ -337,7 +326,6 @@ export default function PackagesPage() {
           </div>
 
           <div className="mt-12 text-center">
-
             <div className="inline-flex items-center bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-purple-900/30 border border-blue-200 dark:border-blue-500/20 rounded-xl px-6 py-4">
               <svg className="w-6 h-6 text-blue-600 dark:text-blue-400 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
@@ -350,57 +338,57 @@ export default function PackagesPage() {
         </div>
       </section>
 
-      {/* اطلاعات تماس */}
       <footer className="py-12 px-6 bg-white dark:bg-black border-t border-gray-200 dark:border-gray-800">
-  <div className="max-w-7xl mx-auto text-center">
-    <div className="text-center py-8">
-      <div className="flex justify-center mb-4">
-        <div className="relative">
-          <div className="w-16 h-16 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/20 dark:to-purple-900/20 flex items-center justify-center">
-            <svg className="w-8 h-8 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
-            </svg>
+        <div className="max-w-7xl mx-auto text-center">
+          <div className="text-center py-8">
+            <div className="flex justify-center mb-4">
+              <div className="relative">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/20 dark:to-purple-900/20 flex items-center justify-center">
+                  <svg className="w-8 h-8 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+                  </svg>
+                </div>
+              </div>
+            </div>
+            
+            <h3 className="text-xl text-gray-500 dark:text-gray-400 mb-2">
+              نیاز به مشاوره دارید؟
+            </h3>
+            
+            <div className="flex flex-col sm:flex-row justify-center gap-4 mb-6 max-w-md mx-auto">
+              <a 
+                href="https://wa.me/989398351743?text=سلام%20👋%0Aدر%20مورد%20پکیج%20های%20اشتراکی%20سوال%20دارم%20لطفا%20راهنمایی%20کنید."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-4 inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl hover:from-green-600 hover:to-green-700 transition-all shadow-md hover:shadow-lg"
+              >
+                <svg className="w-5 h-5 ml-2" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.76.982.998-3.675-.236-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.9 6.994c-.004 5.45-4.438 9.88-9.888 9.88m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.333.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.333 11.893-11.893 0-3.18-1.24-6.162-3.495-8.411" />
+                </svg>
+                واتساپ
+              </a>
+            </div>
+            
+            <div className="mt-6 text-sm text-gray-500 dark:text-gray-400">
+              <p>پاسخ‌گویی ۲۴ ساعته</p>
+
+
+            </div>
+          </div>
+          
+          <div className="mb-8 border-t border-gray-200 dark:border-gray-800 pt-8 mt-8">
+            <p className="text-gray-400 dark:text-gray-500 text-sm">
+              © {new Date().getFullYear()} تمامی حقوق محفوظ است.
+            </p>
           </div>
         </div>
-      </div>
-      
-      <h3 className="text-xl text-gray-500 dark:text-gray-400 mb-2">
-        نیاز به مشاوره دارید؟
-      </h3>
- 
-      
-      <div className="flex flex-col sm:flex-row justify-center gap-4 mb-6 max-w-md mx-auto">
-  
-        
-        {/* دکمه واتساپ - با شماره شما */}
-        <a 
-          href="https://wa.me/989398351743?text=سلام%20👋%0Aدر%20مورد%20پکیج%20های%20اشتراکی%20سوال%20دارم%20لطفا%20راهنمایی%20کنید."
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-4 inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl hover:from-green-600 hover:to-green-700 transition-all shadow-md hover:shadow-lg"
-        >
-          <svg className="w-5 h-5 ml-2" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.76.982.998-3.675-.236-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.9 6.994c-.004 5.45-4.438 9.88-9.888 9.88m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.333.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.333 11.893-11.893 0-3.18-1.24-6.162-3.495-8.411" />
-          </svg>
-          واتساپ
-        </a>
-      </div>
-      
-      <div className="mt-6 text-sm text-gray-500 dark:text-gray-400">
-       <p>پاسخ‌گویی ۲۴ ساعته</p>
-       <p className="mt-4 text-gray-400 dark:text-gray-500 mb-8 max-w-2xl mx-auto">
-        کارشناسان ما از طریق تلفن و واتساپ آماده پاسخگویی به سوالات شما در مورد پکیج‌های اشتراکی هستند
-      </p>
-      </div>
-    </div>
-    
-    <div className="mb-8 border-t border-gray-200 dark:border-gray-800 pt-8 mt-8">
-      <p className="text-gray-400 dark:text-gray-500 text-sm">
-        © {new Date().getFullYear()} تمامی حقوق محفوظ است.
-      </p>
-    </div>
-  </div>
-</footer>
+      </footer>
+
+      <PaymentModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        selectedPackage={selectedPackage}
+      />
     </div>
   );
 }

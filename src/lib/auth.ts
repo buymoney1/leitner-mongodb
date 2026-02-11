@@ -7,6 +7,7 @@ import type { User } from "next-auth";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
+  
   providers: [
     Google({
       clientId: process.env.AUTH_GOOGLE_ID!,
@@ -14,6 +15,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
   secret: process.env.AUTH_SECRET,
+  
+   
+
   
   callbacks: {
     async session({ session, user }) {

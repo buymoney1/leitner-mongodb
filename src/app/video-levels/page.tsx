@@ -487,7 +487,7 @@ export default function VideoLevelsPage() {
           </div>
 
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             <div className="bg-gray-100 dark:bg-gray-800/30 rounded-2xl p-4 border border-gray-300 dark:border-gray-700/50 backdrop-blur-sm text-center">
               <div className="text-2xl font-bold text-cyan-600 dark:text-cyan-400 mb-1">6</div>
               <div className="text-gray-600 dark:text-gray-400 text-sm">سطح مختلف</div>

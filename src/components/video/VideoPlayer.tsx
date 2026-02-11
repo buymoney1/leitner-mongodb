@@ -13,7 +13,7 @@ import VocabularyList from "./VocabularyList";
 import SubtitleList from "../SubtitleList";
 import DictionaryModal from "../DictionaryModal";
 import QuickWordDialog from "./QuickWordDialog";
-import { ArrowLeft, Play, AlertCircle, Home, Film, Volume2, BookOpen, Clock, ChevronDown, ChevronUp, Globe, User, Calendar, Hash, Info } from 'lucide-react';
+import { ArrowLeft, Play, AlertCircle, Home, Film, Volume2, BookOpen, Clock, ChevronDown, ChevronUp, Globe, User, Calendar, Hash, Info, SkipBack, SkipForward } from 'lucide-react';
 import Link from "next/link";
 
 interface VideoPlayerProps {
@@ -244,6 +244,24 @@ export default function VideoPlayer({
     if (playerRef.current) {
       playerRef.current.seekTo(time, 'seconds');
       setPlayerState(prev => ({ ...prev, playing: true }));
+    }
+  };
+
+  // تابع جدید برای رد کردن 10 ثانیه به عقب
+  const handleSkipBackward = () => {
+    if (playerRef.current) {
+      const newTime = Math.max(0, playerState.currentTime - 10);
+      playerRef.current.seekTo(newTime, 'seconds');
+      setPlayerState(prev => ({ ...prev, currentTime: newTime }));
+    }
+  };
+
+  // تابع جدید برای رد کردن 10 ثانیه به جلو
+  const handleSkipForward = () => {
+    if (playerRef.current) {
+      const newTime = Math.min(playerState.duration, playerState.currentTime + 10);
+      playerRef.current.seekTo(newTime, 'seconds');
+      setPlayerState(prev => ({ ...prev, currentTime: newTime }));
     }
   };
 
@@ -524,6 +542,12 @@ export default function VideoPlayer({
                 onWordClick={handleWordClick}
               />
 
+              {/* Skip Buttons Overlay */}
+              <div className={`absolute inset-0 flex items-center justify-between px-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${playerState.showControls ? 'opacity-100' : 'opacity-0'}`}>
+
+
+              </div>
+
               {/* Controls Overlay */}
               <div className={`absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${playerState.showControls ? 'opacity-100' : 'opacity-0'}`}>
                 <PlayerControls
@@ -539,6 +563,8 @@ export default function VideoPlayer({
                   }}
                   onFullScreen={toggleFullScreen}
                   onShowSettings={() => setShowSettings(true)}
+                  onSkipBackward={handleSkipBackward}
+                  onSkipForward={handleSkipForward}
                 />
               </div>
 

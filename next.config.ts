@@ -37,13 +37,12 @@ const withPWA = require('next-pwa')({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-
-
   eslint: {
     ignoreDuringBuilds: true,
   },
 
   images: {
+    
     remotePatterns: [
       {
         protocol: 'https',
@@ -51,7 +50,6 @@ const nextConfig = {
         port: '',
         pathname: '/**',
       },
-  
       {
         protocol: 'http',
         hostname: 'zabanion.ir',
@@ -64,7 +62,26 @@ const nextConfig = {
         port: '',
         pathname: '/**',
       },
-
+      // ✅ اضافه کردن دامنه liara.space برای نمایش تصاویر
+      {
+        protocol: 'https',
+        hostname: 'zabanion.storage.c2.liara.space',
+        port: '',
+        pathname: '/**',
+      },
+      // اضافه کردن دامنه کلی liara.space برای سایر سرویس‌ها
+      {
+        protocol: 'https',
+        hostname: '*.storage.c2.liara.space',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.liara.space',
+        port: '',
+        pathname: '/**',
+      }
     ],
   },
 };
