@@ -1,9 +1,10 @@
 // components/video/SeriesUploadForm.tsx
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import { Upload, Image, FileText, Video, Globe, Plus, Trash2, Calendar, Clock } from 'lucide-react';
+import { Upload, Video, Plus, Trash2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 const videoLevels = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
 
@@ -19,6 +20,7 @@ interface EpisodeFormData {
 }
 
 interface SeasonFormData {
+  id?: string;
   seasonNumber: number;
   title: string;
   description: string;
@@ -26,9 +28,16 @@ interface SeasonFormData {
   episodes: EpisodeFormData[];
 }
 
-export default function SeriesUploadForm() {
+interface SeriesUploadFormProps {
+  seriesId?: string; // اگر وجود داشته باشد، در حالت ویرایش هستیم
+  onSuccess?: () => void;
+}
+
+export default function SeriesUploadForm({ seriesId, onSuccess }: SeriesUploadFormProps) {
   const { data: session, status } = useSession();
+  const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(!!seriesId);
   const [message, setMessage] = useState('');
   
   // اطلاعات اصلی سریال
@@ -64,7 +73,68 @@ export default function SeriesUploadForm() {
   // لغات عمومی سریال
   const [generalVocabText, setGeneralVocabText] = useState('');
 
-  if (status === 'loading') {
+  // بارگذاری اطلاعات سریال در حالت ویرایش
+  useEffect(() => {
+    if (seriesId) {
+      const fetchSeriesData = async () => {
+        setIsLoading(true);
+        try {
+          const response = await fetch(`/api/admin/series/${seriesId}/edit`);
+          if (!response.ok) throw new Error('خطا در دریافت اطلاعات سریال');
+          
+          const data = await response.json();
+          
+          // پر کردن اطلاعات اصلی
+          setTitle(data.title || '');
+          setDescription(data.description || '');
+          setCoverImage(data.coverImage || '');
+          setLevel(data.level || 'A1');
+          setReleaseYear(data.releaseYear || new Date().getFullYear());
+          
+          // پر کردن لغات عمومی
+          if (data.generalVocabularies && data.generalVocabularies.length > 0) {
+            const vocabText = data.generalVocabularies
+              .map((v: any) => `${v.word}|${v.meaning}`)
+              .join('\n');
+            setGeneralVocabText(vocabText);
+          }
+          
+          // پر کردن فصل‌ها و قسمت‌ها
+          if (data.seasons && data.seasons.length > 0) {
+            const formattedSeasons = data.seasons.map((season: any) => ({
+              id: season.id,
+              seasonNumber: season.seasonNumber,
+              title: season.title,
+              description: season.description || '',
+              thumbnailUrl: season.thumbnailUrl || '',
+              episodes: season.episodes.map((episode: any) => ({
+                id: episode.id,
+                episodeNumber: episode.episodeNumber,
+                title: episode.title,
+                videoUrl: episode.videoUrl || '',
+                thumbnailUrl: episode.thumbnailUrl || '',
+                description: episode.description || '',
+                duration: episode.duration || 1200,
+                subtitlesVtt: episode.subtitlesVtt || '',
+                vocabularies: episode.vocabularies || []
+              }))
+            }));
+            setSeasons(formattedSeasons);
+            setTotalSeasons(formattedSeasons.length);
+          }
+        } catch (error) {
+          console.error('Error fetching series:', error);
+          setMessage('❌ خطا در دریافت اطلاعات سریال');
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      
+      fetchSeriesData();
+    }
+  }, [seriesId]);
+
+  if (status === 'loading' || isLoading) {
     return (
       <div className="text-center p-8">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-500 border-t-transparent mx-auto"></div>
@@ -188,7 +258,7 @@ export default function SeriesUploadForm() {
         word: parts[0].trim(),
         meaning: parts[1].trim()
       };
-    }).filter(v => v !== null);
+    }).filter(v => v !== null) as { word: string; meaning: string }[];
     
     updateEpisode(seasonIndex, episodeIndex, 'vocabularies', vocabularies);
   };
@@ -206,11 +276,17 @@ export default function SeriesUploadForm() {
         word: parts[0].trim(),
         meaning: parts[1].trim()
       };
-    }).filter(v => v !== null);
+    }).filter(v => v !== null) as { word: string; meaning: string }[];
 
     try {
-      const response = await fetch('/api/admin/upload-series', {
-        method: 'POST',
+      const url = seriesId 
+        ? `/api/admin/series/${seriesId}/edit` 
+        : '/api/admin/upload-series';
+      
+      const method = seriesId ? 'PUT' : 'POST';
+      
+      const response = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           title,
@@ -229,35 +305,49 @@ export default function SeriesUploadForm() {
       const data = await response.json();
 
       if (response.ok) {
-        setMessage('✅ سریال با موفقیت آپلود شد!');
-        // ریست فرم
-        setTitle('');
-        setDescription('');
-        setCoverImage('');
-        setLevel('A1');
-        setReleaseYear(new Date().getFullYear());
-        setSeasons([{
-          seasonNumber: 1,
-          title: 'فصل ۱',
-          description: '',
-          thumbnailUrl: '',
-          episodes: [{
-            episodeNumber: 1,
-            title: 'قسمت ۱',
-            videoUrl: '',
-            thumbnailUrl: '',
+        setMessage(seriesId ? '✅ سریال با موفقیت ویرایش شد!' : '✅ سریال با موفقیت آپلود شد!');
+        
+        if (!seriesId) {
+          // ریست فرم فقط در حالت آپلود جدید
+          setTitle('');
+          setDescription('');
+          setCoverImage('');
+          setLevel('A1');
+          setReleaseYear(new Date().getFullYear());
+          setSeasons([{
+            seasonNumber: 1,
+            title: 'فصل ۱',
             description: '',
-            duration: 1200,
-            subtitlesVtt: '',
-            vocabularies: []
-          }]
-        }]);
-        setGeneralVocabText('');
+            thumbnailUrl: '',
+            episodes: [{
+              episodeNumber: 1,
+              title: 'قسمت ۱',
+              videoUrl: '',
+              thumbnailUrl: '',
+              description: '',
+              duration: 1200,
+              subtitlesVtt: '',
+              vocabularies: []
+            }]
+          }]);
+          setGeneralVocabText('');
+        }
+        
+        if (onSuccess) {
+          onSuccess();
+        }
+        
+        // ریدایرکت به صفحه سریال در حالت ویرایش
+        if (seriesId) {
+          setTimeout(() => {
+            router.push(`/series/${seriesId}`);
+          }, 2000);
+        }
       } else {
-        setMessage(`❌ خطا: ${data.error || 'خطا در آپلود سریال'}`);
+        setMessage(`❌ خطا: ${data.error || 'خطا در ' + (seriesId ? 'ویرایش' : 'آپلود') + ' سریال'}`);
       }
     } catch (error) {
-      setMessage('❌ خطا در ارتباط با سرور');
+      setMessage(`❌ خطا در ارتباط با سرور`);
       console.error('Upload error:', error);
     } finally {
       setIsSubmitting(false);
@@ -272,8 +362,12 @@ export default function SeriesUploadForm() {
             <Video className="h-6 w-6 text-white" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">آپلود سریال جدید</h2>
-            <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">سریال‌های آموزشی فصل‌بندی شده</p>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              {seriesId ? 'ویرایش سریال' : 'آپلود سریال جدید'}
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">
+              {seriesId ? 'ویرایش اطلاعات سریال' : 'سریال‌های آموزشی فصل‌بندی شده'}
+            </p>
           </div>
         </div>
 
@@ -560,6 +654,7 @@ grammar|گرامر"
                           لغات این قسمت
                         </label>
                         <textarea
+                          defaultValue={episode.vocabularies?.map(v => `${v.word}|${v.meaning}`).join('\n')}
                           onChange={(e) => updateEpisodeVocabulary(seasonIndex, episodeIndex, e.target.value)}
                           className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono text-sm min-h-[80px]"
                           placeholder="word|معنی"
@@ -582,12 +677,12 @@ grammar|گرامر"
               {isSubmitting ? (
                 <>
                   <div className="h-5 w-5 animate-spin rounded-full border-2 border-solid border-white border-t-transparent"></div>
-                  در حال آپلود...
+                  {seriesId ? 'در حال ویرایش...' : 'در حال آپلود...'}
                 </>
               ) : (
                 <>
                   <Upload className="h-5 w-5" />
-                  آپلود سریال
+                  {seriesId ? 'ویرایش سریال' : 'آپلود سریال'}
                 </>
               )}
             </button>

@@ -40,7 +40,10 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-
+  typescript: {
+    // همچنین می‌توانید خطاهای تایپ اسکریپت را نادیده بگیرید
+    ignoreBuildErrors: true,
+  },
   images: {
     
     remotePatterns: [

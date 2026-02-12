@@ -3,7 +3,8 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Play, Star, Target, TrendingUp, Users, Clock, Upload, ChevronLeft, Tv, Film } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Play, Star, Target, TrendingUp, Users, Clock, Upload, ChevronLeft, Tv, Film, Edit } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 
@@ -95,29 +96,15 @@ const videoLevels: VideoLevel[] = [
     wordCount: '۸۰۰۰+ کلمه',
     learners: '۲۰۰+ زبان‌آموز'
   },
-  {
-    level: 'C2',
-    title: 'مسلط',
-    description: 'سطح native',
-    color: 'from-gray-500 to-slate-600',
-    iconColor: 'text-gray-500 dark:text-gray-400',
-    bgColor: 'bg-gray-500/10 dark:bg-gray-500/20',
-    borderColor: 'border-gray-500/20 dark:border-gray-500/30',
-    estimatedTime: '۸+ ماه',
-    wordCount: '۱۶۰۰۰+ کلمه',
-    learners: '۱۰۰+ زبان‌آموز'
-  }
+
 ];
-
-
-
 
 async function fetchVideosByLevel(level: string): Promise<Video[]> {
   try {
     console.log(`📡 Fetching videos for level: ${level}`);
     
     const response = await fetch(`/api/videos/level/${level}?limit=4`, {
-      cache: 'no-store' // اضافه کردن این خط
+      cache: 'no-store'
     });
     
     console.log(`📊 Response status for ${level}:`, response.status);
@@ -181,6 +168,7 @@ function formatDuration(minutes: number | null): string {
 }
 
 export default function VideoLevelsPage() {
+  const router = useRouter();
   const { data: session, status } = useSession();
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -221,6 +209,16 @@ export default function VideoLevelsPage() {
 
     loadVideos();
   }, []);
+
+  const handleEditClick = (e: React.MouseEvent, videoId: string, isSeries: boolean) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (isSeries) {
+      router.push(`/admin/edit-series/${videoId}`);
+    } else {
+      router.push(`/admin/edit-video/${videoId}`);
+    }
+  };
 
   if (status === 'loading' || isLoading) {
     return (
@@ -281,7 +279,6 @@ export default function VideoLevelsPage() {
             </div>
           </div>
 
-          {/* Stats */}
 
 
           {/* Levels Grid با ویدیوهای افقی */}
@@ -348,119 +345,138 @@ export default function VideoLevelsPage() {
                     <div className="relative">
                       <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
                         {videos.map((video) => (
-                          <Link 
-                            key={video.id} 
-                            href={video.isSeries ? `/series/${video.id}` : `/video/${video.id}`}
-                            className="flex-shrink-0 w-72 group"
-                          >
-                            <div className="relative overflow-hidden rounded-xl border border-gray-300 dark:border-gray-700/50 bg-white dark:bg-gray-800/50 transition-all duration-300 group-hover:shadow-lg dark:group-hover:shadow-gray-800/50 group-hover:border-gray-400 dark:group-hover:border-gray-600 h-full">
-                              {/* Thumbnail */}
-                              <div className="relative aspect-video overflow-hidden bg-gradient-to-br from-gray-300 to-gray-400 dark:from-gray-700 dark:to-gray-800">
-                                {video.thumbnailUrl || video.coverImage ? (
-                                  <Image 
-                                    src={video.thumbnailUrl || video.coverImage || ''} 
-                                    alt={video.title}
-                                    width={400}
-                                    height={225}
-                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                    onError={(e) => {
-                                      e.currentTarget.src = '';
-                                      e.currentTarget.parentElement?.classList.add('bg-gradient-to-br', 'from-gray-300', 'to-gray-400', 'dark:from-gray-700', 'dark:to-gray-800');
-                                    }}
-                                  />
-                                ) : (
-                                  <div className="absolute inset-0 flex items-center justify-center">
-                                    <Play className="h-12 w-12 text-gray-500 dark:text-gray-400 group-hover:text-white/70 transition-colors" />
-                                  </div>
-                                )}
-                                
-                                {/* Overlay */}
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                
-                                {/* Play Button */}
-                                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                  <div className="bg-white/20 dark:bg-white/20 backdrop-blur-sm rounded-full p-4 border border-white/30">
-                                    <Play className="h-8 w-8 text-white fill-white" />
-                                  </div>
-                                </div>
-                                
-                                {/* Badges */}
-                                <div className="absolute top-2 left-2 flex flex-col gap-1">
-                                  {/* نوع ویدیو */}
-                                  <div className={`px-2 py-1 rounded text-xs font-bold ${
+                          <div key={video.id} className="flex-shrink-0 w-72 group relative">
+                            {/* دکمه ویرایش - برای ادمین و همه ویدیوها */}
+                            {isAdmin && (
+                              <div className="absolute top-2 left-2 z-20">
+                                <button
+                                  onClick={(e) => handleEditClick(e, video.id, video.isSeries)}
+                                  className={`flex items-center gap-1 px-2 py-1.5 text-white text-xs rounded-lg transition-colors backdrop-blur-sm border border-white/20 shadow-lg ${
                                     video.isSeries 
-                                      ? 'bg-purple-600 text-white' 
-                                      : 'bg-blue-600 text-white'
-                                  }`}>
-                                    {video.isSeries ? 'سریال' : 'فیلم'}
+                                      ? 'bg-purple-600 hover:bg-purple-700' 
+                                      : 'bg-blue-600 hover:bg-blue-700'
+                                  }`}
+                                >
+                                  <Edit className="h-3 w-3" />
+                                  {video.isSeries ? 'ویرایش سریال' : 'ویرایش فیلم'}
+                                </button>
+                              </div>
+                            )}
+                            
+                            {/* لینک اصلی ویدیو */}
+                            <Link 
+                              href={video.isSeries ? `/series/${video.id}` : `/video/${video.id}`}
+                              className="block"
+                            >
+                              <div className="relative overflow-hidden rounded-xl border border-gray-300 dark:border-gray-700/50 bg-white dark:bg-gray-800/50 transition-all duration-300 group-hover:shadow-lg dark:group-hover:shadow-gray-800/50 group-hover:border-gray-400 dark:group-hover:border-gray-600 h-full">
+                                {/* Thumbnail */}
+                                <div className="relative aspect-video overflow-hidden bg-gradient-to-br from-gray-300 to-gray-400 dark:from-gray-700 dark:to-gray-800">
+                                  {video.thumbnailUrl || video.coverImage ? (
+                                    <Image 
+                                      src={video.thumbnailUrl || video.coverImage || ''} 
+                                      alt={video.title}
+                                      width={400}
+                                      height={225}
+                                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                      onError={(e) => {
+                                        e.currentTarget.src = '';
+                                        e.currentTarget.parentElement?.classList.add('bg-gradient-to-br', 'from-gray-300', 'to-gray-400', 'dark:from-gray-700', 'dark:to-gray-800');
+                                      }}
+                                    />
+                                  ) : (
+                                    <div className="absolute inset-0 flex items-center justify-center">
+                                      <Play className="h-12 w-12 text-gray-500 dark:text-gray-400 group-hover:text-white/70 transition-colors" />
+                                    </div>
+                                  )}
+                                  
+                                  {/* Overlay */}
+                                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                  
+                                  {/* Play Button */}
+                                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                    <div className="bg-white/20 dark:bg-white/20 backdrop-blur-sm rounded-full p-4 border border-white/30">
+                                      <Play className="h-8 w-8 text-white fill-white" />
+                                    </div>
                                   </div>
                                   
-                                  {/* Duration badge - فقط برای فیلم‌های تک قسمتی */}
-                                  {!video.isSeries && video.duration && (
-                                    <div className="bg-black/70 text-white text-xs px-2 py-1 rounded">
-                                      {formatDuration(video.duration)}
+                                  {/* Badges */}
+                                  <div className="absolute top-2 left-2 flex flex-col gap-1">
+                                    {/* نوع ویدیو - فقط اگر دکمه ویرایش وجود نداشته باشه یا فاصله داشته باشه */}
+                                    <div className={`px-2 py-1 rounded text-xs font-bold ${
+                                      video.isSeries 
+                                        ? 'bg-purple-600 text-white' 
+                                        : 'bg-blue-600 text-white'
+                                    }`}>
+                                      {video.isSeries ? 'سریال' : 'فیلم'}
+                                    </div>
+                                    
+                                    {/* Duration badge - فقط برای فیلم‌های تک قسمتی */}
+                                    {!video.isSeries && video.duration && (
+                                      <div className="bg-black/70 text-white text-xs px-2 py-1 rounded">
+                                        {formatDuration(video.duration)}
+                                      </div>
+                                    )}
+                                  </div>
+                                  
+                                  {/* Level badge */}
+                                  <div className={`absolute top-2 right-2 ${levelInfo.bgColor} text-white px-2 py-1 rounded text-xs font-semibold`}>
+                                    {video.level}
+                                  </div>
+                                  
+                                  {/* اطلاعات سریال */}
+                                  {video.isSeries && (
+                                    <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded backdrop-blur-sm">
+                                      <div className="flex items-center gap-1">
+                                        <Tv className="h-3 w-3" />
+                                        <span>{video.totalSeasons} فصل</span>
+                                        <span className="mx-1">•</span>
+                                        <span>{video.totalEpisodes} قسمت</span>
+                                      </div>
                                     </div>
                                   )}
                                 </div>
                                 
-                                {/* Level badge */}
-                                <div className={`absolute top-2 right-2 ${levelInfo.bgColor} text-white px-2 py-1 rounded text-xs font-semibold`}>
-                                  {video.level}
-                                </div>
-                                
-                                {/* اطلاعات سریال */}
-                                {video.isSeries && (
-                                  <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded backdrop-blur-sm">
+                                {/* Content */}
+                                <div className="p-4">
+                                  <h3 className="text-sm font-medium text-gray-900 dark:text-white line-clamp-2 mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                                    {video.title}
+                                  </h3>
+                                  
+                                  {/* توضیحات */}
+                                  {video.description && (
+                                    <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-2 mb-2">
+                                      {video.description}
+                                    </p>
+                                  )}
+                                  
+                                  {/* اطلاعات پایین */}
+                                  <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
                                     <div className="flex items-center gap-1">
-                                      <Tv className="h-3 w-3" />
-                                      <span>{video.totalSeasons} فصل</span>
-                                      <span className="mx-1">•</span>
-                                      <span>{video.totalEpisodes} قسمت</span>
+                                      <Clock className="h-3 w-3" />
+                                      <span>
+                                        {new Date(video.createdAt).toLocaleDateString('fa-IR')}
+                                      </span>
+                                    </div>
+                                    
+                                    {/* آیکون نوع */}
+                                    <div className="flex items-center gap-1">
+                                      {video.isSeries ? (
+                                        <>
+                                          <Tv className="h-3 w-3" />
+                                          <span>سریال</span>
+                                        </>
+                                      ) : (
+                                        <>
+                                          <Film className="h-3 w-3" />
+                                          <span>فیلم</span>
+                                        </>
+                                      )}
                                     </div>
                                   </div>
-                                )}
-                              </div>
-                              
-                              {/* Content */}
-                              <div className="p-4">
-                                <h3 className="text-sm font-medium text-gray-900 dark:text-white line-clamp-2 mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                                  {video.title}
-                                </h3>
-                                
-                                {/* توضیحات */}
-                                {video.description && (
-                                  <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-2 mb-2">
-                                    {video.description}
-                                  </p>
-                                )}
-                                
-                                {/* اطلاعات پایین */}
-                                <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-                                  <div className="flex items-center gap-1">
-                                    <Clock className="h-3 w-3" />
-                                    <span>
-                                      {new Date(video.createdAt).toLocaleDateString('fa-IR')}
-                                    </span>
-                                  </div>
-                                  
-                                  {/* آیکون نوع */}
-                                  <div className="flex items-center gap-1">
-                                    {video.isSeries ? (
-                                      <>
-                                        <Tv className="h-3 w-3" />
-                                        <span>سریال</span>
-                                      </>
-                                    ) : (
-                                      <>
-                                        <Film className="h-3 w-3" />
-                                        <span>فیلم</span>
-                                      </>
-                                    )}
-                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          </Link>
+                            </Link>
+                          </div>
                         ))}
                       </div>
                     </div>
@@ -471,41 +487,28 @@ export default function VideoLevelsPage() {
                         هنوز ویدیویی برای این سطح اضافه نشده است
                       </p>
                       {isAdmin && (
-                        <Link 
-                          href="/admin/upload-video"
-                          className="inline-flex items-center gap-2 mt-4 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
-                        >
-                          <Upload className="h-4 w-4" />
-                          اولین ویدیو را اضافه کنید
-                        </Link>
+                        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-4">
+                          <Link 
+                            href="/admin/upload-video"
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-sm rounded-lg transition-colors shadow-md"
+                          >
+                            <Film className="h-4 w-4" />
+                            افزودن فیلم
+                          </Link>
+                          <Link 
+                            href="/admin/upload-series"
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white text-sm rounded-lg transition-colors shadow-md"
+                          >
+                            <Tv className="h-4 w-4" />
+                            افزودن سریال
+                          </Link>
+                        </div>
                       )}
                     </div>
                   )}
                 </div>
               );
             })}
-          </div>
-
-
-          <div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <div className="bg-gray-100 dark:bg-gray-800/30 rounded-2xl p-4 border border-gray-300 dark:border-gray-700/50 backdrop-blur-sm text-center">
-              <div className="text-2xl font-bold text-cyan-600 dark:text-cyan-400 mb-1">6</div>
-              <div className="text-gray-600 dark:text-gray-400 text-sm">سطح مختلف</div>
-            </div>
-            <div className="bg-gray-100 dark:bg-gray-800/30 rounded-2xl p-4 border border-gray-300 dark:border-gray-700/50 backdrop-blur-sm text-center">
-              <div className="text-2xl font-bold text-purple-600 dark:text-purple-400 mb-1">
-                {totalVideos}
-              </div>
-              <div className="text-gray-600 dark:text-gray-400 text-sm">ویدیو آموزشی</div>
-            </div>
-            <div className="bg-gray-100 dark:bg-gray-800/30 rounded-2xl p-4 border border-gray-300 dark:border-gray-700/50 backdrop-blur-sm text-center">
-              <div className="text-2xl font-bold text-green-600 dark:text-green-400 mb-1">1000+</div>
-              <div className="text-gray-600 dark:text-gray-400 text-sm">زبان‌آموز فعال</div>
-            </div>
-            <div className="bg-gray-100 dark:bg-gray-800/30 rounded-2xl p-4 border border-gray-300 dark:border-gray-700/50 backdrop-blur-sm text-center">
-              <div className="text-2xl font-bold text-orange-600 dark:text-orange-400 mb-1">95%</div>
-              <div className="text-gray-600 dark:text-gray-400 text-sm">رضایت‌مندی</div>
-            </div>
           </div>
           
           {/* Footer CTA */}

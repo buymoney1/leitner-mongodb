@@ -1,20 +1,20 @@
-// app/admin/edit-video/[videoId]/page.tsx
+// app/admin/edit-series/[seriesId]/page.tsx
 'use client';
 
-import {  useSession } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import AdminVideoUploadForm from '@/components/video/AdminVideoUploadForm';
+import SeriesUploadForm from '@/components/video/SeriesUploadForm';
 import { use } from 'react';
 
-interface EditVideoPageProps {
+interface EditSeriesPageProps {
   params: Promise<{
-    videoId: string;
+    seriesId: string;
   }>;
 }
 
-export default function EditVideoPage({ params }: EditVideoPageProps) {
+export default function EditSeriesPage({ params }: EditSeriesPageProps) {
   // استفاده از React.use برای unwrap کردن params
-  const { videoId } = use(params);
+  const { seriesId } = use(params);
   const { data: session, status } = useSession();
   const router = useRouter();
 
@@ -35,12 +35,12 @@ export default function EditVideoPage({ params }: EditVideoPageProps) {
   }
 
   const handleSuccess = () => {
-    console.log('Video updated successfully');
+    console.log('Series updated successfully');
   };
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 py-8">
-      <AdminVideoUploadForm videoId={videoId} onSuccess={handleSuccess} />
+      <SeriesUploadForm seriesId={seriesId} onSuccess={handleSuccess} />
     </div>
   );
 }

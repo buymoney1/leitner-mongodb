@@ -1,15 +1,22 @@
 // components/video/AdminVideoUploadForm.tsx
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import { Upload, Image, FileText, Video, Globe } from 'lucide-react';
+import { Upload, Image, FileText, Video, Globe, Edit } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 // لیست سطوح را از enum می‌گیریم تا در منو نمایش دهیم
 const videoLevels = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
 
-export default function AdminVideoUploadForm() {
-  const { data: session, status } = useSession(); 
+interface AdminVideoUploadFormProps {
+  videoId?: string; // اگر وجود داشته باشد، در حالت ویرایش هستیم
+  onSuccess?: () => void;
+}
+
+export default function AdminVideoUploadForm({ videoId, onSuccess }: AdminVideoUploadFormProps) {
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const [title, setTitle] = useState('');
   const [videoUrl, setVideoUrl] = useState('');
   const [thumbnailUrl, setThumbnailUrl] = useState('');
@@ -17,10 +24,49 @@ export default function AdminVideoUploadForm() {
   const [level, setLevel] = useState('A1');
   const [subtitlesText, setSubtitlesText] = useState('');
   const [message, setMessage] = useState('');
-  const [vocabularyText, setVocabularyText] = useState(''); 
+  const [vocabularyText, setVocabularyText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(!!videoId);
 
-  if (status === 'loading') {
+  // بارگذاری اطلاعات ویدیو در حالت ویرایش
+  useEffect(() => {
+    if (videoId) {
+      const fetchVideoData = async () => {
+        setIsLoading(true);
+        try {
+          const response = await fetch(`/api/admin/video/${videoId}/edit`);
+          if (!response.ok) throw new Error('خطا در دریافت اطلاعات ویدیو');
+          
+          const data = await response.json();
+          
+          // پر کردن اطلاعات اصلی
+          setTitle(data.title || '');
+          setVideoUrl(data.videoUrl || '');
+          setThumbnailUrl(data.thumbnailUrl || '');
+          setDescription(data.description || '');
+          setLevel(data.level || 'A1');
+          setSubtitlesText(data.subtitlesVtt || '');
+          
+          // پر کردن لغات
+          if (data.vocabularies && data.vocabularies.length > 0) {
+            const vocabText = data.vocabularies
+              .map((v: any) => `${v.word}|${v.meaning}`)
+              .join('\n');
+            setVocabularyText(vocabText);
+          }
+        } catch (error) {
+          console.error('Error fetching video:', error);
+          setMessage('❌ خطا در دریافت اطلاعات ویدیو');
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      
+      fetchVideoData();
+    }
+  }, [videoId]);
+
+  if (status === 'loading' || isLoading) {
     return (
       <div className="text-center p-8">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-500 border-t-transparent mx-auto"></div>
@@ -57,8 +103,14 @@ export default function AdminVideoUploadForm() {
     }).filter(vocab => vocab !== null);
 
     try {
-      const response = await fetch('/api/admin/upload-video', {
-        method: 'POST',
+      const url = videoId 
+        ? `/api/admin/video/${videoId}/edit` 
+        : '/api/admin/upload-video';
+      
+      const method = videoId ? 'PUT' : 'POST';
+      
+      const response = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           title, 
@@ -74,17 +126,31 @@ export default function AdminVideoUploadForm() {
       const data = await response.json();
 
       if (response.ok) {
-        setMessage('✅ ویدیو با موفقیت آپلود شد!');
-        // ریست فرم
-        setTitle('');
-        setVideoUrl('');
-        setThumbnailUrl('');
-        setDescription('');
-        setLevel('A1'); 
-        setSubtitlesText('');
-        setVocabularyText('');
+        setMessage(videoId ? '✅ ویدیو با موفقیت ویرایش شد!' : '✅ ویدیو با موفقیت آپلود شد!');
+        
+        if (!videoId) {
+          // ریست فرم فقط در حالت آپلود جدید
+          setTitle('');
+          setVideoUrl('');
+          setThumbnailUrl('');
+          setDescription('');
+          setLevel('A1');
+          setSubtitlesText('');
+          setVocabularyText('');
+        }
+        
+        if (onSuccess) {
+          onSuccess();
+        }
+        
+        // ریدایرکت به صفحه ویدیو در حالت ویرایش
+        if (videoId) {
+          setTimeout(() => {
+            router.push(`/video/${videoId}`);
+          }, 2000);
+        }
       } else {
-        setMessage(`❌ خطا: ${data.error || 'خطا در آپلود ویدیو'}`);
+        setMessage(`❌ خطا: ${data.error || 'خطا در ' + (videoId ? 'ویرایش' : 'آپلود') + ' ویدیو'}`);
       }
     } catch (error) {
       setMessage('❌ خطا در ارتباط با سرور');
@@ -98,12 +164,26 @@ export default function AdminVideoUploadForm() {
     <div className="max-w-4xl mx-auto p-4 md:p-6">
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-6 md:p-8">
         <div className="flex items-center gap-3 mb-8">
-          <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600">
-            <Upload className="h-6 w-6 text-white" />
+          <div className={`p-3 rounded-xl bg-gradient-to-br ${
+            videoId 
+              ? 'from-amber-500 to-orange-600' 
+              : 'from-blue-500 to-indigo-600'
+          }`}>
+            {videoId ? (
+              <Edit className="h-6 w-6 text-white" />
+            ) : (
+              <Upload className="h-6 w-6 text-white" />
+            )}
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">آپلود ویدیو جدید</h2>
-            <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">ویدیوهای آموزشی را برای زبان‌آموزان آپلود کنید</p>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              {videoId ? 'ویرایش ویدیو' : 'آپلود ویدیو جدید'}
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">
+              {videoId 
+                ? 'اطلاعات ویدیو را ویرایش کنید' 
+                : 'ویدیوهای آموزشی را برای زبان‌آموزان آپلود کنید'}
+            </p>
           </div>
         </div>
 
@@ -284,17 +364,21 @@ What is your name?
             <button 
               type="submit" 
               disabled={isSubmitting}
-              className="w-full py-4 px-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3 disabled:cursor-not-allowed"
+              className={`w-full py-4 px-6 bg-gradient-to-r ${
+                videoId 
+                  ? 'from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700' 
+                  : 'from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700'
+              } disabled:from-gray-400 disabled:to-gray-500 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3 disabled:cursor-not-allowed`}
             >
               {isSubmitting ? (
                 <>
                   <div className="h-5 w-5 animate-spin rounded-full border-2 border-solid border-white border-t-transparent"></div>
-                  در حال آپلود...
+                  {videoId ? 'در حال ویرایش...' : 'در حال آپلود...'}
                 </>
               ) : (
                 <>
-                  <Upload className="h-5 w-5" />
-                  آپلود ویدیو
+                  {videoId ? <Edit className="h-5 w-5" /> : <Upload className="h-5 w-5" />}
+                  {videoId ? 'ویرایش ویدیو' : 'آپلود ویدیو'}
                 </>
               )}
             </button>
