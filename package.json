@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build --no-lint",
+    "build": "prisma generate && next build --no-lint",
+    "build:liara": "npx prisma generate && next build --no-lint",
     "start": "next start",
     "lint": "next lint"
   },

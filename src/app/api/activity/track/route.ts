@@ -1,6 +1,5 @@
 // app/api/activity/track/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-
 import { prisma } from '@/lib/prisma';
 import { getAuthSession } from '../../../../../lib/server-auth';
 
@@ -65,30 +64,51 @@ export async function POST(req: NextRequest) {
         data: {
           userId: session.user.id,
           date: today,
-          progress: 0
+          progress: 0,
+          videoWatched: false,
+          podcastListened: false,
+          wordsReviewed: false,
+          articleRead: false,
+          songListened: false
         }
       });
     }
 
-    // محاسبه کل زمان هر فعالیت
-    const activitySummary = todayActivities.reduce((acc, act) => {
-      if (!acc[act.activityType]) {
-        acc[act.activityType] = { totalDuration: 0, count: 0 };
+    // تعریف نوع برای خلاصه فعالیت
+    type ActivitySummaryType = {
+      totalDuration: number;
+      count: number;
+    };
+
+    // محاسبه کل زمان هر فعالیت - روش اصلاح شده
+    const activitySummary: Record<string, ActivitySummaryType> = {};
+    
+    todayActivities.forEach((act) => {
+      if (!activitySummary[act.activityType]) {
+        activitySummary[act.activityType] = { totalDuration: 0, count: 0 };
       }
-      acc[act.activityType].totalDuration += act.duration;
-      acc[act.activityType].count++;
-      return acc;
-    }, {} as Record<string, { totalDuration: number; count: number }>);
+      activitySummary[act.activityType].totalDuration += act.duration;
+      activitySummary[act.activityType].count++;
+    });
 
     // آپدیت DailyActivity
-    const updates: any = {};
+    interface DailyActivityUpdates {
+      videoWatched?: boolean;
+      podcastListened?: boolean;
+      wordsReviewed?: boolean;
+      articleRead?: boolean;
+      songListened?: boolean;
+      progress?: number;
+    }
+
+    const updates: DailyActivityUpdates = {};
     const activitiesToMark: string[] = [];
 
     Object.entries(activitySummary).forEach(([type, { totalDuration }]) => {
       if (totalDuration >= 10) {
         switch (type) {
           case 'video':
-            if (!dailyActivity!.videoWatched) {
+            if (!dailyActivity.videoWatched) {
               updates.videoWatched = true;
               activitiesToMark.push(
                 ...todayActivities.filter(a => a.activityType === 'video').map(a => a.id)
@@ -96,7 +116,7 @@ export async function POST(req: NextRequest) {
             }
             break;
           case 'podcast':
-            if (!dailyActivity!.podcastListened) {
+            if (!dailyActivity.podcastListened) {
               updates.podcastListened = true;
               activitiesToMark.push(
                 ...todayActivities.filter(a => a.activityType === 'podcast').map(a => a.id)
@@ -104,7 +124,7 @@ export async function POST(req: NextRequest) {
             }
             break;
           case 'words':
-            if (!dailyActivity!.wordsReviewed) {
+            if (!dailyActivity.wordsReviewed) {
               updates.wordsReviewed = true;
               activitiesToMark.push(
                 ...todayActivities.filter(a => a.activityType === 'words').map(a => a.id)
@@ -112,7 +132,7 @@ export async function POST(req: NextRequest) {
             }
             break;
           case 'article':
-            if (!dailyActivity!.articleRead) {
+            if (!dailyActivity.articleRead) {
               updates.articleRead = true;
               activitiesToMark.push(
                 ...todayActivities.filter(a => a.activityType === 'article').map(a => a.id)
@@ -120,7 +140,7 @@ export async function POST(req: NextRequest) {
             }
             break;
           case 'song':
-            if (!dailyActivity!.songListened) {
+            if (!dailyActivity.songListened) {
               updates.songListened = true;
               activitiesToMark.push(
                 ...todayActivities.filter(a => a.activityType === 'song').map(a => a.id)
@@ -133,11 +153,11 @@ export async function POST(req: NextRequest) {
 
     // محاسبه پیشرفت
     const currentStatus = {
-      video: updates.videoWatched || dailyActivity.videoWatched,
-      podcast: updates.podcastListened || dailyActivity.podcastListened,
-      words: updates.wordsReviewed || dailyActivity.wordsReviewed,
-      article: updates.articleRead || dailyActivity.articleRead,
-      song: updates.songListened || dailyActivity.songListened
+      video: updates.videoWatched !== undefined ? updates.videoWatched : dailyActivity.videoWatched,
+      podcast: updates.podcastListened !== undefined ? updates.podcastListened : dailyActivity.podcastListened,
+      words: updates.wordsReviewed !== undefined ? updates.wordsReviewed : dailyActivity.wordsReviewed,
+      article: updates.articleRead !== undefined ? updates.articleRead : dailyActivity.articleRead,
+      song: updates.songListened !== undefined ? updates.songListened : dailyActivity.songListened
     };
 
     const completedCount = Object.values(currentStatus).filter(Boolean).length;
@@ -164,20 +184,27 @@ export async function POST(req: NextRequest) {
     }
 
     // اگر روز کامل شد
-    if (updates.progress === 100 && !dailyActivity.completedAt) {
+    const finalProgress = updates.progress !== undefined ? updates.progress : dailyActivity.progress;
+    if (finalProgress === 100 && !dailyActivity.completedAt) {
       await prisma.dailyActivity.update({
         where: { id: dailyActivity.id },
         data: { completedAt: new Date() }
       });
     }
 
+    // ساخت شیء نهایی برای پاسخ
+    const updatedDailyActivity = {
+      ...dailyActivity,
+      ...updates
+    };
+
     return NextResponse.json({
       success: true,
       data: {
         activity,
-        dailyActivity: { ...dailyActivity, ...updates },
+        dailyActivity: updatedDailyActivity,
         marked: activitiesToMark.length,
-        progress: updates.progress || dailyActivity.progress
+        progress: finalProgress
       }
     });
 
