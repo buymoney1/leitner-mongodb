@@ -61,7 +61,7 @@ const nextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'zabanion.ir',
+        hostname: 'zabanionapp.ir',
         port: '',
         pathname: '/**',
       },
